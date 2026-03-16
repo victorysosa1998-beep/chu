@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Project | City of Champion Fire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Inter:wght@300;400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #ffffff; }
+        .font-outfit { font-family: 'Outfit', sans-serif; }
+        
+        /* Lightbox Styles */
+        #lightbox {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+        }
+        #lightbox img {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="lightbox" onclick="this.style.display='none'">
+        <img id="lightbox-img" src="" alt="Full View">
+        <div class="absolute top-6 right-6 text-white text-2xl">
+            <i class="fas fa-times"></i>
+        </div>
+    </div>
+
+    <div class="relative h-64 bg-gray-900">
+        <img src="media/construction-site.jpg" alt="Building" class="w-full h-full object-cover opacity-50">
+        <div class="absolute inset-0 flex items-center justify-center">
+            <h1 class="font-outfit text-4xl font-extrabold text-white tracking-tighter">Build With Us</h1>
+        </div>
+        <a href="give.html" class="absolute top-6 left-6 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-6 py-12">
+        <div class="prose prose-lg mb-12">
+            <h2 class="font-outfit text-2xl font-bold text-gray-900 mb-4">Expanding Our Sanctuary</h2>
+            <p class="text-gray-600 leading-relaxed">
+                We are currently embarking on a divine mandate to expand our borders. This building project is more than just bricks and mortar; it is a tabernacle being raised for the harvest of souls and the manifestation of God's fire. 
+            </p>
+            <p class="text-gray-600 mt-4 leading-relaxed font-medium italic">
+                "Except the Lord build the house, they labour in vain that build it." — Psalm 127:1
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-16">
+            <img src="media/building3.jpeg" onclick="openLightbox(this.src)" class="rounded-2xl h-48 w-full object-cover shadow-md cursor-zoom-in hover:opacity-90 transition" alt="Progress 1">
+            <img src="media/building2.jpeg" onclick="openLightbox(this.src)" class="rounded-2xl h-48 w-full object-cover shadow-md cursor-zoom-in hover:opacity-90 transition" alt="Progress 2">
+            <img src="media/building.jpeg" onclick="openLightbox(this.src)" class="rounded-2xl h-48 w-full object-cover shadow-md cursor-zoom-in hover:opacity-90 transition" alt="Progress 3">
+        </div>
+
+        <div class="bg-amber-50 rounded-[2.5rem] p-8 md:p-12 text-center border border-amber-100">
+            <h3 class="font-outfit text-xl font-bold text-amber-900 mb-6 uppercase tracking-widest">Building Fund Account</h3>
+            <div class="bg-white inline-block px-8 py-4 rounded-2xl shadow-sm border border-amber-200">
+                <span class="block text-xs font-bold text-amber-600 mb-1">ACCESS BANK</span>
+                <span class="text-3xl font-mono font-black text-gray-800 tracking-wider">1234567890</span>
+                <p class="text-gray-400 text-sm mt-2">City of Champion Fire (Building)</p>
+            </div>
+            <p class="mt-8 text-amber-800/60 text-sm">Thank you for partnering with the vision.</p>
+        </div>
+    </div>
+
+    <script>
+        function openLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Branches | City of Champion Fire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; }
+        h1, h2, h3, .font-outfit { font-family: 'Outfit', sans-serif; }
+        
+        .branch-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .branch-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <header class="bg-black text-white py-20 px-6 text-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-20">
+            <img src="media/building3.jpeg" alt="background" class="w-full h-full object-cover">
+        </div>
+        <div class="relative z-10">
+            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tighter mb-4">OUR LOCATIONS</h1>
+            <p class="text-red-500 font-bold tracking-[0.2em] uppercase">Find a global home near you</p>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-6 -mt-10 relative z-20">
+        <div class="bg-white p-4 rounded-2xl shadow-xl max-w-2xl mx-auto flex items-center border border-gray-100">
+            <i class="fas fa-search text-gray-400 ml-4"></i>
+            <input type="text" placeholder="Search by city or country..." class="w-full px-4 py-2 outline-none text-gray-700">
+            <button class="bg-red-700 text-white px-6 py-2 rounded-xl font-bold hover:bg-black transition">SEARCH</button>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-6 py-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            
+            <div class="branch-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
+                <div class="h-48 bg-gray-200 relative">
+                    <img src="media/building3.jpeg" class="w-full h-full object-cover" alt="HQ">
+                    <div class="absolute top-4 right-4 bg-red-700 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Global HQ</div>
+                </div>
+                <div class="p-8">
+                    <h3 class="text-2xl font-extrabold mb-1">Champion Cathedral</h3>
+                    <p class="text-gray-400 text-sm mb-6 flex items-center gap-2">
+                        <i class="fas fa-user-tie text-red-700"></i> Lead Pastor: john Doe
+                    </p>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-start gap-4 text-gray-600">
+                            <i class="fas fa-map-marker-alt mt-1 text-red-700"></i>
+                            <p class="text-sm leading-relaxed"> City of Champions, Au Road, <br>
+                            by Auchi Bypass, Uselu N'Ahor,<br>
+                            Benin City.</p>
+                        </div>
+                        <div class="flex items-center gap-4 text-gray-600">
+                            <i class="fas fa-clock text-red-700"></i>
+                            <p class="text-sm">Sundays: 8:00 AM | Wednesdays: 5:00 PM</p>
+                        </div>
+                    </div>
+                    <a href="https://maps.google.com" target="_blank" class="block text-center border-2 border-black text-black font-bold py-3 rounded-xl hover:bg-black hover:text-white transition">
+                        GET DIRECTIONS
+                    </a>
+                </div>
+            </div>
+
+            <div class="branch-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
+                <div class="h-48 bg-gray-200">
+                    <img src="media/building3.jpeg" class="w-full h-full object-cover" alt="Lagos">
+                </div>
+                <div class="p-8">
+                    <h3 class="text-2xl font-extrabold mb-1">Lagos Island Center</h3>
+                    <p class="text-gray-400 text-sm mb-6 flex items-center gap-2">
+                        <i class="fas fa-user-tie text-red-700"></i> Resident Pastor: John Doe
+                    </p>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-start gap-4 text-gray-600">
+                            <i class="fas fa-map-marker-alt mt-1 text-red-700"></i>
+                            <p class="text-sm leading-relaxed">Civic Center, Victoria Island, <br>Lagos State, Nigeria.</p>
+                        </div>
+                        <div class="flex items-center gap-4 text-gray-600">
+                            <i class="fas fa-clock text-red-700"></i>
+                            <p class="text-sm">Sundays: 9:00 AM | Thursdays: 6:00 PM</p>
+                        </div>
+                    </div>
+                    <a href="#" class="block text-center border-2 border-black text-black font-bold py-3 rounded-xl hover:bg-black hover:text-white transition">
+                        GET DIRECTIONS
+                    </a>
+                </div>
+            </div>
+
+            <div class="branch-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
+                <div class="h-48 bg-gray-200">
+                    <img src="media/building3.jpeg" class="w-full h-full object-cover" alt="Abuja">
+                </div>
+                <div class="p-8">
+                    <h3 class="text-2xl font-extrabold mb-1">Abuja City Church</h3>
+                    <p class="text-gray-400 text-sm mb-6 flex items-center gap-2">
+                        <i class="fas fa-user-tie text-red-700"></i> Resident Pastor: Jane Smith
+                    </p>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-start gap-4 text-gray-600">
+                            <i class="fas fa-map-marker-alt mt-1 text-red-700"></i>
+                            <p class="text-sm leading-relaxed">Transcorp Hilton, Maitama, <br>Abuja, FCT, Nigeria.</p>
+                        </div>
+                        <div class="flex items-center gap-4 text-gray-600">
+                            <i class="fas fa-clock text-red-700"></i>
+                            <p class="text-sm">Sundays: 7:30 AM & 10:00 AM</p>
+                        </div>
+                    </div>
+                    <a href="#" class="block text-center border-2 border-black text-black font-bold py-3 rounded-xl hover:bg-black hover:text-white transition">
+                        GET DIRECTIONS
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <section class="bg-gray-100 py-20 px-6">
+        <div class="container mx-auto max-w-4xl text-center">
+            <h2 class="text-4xl font-extrabold tracking-tight mb-6">Can't find a branch near you?</h2>
+            <p class="text-xl text-gray-600 mb-10 italic">Join thousands of people globally in our online campus and experience the fire from anywhere in the world.</p>
+            <button class="bg-black text-white px-10 py-4 rounded-2xl font-extrabold hover:bg-red-700 transition transform hover:-translate-y-1">
+                JOIN ONLINE CAMPUS
+            </button>
+        </div>
+    </section>
+
+    <footer class="py-12 border-t border-gray-200">
+        <div class="text-center text-gray-400 text-sm font-bold tracking-widest uppercase">
+            © 2026 City of Champion Fire. All Rights Reserved.
+        </div>
+    </footer>
+
+</body>
+</html>

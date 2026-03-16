@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testimonies | City of Champion Fire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
+        h1, h2, h3, .font-outfit { font-family: 'Outfit', sans-serif; }
+        
+        .testimony-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        .testimony-card:hover {
+            transform: translateY(-5px);
+            border-left: 4px solid #b91c1c;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="church.html" class="text-red-700 font-bold flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> BACK TO HOME
+            </a>
+            <h1 class="text-xl font-extrabold uppercase tracking-tighter">Share Your Victory</h1>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-6 py-12 max-w-6xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
+            <div class="lg:col-span-1">
+                <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 sticky top-24">
+                    <h2 class="text-2xl font-bold mb-2">Post Testimony</h2>
+                    <p class="text-gray-500 text-sm mb-6">Let the world hear what God has done for you.</p>
+                    
+                    <form id="testimonyForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Full Name</label>
+                            <input type="text" id="userName" required placeholder="Enter your name" 
+                                class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-red-700 focus:ring-0 transition outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Your Story</label>
+                            <textarea id="userTestimony" required rows="5" placeholder="What is your testimony?" 
+                                class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-red-700 focus:ring-0 transition outline-none resize-none"></textarea>
+                        </div>
+                        <button type="submit" id="submitBtn" class="w-full bg-red-700 text-white font-bold py-4 rounded-xl hover:bg-black transition shadow-lg flex items-center justify-center gap-2">
+                            <span>SHARE TESTIMONY</span>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-3xl font-extrabold tracking-tight">Recent Testimonies</h2>
+                    <span id="count" class="bg-red-100 text-red-700 px-4 py-1 rounded-full text-xs font-bold uppercase">Loading...</span>
+                </div>
+
+                <div id="testimoniesList" class="space-y-6">
+                    <div class="animate-pulse flex space-x-4">
+                        <div class="flex-1 space-y-4 py-1">
+                            <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                            <div class="space-y-2">
+                                <div class="h-4 bg-gray-200 rounded"></div>
+                                <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // TODO: Replace with your actual project config
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const colRef = collection(db, 'testimonies');
+
+        // ELEMENTS
+        const testimonyForm = document.getElementById('testimonyForm');
+        const testimoniesList = document.getElementById('testimoniesList');
+        const countBadge = document.getElementById('count');
+
+        // 1. SAVING & POSTING
+        testimonyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> POSTING...';
+
+            try {
+                await addDoc(colRef, {
+                    name: document.getElementById('userName').value,
+                    content: document.getElementById('userTestimony').value,
+                    createdAt: serverTimestamp()
+                });
+                
+                testimonyForm.reset();
+                alert("Testimony shared successfully! To God be the glory.");
+            } catch (err) {
+                console.error("Error adding document: ", err);
+                alert("Something went wrong. Please try again.");
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>SHARE TESTIMONY</span> <i class="fas fa-paper-plane"></i>';
+        });
+
+        // 2. UPDATING (Real-time Fetching)
+        const q = query(colRef, orderBy('createdAt', 'desc'));
+        
+        onSnapshot(q, (snapshot) => {
+            let html = '';
+            snapshot.docs.forEach(doc => {
+                const data = doc.data();
+                const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : 'Just now';
+                
+                html += `
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 testimony-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-900">${data.name}</h3>
+                                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">${date}</p>
+                            </div>
+                            <div class="text-red-700 opacity-20 text-3xl">
+                                <i class="fas fa-quote-right"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 leading-relaxed italic">"${data.content}"</p>
+                    </div>
+                `;
+            });
+            
+            testimoniesList.innerHTML = html || '<p class="text-center text-gray-400 py-10">No testimonies yet. Be the first to share!</p>';
+            countBadge.innerText = `${snapshot.size} STORIES`;
+        });
+    </script>
+</body>
+</html>

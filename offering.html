@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offering | City of Champion Fire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Inter:wght@300;400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+        .font-outfit { font-family: 'Outfit', sans-serif; }
+        .copy-card:active { transform: scale(0.98); }
+    </style>
+</head>
+<body class="min-height-screen flex items-center justify-center py-12 px-6">
+    <div class="max-w-md w-full text-center">
+        <a href="give.html" class="inline-flex items-center text-gray-400 hover:text-red-700 mb-8 transition">
+            <i class="fas fa-arrow-left mr-2 text-sm"></i> Back
+        </a>
+        
+        <div class="mb-10">
+            <div class="w-20 h-20 bg-red-100 text-red-700 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-6">
+                <i class="fas fa-hand-holding-heart"></i>
+            </div>
+            <h1 class="font-outfit text-3xl font-extrabold text-gray-900">Tithe & Offering</h1>
+            <p class="text-gray-500 mt-2">Tap an account number to copy it</p>
+        </div>
+
+        <div onclick="copyToClipboard('0123456789', 'acct1')" class="copy-card bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 mb-4 cursor-pointer hover:border-red-200 transition-all text-left relative overflow-hidden">
+            <span class="text-xs font-bold text-red-600 uppercase tracking-widest">GT Bank</span>
+            <div class="flex justify-between items-center mt-1">
+                <span id="acct1" class="text-2xl font-mono font-bold text-gray-800">0123456789</span>
+                <i class="far fa-copy text-gray-300"></i>
+            </div>
+            <p class="text-gray-400 text-sm mt-1">City of Champion Fire Int'l</p>
+        </div>
+
+        <div onclick="copyToClipboard('9876543210', 'acct2')" class="copy-card bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 mb-4 cursor-pointer hover:border-red-200 transition-all text-left relative overflow-hidden">
+            <span class="text-xs font-bold text-red-600 uppercase tracking-widest">Zenith Bank</span>
+            <div class="flex justify-between items-center mt-1">
+                <span id="acct2" class="text-2xl font-mono font-bold text-gray-800">9876543210</span>
+                <i class="far fa-copy text-gray-300"></i>
+            </div>
+            <p class="text-gray-400 text-sm mt-1">City of Champion Fire Int'l</p>
+        </div>
+
+        <div onclick="copyToClipboard('1122334455', 'acct3')" class="copy-card bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 mb-4 cursor-pointer hover:border-red-200 transition-all text-left relative overflow-hidden">
+            <span class="text-xs font-bold text-red-600 uppercase tracking-widest">Access Bank</span>
+            <div class="flex justify-between items-center mt-1">
+                <span id="acct3" class="text-2xl font-mono font-bold text-gray-800">1122334455</span>
+                <i class="far fa-copy text-gray-300"></i>
+            </div>
+            <p class="text-gray-400 text-sm mt-1">City of Champion Fire Int'l</p>
+        </div>
+
+        <div onclick="copyToClipboard('2233445566', 'acct4')" class="copy-card bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 mb-8 cursor-pointer hover:border-red-200 transition-all text-left relative overflow-hidden">
+            <span class="text-xs font-bold text-red-600 uppercase tracking-widest">UBA</span>
+            <div class="flex justify-between items-center mt-1">
+                <span id="acct4" class="text-2xl font-mono font-bold text-gray-800">2233445566</span>
+                <i class="far fa-copy text-gray-300"></i>
+            </div>
+            <p class="text-gray-400 text-sm mt-1">City of Champion Fire Int'l</p>
+        </div>
+
+        <p class="text-xs text-gray-400 px-6 italic">"God loves a cheerful giver."</p>
+    </div>
+
+    <script>
+        function copyToClipboard(text, id) {
+            navigator.clipboard.writeText(text);
+            const el = document.getElementById(id);
+            const originalText = el.innerText;
+            el.innerText = "COPIED!";
+            el.style.color = "#b91c1c";
+            setTimeout(() => {
+                el.innerText = originalText;
+                el.style.color = "#1f2937";
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

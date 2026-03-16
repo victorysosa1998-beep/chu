@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City of Champion Fire International Assembly | Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Updated Typography for a "cooler" look */
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; scroll-behavior: smooth; letter-spacing: -0.01em; }
+        h1, h2, h3, h4, .nav-font { font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; }
+        
+        /* Entrance Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Glassmorphism Navbar */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Video Background Container */
+        .hero-video-container {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #bg-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(139,0,0,0.6));
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            color: white;
+        }
+
+        /* Hover Reveal Card Logic */
+        .service-card {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            cursor: pointer;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .service-card-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transform: scale(1.1);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .service-card:hover .service-card-img {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .service-card:hover .card-text, 
+        .service-card:hover i {
+            color: white !important;
+            text-shadow: 0px 4px 10px rgba(0,0,0,0.9);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Mobile Drawer */
+        #mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.4s ease-in-out;
+        }
+        #mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        .accent-gold { color: #D4AF37; }
+        .bg-navy { background-color: #d8e1ea; }
+
+        /* Floating Breathing WhatsApp Icon */
+        .whatsapp-float-container {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .whatsapp-text {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 13px;
+            color: #4b5563;
+            white-space: nowrap;
+            border: 1px solid #e5e7eb;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .whatsapp-text b {
+            color: #000;
+            font-weight: 800;
+        }
+
+        .whatsapp-float {
+            background-color: #25d366;
+            color: white;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: breathe 2s infinite;
+            border: none;
+            cursor: pointer;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+
+        /* WhatsApp Popup Menu */
+        #whatsapp-popup {
+            position: fixed;
+            bottom: 95px;
+            right: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 1001;
+            width: 180px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        #whatsapp-popup.show {
+            display: flex;
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .wa-option {
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+            color: #374151;
+        }
+
+        .wa-option:hover {
+            background: #f3f4f6;
+        }
+
+        /* Updated Banner Slider Styles */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            min-height: 400px;
+            overflow: hidden;
+            background: #fff;
+        }
+        
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            background-size: contain;
+            background-position: center top;
+            background-repeat: no-repeat;
+            transform: translateX(-100%);
+        }
+
+        .slide.active { 
+            opacity: 1; 
+            visibility: visible;
+            transform: translateX(0);
+        }
+        
+        .slide.exit {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        /* Cool Extras */
+        .shimmer-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+            display: block;
+        }
+        .shimmer-btn:hover::after {
+            left: 120%;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(to right, #ffffff, #D4AF37, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 4s linear infinite;
+        }
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        .img-grounded {
+            animation: none;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-truncate {
+                display: -webkit-box;
+                -webkit-line-clamp: 6; 
+                -webkit-box-orient: vertical;  
+                overflow: hidden;
+            }
+            .mobile-truncate.expanded {
+                display: block;
+                -webkit-line-clamp: unset;
+            }
+            /* FIXED: Re-enabling the text on mobile */
+            .whatsapp-text {
+                display: block; 
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+        }
+
+        /* New Address Footer Style */
+        .footer-address-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+        .footer-address-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: #b91c1c; /* red-700 */
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+
+    <div id="whatsapp-popup">
+        <a href="https://wa.me/YOUR_NUMBER" target="_blank" class="wa-option">
+            <i class="fab fa-whatsapp text-green-500 text-lg"></i> Chat with Us
+        </a>
+        <a href="portal.html" class="wa-option border-t">
+            <i class="fas fa-file-alt text-red-700 text-lg"></i> Access File
+        </a>
+    </div>
+
+    <div class="whatsapp-float-container">
+        <span class="whatsapp-text">Need help? <b>Chat</b></span>
+        <button onclick="toggleWAPopup(event)" class="whatsapp-float">
+            <i class="fab fa-whatsapp"></i>
+        </button>
+    </div>
+
+    <div id="mobile-menu" class="fixed inset-0 bg-white z-[100] p-8 flex flex-col items-center justify-center space-y-8 lg:hidden">
+        <button onclick="toggleMenu()" class="absolute top-8 right-8 text-3xl"><i class="fas fa-times"></i></button>
+        <a href="#home" onclick="toggleMenu()" class="text-2xl font-bold hover:text-red-700">Home</a>
+        <a href="#about" onclick="toggleMenu()" class="text-2xl font-bold hover:text-red-700">About Us</a>
+        <a href="testimonies.html" onclick="toggleMenu()" class="text-2xl font-bold hover:text-red-700">Testimonies</a>
+        <a href="#contact" onclick="toggleMenu()" class="text-2xl font-bold hover:text-red-700">Contact</a>
+        <div class="flex flex-col w-full space-y-4 pt-8 border-t">
+            <a href="#" class="bg-red-700 text-white text-center py-4 rounded-xl flex items-center justify-center gap-2">
+                <i class="fas fa-video"></i> WATCH LIVE
+            </a>
+            <a href="give.html" class="bg-amber-500 text-white text-center py-4 rounded-xl flex items-center justify-center gap-2 font-bold">
+                <i class="fas fa-coins"></i> GIVE ONLINE
+            </a>
+        </div>
+    </div>
+
+    <nav class="glass-nav sticky top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <a href="#home" class="flex items-center gap-2 group">
+                    <img src="media/logos.png" alt="City of Champion Fire Logo" class="h-12 md:h-20 w-auto transition-transform group-hover:scale-105">
+                </a>
+            </div>
+
+            <div class="hidden lg:flex items-center space-x-10 nav-font font-bold uppercase text-[11px] tracking-widest">
+                <a href="#home" class="hover:text-red-700 transition relative after:content-[''] after:absolute after:w-0 after:h-[2px] after:bg-red-700 after:left-0 after:-bottom-1 hover:after:w-full after:transition-all">Home</a>
+                <a href="#about" class="hover:text-red-700 transition">About Us</a>
+                <a href="#contact" class="hover:text-red-700 transition">Contact</a>
+                <a href="#" class="flex items-center gap-2 bg-red-700 text-white px-5 py-3 rounded-full hover:bg-black transition shadow-lg shimmer-btn">
+                    <i class="fas fa-video"></i> LIVE
+                </a>
+                <a href="give.html" class="flex items-center gap-2 bg-white border-2 border-gray-100 text-gray-800 px-5 py-3 rounded-full hover:bg-gray-50 transition shadow-sm">
+                    <i class="fas fa-coins text-amber-500"></i> GIVE
+                </a>
+            </div>
+
+            <div class="flex lg:hidden items-center gap-3">
+                <a href="give.html" class="flex items-center gap-2 bg-white border-2 border-gray-100 text-gray-800 px-4 py-2 rounded-full shadow-sm text-[11px] font-bold">
+                    <i class="fas fa-coins text-amber-500"></i> <span>GIVE</span>
+                </a>
+                <button onclick="toggleMenu()" class="text-2xl ml-1 text-gray-800"><i class="fas fa-bars-staggered"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero-video-container">
+        <video autoplay muted loop playsinline id="bg-video">
+            <source src="media/bgvideo1.mp4" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+        <div class="hero-content px-4 reveal active">
+            <span class="uppercase tracking-[10px] text-xs opacity-80 mb-4 block font-semibold">International Worship Center</span>
+            <h1 class="text-4xl md:text-8xl font-extrabold mb-6 tracking-tighter drop-shadow-2xl">Restoring Human <br><span class="accent-gold uppercase gradient-text">Destiny & Dignity</span></h1>
+            <p class="text-base md:text-2xl mb-10 font-light max-w-2xl mx-auto leading-relaxed opacity-90">God is in this place (Genesis 28:16).</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="branches.html" class="bg-transparent border-2 border-white/30 backdrop-blur-sm hover:bg-white hover:text-black px-7 py-3 rounded-full text-sm font-bold transition">Find our branches</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-24 bg-white overflow-hidden">
+        <div class="container mx-auto px-6 reveal">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                <div class="lg:w-1/2 relative flex justify-center items-center reveal">
+                    <div class="relative w-full max-w-xl img-grounded border-4 border-gray-100 rounded-[2rem] shadow-2xl bg-navy p-6 flex items-center justify-center">
+                        <img src="media/o1-removebg-preview.png" alt="Pastor" class="w-full h-auto max-h-[550px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
+                        </div>
+                </div>
+
+                <div class="lg:w-1/2 reveal">
+                    <h4 class="text-red-700 font-extrabold uppercase tracking-widest mb-4 text-sm">Establishing Champions</h4>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">About City of Champion Fire</h2>
+                    
+                    <div id="about-text-container" class="mobile-truncate md:block">
+                        <p class="text-gray-600 mb-6 text-lg leading-relaxed font-light">
+                          Welcome to the official website of City of Champions International Assembly. It is always a joy to connect with you and welcome you into our church family.
+
+    City of Champions International Assembly is a dynamic, people-focused ministry committed to restoring human destiny and dignity through the transforming power of God. We are passionate about teaching the Word of God with clarity, simplicity, and power so that lives can be changed and purpose can be discovered.
+                        </p>
+
+                        <p class="text-gray-600 mb-10 text-lg leading-relaxed font-light">
+                            Under the leadership of our Senior Pastor, the ministry continues to witness lives being transformed, hope restored, and faith strengthened. Our mission is to raise a generation of champions who will impact and dominate their world through the fire and power of the Holy Spirit.
+
+    We invite you to take a step of faith and discover all that God has prepared for you. We believe that when you walk with God, your life cannot remain the same
+                            
+                        </p>
+                    </div>
+
+                    <a href="javascript:void(0)" onclick="readFullStory(this)" id="read-story-btn" class="group inline-flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-xl hover:bg-red-700 transition font-bold shadow-xl md:hidden">
+                        READ OUR FULL STORY <i class="fas fa-arrow-right group-hover:translate-x-2 transition"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 bg-gray-50 reveal">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-4xl font-extrabold text-gray-800 uppercase tracking-tighter">Weekly Experiences</h2>
+                <div class="w-24 h-1.5 bg-red-700 mx-auto mt-4 rounded-full"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <a href="/sunday-service" class="service-card reveal bg-white rounded-3xl group shadow-sm">
+                    <img src="media/worship.jpeg" class="service-card-img" alt="Sunday">
+                    <i class="fa-solid fa-church text-5xl text-red-700 mb-6 transition-all group-hover:scale-110"></i>
+                    <h3 class="card-text text-2xl font-bold mb-2">Sunday Worship</h3>
+                    <p class="card-text text-gray-500 font-medium tracking-widest text-sm">6:30 AM | 9:00 AM</p>
+                </a>
+                <a href="/healing-service" class="service-card reveal bg-white rounded-3xl group shadow-sm" style="transition-delay: 100ms;">
+                    <img src="media/healing.jpeg" class="service-card-img" alt="Healing">
+                    <i class="fa-solid fa-fire text-5xl text-red-700 mb-6 transition-all group-hover:scale-110"></i>
+                    <h3 class="card-text text-2xl font-bold mb-2">Healing & Deliverance</h3>
+                    <p class="card-text text-gray-500 font-medium tracking-widest text-sm">Tuesday: 9:30 AM</p>
+                </a>
+                <a href="/communion-service" class="service-card reveal bg-white rounded-3xl group shadow-sm" style="transition-delay: 200ms;">
+                    <img src="media/uu.jpeg" class="service-card-img" alt="Communion">
+                    <i class="fa-solid fa-dove text-5xl text-red-700 mb-6 transition-all group-hover:scale-110"></i>
+                    <h3 class="card-text text-2xl font-bold mb-2">Power Communion</h3>
+                    <p class="card-text text-gray-500 font-medium tracking-widest text-sm">Wednesday: 5:30 PM</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div class="md:hidden py-10 bg-white text-center reveal">
+        <h2 class="text-3xl font-extrabold text-gray-900 uppercase tracking-tighter">Upcoming Programs</h2>
+        <div class="w-16 h-1 bg-red-700 mx-auto mt-3"></div>
+    </div>
+
+    <section class="reveal">
+        <div class="slider-container md:hidden reveal" id="banner-slider">
+            <div class="slide active" style="background-image: url('media/banner.jpeg');"></div>
+            <div class="slide" style="background-image: url('media/banner1.jpeg');"></div>
+            <div class="slide" style="background-image: url('media/banner2.jpeg');"></div>
+            <div class="slide" style="background-image: url('media/banner3.jpeg');"></div>
+            <div class="slide" style="background-image: url('media/banner4.jpeg');"></div>
+            <div class="slide" style="background-image: url('media/banner5.jpeg');"></div>
+        </div>
+
+        <div class="md:hidden w-full bg-zinc-900 py-10 px-6 text-center reveal">
+            <h4 class="text-red-700 font-bold uppercase tracking-widest mb-4 text-xs">Live Stream</h4>
+            <h2 class="text-white text-3xl font-extrabold mb-6 uppercase tracking-widest">Experience the Power</h2>
+            <div class="relative w-full aspect-video mb-6 rounded-xl overflow-hidden shadow-2xl">
+                 <video id="replay-video-mobile" playsinline controls loop class="w-full h-full object-cover">
+                    <source src="media/vidpreach.mp4" type="video/mp4">
+                </video>
+                <div id="video-play-overlay-mobile" class="absolute inset-0 flex items-center justify-center bg-black/20">
+                     <button onclick="playMobileVideo()" class="w-16 h-16 bg-red-700 rounded-full flex items-center justify-center text-white text-xl hover:bg-white hover:text-red-700 transition-all shadow-2xl">
+                        <i class="fas fa-play ml-1"></i>
+                    </button>
+                </div>
+            </div>
+            <p class="text-gray-400 text-sm mb-6 leading-relaxed font-light">Join us today at City of Champions International Assembly for a life-transforming encounter. Come and experience heartfelt worship, the powerful Word of God, and a community that is passionate about seeing lives changed.</p>
+        </div>
+
+        <div class="hidden md:flex relative w-full h-[600px] overflow-hidden bg-black flex-row items-stretch reveal">
+            <div class="w-1/2 relative reveal">
+                <video id="replay-video" playsinline controls loop class="absolute inset-0 w-full h-full object-cover opacity-80">
+                    <source src="media/vidpreach.mp4" type="video/mp4">
+                </video>
+                <div id="video-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/20">
+                     <button onclick="playMainVideo()" class="play-button-outer w-20 h-20 bg-red-700 rounded-full flex items-center justify-center text-white text-2xl hover:bg-white hover:text-red-700 transition-all duration-500 shadow-2xl">
+                        <i class="fas fa-play ml-1"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="w-1/2 flex flex-col justify-center px-16 bg-zinc-900 reveal">
+                <h4 class="text-red-700 font-extrabold uppercase tracking-widest mb-4 text-sm">Live Stream</h4>
+                <h2 class="text-white text-5xl font-extrabold mb-8 uppercase tracking-widest leading-tight">Experience <br>the Power</h2>
+                <p class="text-gray-400 text-lg mb-8 leading-relaxed font-light">Join us today at City of Champions International Assembly for a life-transforming encounter. Come and experience heartfelt worship, the powerful Word of God, and a community that is passionate about seeing lives changed.</p>
+                <a href="javascript:void(0)" onclick="playMainVideo()" class="inline-block border-2 border-red-700 text-red-700 px-8 py-3 rounded-full font-bold hover:bg-red-700 hover:text-white transition w-max">WATCH REPLAY</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact" class="bg-gray-950 text-white py-20 mt-0 reveal">
+        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-16 reveal">
+            <div class="reveal">
+                <h3 class="text-xl font-bold mb-8 uppercase tracking-widest text-red-700">Find Us</h3>
+                <div class="footer-address-card flex items-start gap-4">
+                    <div class="bg-red-700/20 p-3 rounded-lg">
+                        <i class="fas fa-location-dot text-red-700 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="opacity-80 leading-relaxed text-md font-medium">
+                            City of Champions, Au Road, <br>
+                            by Auchi Bypass, Uselu N'Ahor,<br>
+                            Benin City.
+                        </p>
+                        <p class="text-red-700 text-xs font-bold uppercase mt-2 tracking-widest">International Worship Center</p>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal">
+                <h3 class="text-xl font-bold mb-8 uppercase tracking-widest text-red-700">Contact Details</h3>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4">
+                        <div class="bg-red-700/20 p-3 rounded-lg">
+                            <i class="fas fa-phone text-red-700"></i>
+                        </div>
+                        <a href="tel:+2340000000000" class="opacity-80 hover:opacity-100 transition">+234 000 000 0000</a>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="bg-red-700/20 p-3 rounded-lg">
+                            <i class="fas fa-envelope text-red-700"></i>
+                        </div>
+                        <a href="mailto:info@cityofchampions.com" class="opacity-80 hover:opacity-100 transition">info@cityofchampions.com</a>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal">
+                <h3 class="text-xl font-bold mb-8 uppercase tracking-widest text-red-700">Connect</h3>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-3xl hover:text-red-500 transition opacity-80 hover:opacity-100"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" class="text-3xl hover:text-red-500 transition opacity-80 hover:opacity-100"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" class="text-3xl hover:text-red-500 transition opacity-80 hover:opacity-100"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-white/5 mt-20 pt-10 text-center opacity-40 text-sm tracking-widest">
+            &copy; 2026 City of Champion Fire International Assembly.
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('open');
+        }
+
+        // WhatsApp Popup Logic
+        function toggleWAPopup(event) {
+            event.stopPropagation();
+            const popup = document.getElementById('whatsapp-popup');
+            popup.classList.toggle('show');
+        }
+
+        // Close popup when clicking outside
+        window.onclick = function(event) {
+            const popup = document.getElementById('whatsapp-popup');
+            if (popup.classList.contains('show')) {
+                popup.classList.remove('show');
+            }
+        }
+
+        function readFullStory(btn) {
+            const container = document.getElementById('about-text-container');
+            container.classList.add('expanded');
+            btn.style.display = 'none';
+        }
+
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+
+        function playMainVideo() {
+            const video = document.getElementById('replay-video');
+            const overlay = document.getElementById('video-play-overlay');
+            if(video) {
+                video.play();
+                overlay.style.display = 'none';
+            }
+        }
+
+        function playMobileVideo() {
+            const video = document.getElementById('replay-video-mobile');
+            const overlay = document.getElementById('video-play-overlay-mobile');
+            if(video) {
+                video.play();
+                overlay.style.display = 'none';
+            }
+        }
+
+        // FIXED: Mobile Autoplay Persistence Logic
+        const bgVideo = document.getElementById('bg-video');
+        if (bgVideo) {
+            // Force play on first user interaction to bypass browser restrictions
+            document.body.addEventListener('touchstart', function() {
+                if (bgVideo.paused) bgVideo.play();
+            }, { once: true });
+
+            // Detect if video pauses unexpectedly (e.g., due to power saving) and restart it
+            bgVideo.addEventListener('pause', () => {
+                // Short delay before trying to play again
+                setTimeout(() => {
+                    bgVideo.play().catch(e => console.log("Autoplay blocked: ", e));
+                }, 100);
+            });
+        }
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slider-container .slide');
+        
+        function nextSlide() {
+            if (slides.length === 0) return;
+            slides[currentSlide].classList.remove('active');
+            slides[currentSlide].classList.add('exit');
+            
+            const prevSlide = currentSlide;
+            currentSlide = (currentSlide + 1) % slides.length;
+            
+            slides[currentSlide].classList.remove('exit');
+            slides[currentSlide].classList.add('active');
+            
+            setTimeout(() => {
+                slides[prevSlide].classList.remove('exit');
+            }, 1000);
+        }
+
+        setInterval(nextSlide, 5000);
+
+        window.addEventListener("scroll", reveal);
+        window.addEventListener("load", reveal);
+    </script>
+</body>
+</html>
