@@ -7,331 +7,171 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/png" href="media/logo1.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        /* Updated Typography for a "cooler" look */
+        /* ── ORIGINAL STYLES VERBATIM ── */
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap');
-        
+
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; scroll-behavior: smooth; letter-spacing: -0.01em; }
         h1, h2, h3, h4, .nav-font { font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; }
-        
-        /* Entrance Animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
 
-        /* Glassmorphism Navbar */
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
 
-        /* Video Background Container */
-        .hero-video-container {
-            position: relative;
-            height: 100vh;
-            width: 100%;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .glass-nav { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.05); }
 
-        #bg-video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            transform: translate(-50%, -50%);
-            z-index: -1;
-            object-fit: cover;
-        }
+        .hero-video-container { position: relative; height: 100vh; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        #bg-video { position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%; width: auto; height: auto; transform: translate(-50%, -50%); z-index: -1; object-fit: cover; }
+        .video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.4), rgba(139,0,0,0.6)); z-index: 0; }
+        .hero-content { position: relative; z-index: 10; text-align: center; color: white; }
 
-        .video-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(139,0,0,0.6));
-            z-index: 0;
-        }
+        .service-card { position: relative; overflow: hidden; transition: all 0.5s ease; cursor: pointer; min-height: 350px; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1; border: 1px solid rgba(0,0,0,0.1); }
+        .service-card-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.1); transition: all 0.6s cubic-bezier(0.4,0,0.2,1); z-index: -1; }
+        .service-card:hover .service-card-img { opacity: 1; transform: scale(1); }
+        .service-card:hover .card-text, .service-card:hover i { color: white !important; text-shadow: 0px 4px 10px rgba(0,0,0,0.9); }
+        .service-card:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); }
 
-        .hero-content {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            color: white;
-        }
-
-        /* Hover Reveal Card Logic */
-        .service-card {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.5s ease;
-            cursor: pointer;
-            min-height: 350px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .service-card-img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transform: scale(1.1);
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: -1;
-        }
-
-        .service-card:hover .service-card-img {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .service-card:hover .card-text, 
-        .service-card:hover i {
-            color: white !important;
-            text-shadow: 0px 4px 10px rgba(0,0,0,0.9);
-        }
-
-        .service-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Mobile Drawer */
-        #mobile-menu {
-            transform: translateX(100%);
-            transition: transform 0.4s ease-in-out;
-        }
-        #mobile-menu.open {
-            transform: translateX(0);
-        }
+        #mobile-menu { transform: translateX(100%); transition: transform 0.4s ease-in-out; }
+        #mobile-menu.open { transform: translateX(0); }
 
         .accent-gold { color: #D4AF37; }
         .bg-navy { background-color: #d8e1ea; }
 
-        /* Floating Breathing WhatsApp Icon */
-        .whatsapp-float-container {
-            position: fixed;
-            bottom: 30px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-        }
+        .whatsapp-float-container { position: fixed; bottom: 30px; right: 20px; display: flex; align-items: center; gap: 10px; z-index: 1000; }
+        .whatsapp-text { background: white; padding: 8px 15px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 13px; color: #4b5563; white-space: nowrap; border: 1px solid #e5e7eb; opacity: 1; transition: opacity 0.3s ease; }
+        .whatsapp-text b { color: #000; font-weight: 800; }
+        .whatsapp-float { background-color: #25d366; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: breathe 2s infinite; border: none; cursor: pointer; }
+        @keyframes breathe { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37,211,102,0.7); } 70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(37,211,102,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37,211,102,0); } }
 
-        .whatsapp-text {
-            background: white;
-            padding: 8px 15px;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            font-size: 13px;
-            color: #4b5563;
-            white-space: nowrap;
-            border: 1px solid #e5e7eb;
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
+        #whatsapp-popup { position: fixed; bottom: 95px; right: 20px; background: white; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); padding: 10px; display: none; flex-direction: column; gap: 8px; z-index: 1001; width: 180px; transform: translateY(20px); opacity: 0; transition: all 0.3s ease; }
+        #whatsapp-popup.show { display: flex; transform: translateY(0); opacity: 1; }
+        .wa-option { padding: 12px 15px; border-radius: 10px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: background 0.2s; color: #374151; }
+        .wa-option:hover { background: #f3f4f6; }
 
-        .whatsapp-text b {
-            color: #000;
-            font-weight: 800;
-        }
+        .slider-container { position: relative; width: 100%; min-height: 400px; overflow: hidden; background: #fff; }
+        .slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: all 1s cubic-bezier(0.4,0,0.2,1); background-size: contain; background-position: center top; background-repeat: no-repeat; transform: translateX(-100%); }
+        .slide.active { opacity: 1; visibility: visible; transform: translateX(0); }
+        .slide.exit { transform: translateX(100%); opacity: 0; }
 
-        .whatsapp-float {
-            background-color: #25d366;
-            color: white;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            animation: breathe 2s infinite;
-            border: none;
-            cursor: pointer;
-        }
+        .shimmer-btn { position: relative; overflow: hidden; }
+        .shimmer-btn::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent); transform: rotate(45deg); transition: 0.5s; display: block; }
+        .shimmer-btn:hover::after { left: 120%; }
 
-        @keyframes breathe {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-            70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
-        }
+        .gradient-text { background: linear-gradient(to right, #ffffff, #D4AF37, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200% auto; animation: shine 4s linear infinite; }
+        @keyframes shine { to { background-position: 200% center; } }
 
-        /* WhatsApp Popup Menu */
-        #whatsapp-popup {
-            position: fixed;
-            bottom: 95px;
-            right: 20px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            padding: 10px;
-            display: none;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 1001;
-            width: 180px;
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        #whatsapp-popup.show {
-            display: flex;
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .wa-option {
-            padding: 12px 15px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: background 0.2s;
-            color: #374151;
-        }
-
-        .wa-option:hover {
-            background: #f3f4f6;
-        }
-
-        /* Updated Banner Slider Styles */
-        .slider-container {
-            position: relative;
-            width: 100%;
-            min-height: 400px;
-            overflow: hidden;
-            background: #fff;
-        }
-        
-        .slide {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
-            background-size: contain;
-            background-position: center top;
-            background-repeat: no-repeat;
-            transform: translateX(-100%);
-        }
-
-        .slide.active { 
-            opacity: 1; 
-            visibility: visible;
-            transform: translateX(0);
-        }
-        
-        .slide.exit {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-
-        /* Cool Extras */
-        .shimmer-btn {
-            position: relative;
-            overflow: hidden;
-        }
-        .shimmer-btn::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-            transform: rotate(45deg);
-            transition: 0.5s;
-            display: block;
-        }
-        .shimmer-btn:hover::after {
-            left: 120%;
-        }
-        
-        .gradient-text {
-            background: linear-gradient(to right, #ffffff, #D4AF37, #ffffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: shine 4s linear infinite;
-        }
-        @keyframes shine {
-            to { background-position: 200% center; }
-        }
-
-        .img-grounded {
-            animation: none;
-            position: relative;
-        }
+        .img-grounded { animation: none; position: relative; }
 
         @media (max-width: 768px) {
-            .mobile-truncate {
-                display: -webkit-box;
-                -webkit-line-clamp: 6; 
-                -webkit-box-orient: vertical;  
-                overflow: hidden;
-            }
-            .mobile-truncate.expanded {
-                display: block;
-                -webkit-line-clamp: unset;
-            }
-            /* FIXED: Re-enabling the text on mobile */
-            .whatsapp-text {
-                display: block; 
-                font-size: 11px;
-                padding: 6px 12px;
-            }
+            .mobile-truncate { display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; }
+            .mobile-truncate.expanded { display: block; -webkit-line-clamp: unset; }
+            .whatsapp-text { display: block; font-size: 11px; padding: 6px 12px; }
         }
 
-        /* New Address Footer Style */
-        .footer-address-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            transition: all 0.3s ease;
-        }
-        .footer-address-card:hover {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: #b91c1c; /* red-700 */
-        }
+        .footer-address-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; transition: all 0.3s ease; }
+        .footer-address-card:hover { background: rgba(255,255,255,0.07); border-color: #b91c1c; }
+
+        /* ══════════════════════════════════════
+           NEW SECTION STYLES
+        ══════════════════════════════════════ */
+        .fade-up { opacity: 0; transform: translateY(36px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+        .fade-up.d1 { transition-delay: 0.12s; }
+        .fade-up.d2 { transition-delay: 0.24s; }
+        .fade-up.d3 { transition-delay: 0.38s; }
+
+        .bb-label { color: #c8102e !important; font-size: 11px !important; font-weight: 700 !important; letter-spacing: 0.25em !important; text-transform: uppercase !important; font-family: 'Inter', sans-serif !important; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .bb-label::before { content: ''; display: block; width: 28px; height: 1.5px; background: #c8102e; flex-shrink: 0; }
+
+        /* Stats */
+        .bb-stats { background: #0a0a0a; display: grid; grid-template-columns: repeat(4,1fr); }
+        .bb-stat { padding: 44px 20px; text-align: center; background: #111; border-right: 1px solid rgba(255,255,255,0.06); }
+        .bb-stat:last-child { border-right: none; }
+        .bb-stat-num { font-family: 'Bebas Neue', sans-serif !important; font-size: 3.8rem; color: #f0c842; letter-spacing: 0.04em; line-height: 1; display: block; }
+        .bb-stat-lbl { color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; margin-top: 8px; font-family: 'Inter', sans-serif; display: block; }
+        @media (max-width: 1024px) { .bb-stats { grid-template-columns: repeat(2,1fr); } }
+
+        /* Programs */
+        .bb-prog-section { background: #f5f1eb; padding: 80px 60px; }
+        .bb-prog-title { font-family: 'Bebas Neue', sans-serif !important; font-size: clamp(2.2rem,4vw,3.8rem) !important; letter-spacing: 0.04em !important; line-height: 1 !important; color: #1a1a1a !important; margin-bottom: 48px !important; }
+        .bb-prog-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+        .bb-prog-card { background: #fff; border-radius: 4px; overflow: hidden; display: flex; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 2px 20px rgba(0,0,0,0.05); }
+        .bb-prog-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
+        .bb-prog-date { background: #c8102e; color: #fff; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 72px; flex-shrink: 0; }
+        .bb-prog-day { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; line-height: 1; display: block; }
+        .bb-prog-month { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.85; display: block; }
+        .bb-prog-body { padding: 20px 22px; }
+        .bb-prog-tag { display: inline-block; background: #fee2e2; color: #c8102e; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 10px; border-radius: 2px; margin-bottom: 8px; font-family: 'Inter', sans-serif; }
+        .bb-prog-name { font-family: 'Outfit', sans-serif !important; font-size: 0.95rem !important; font-weight: 700 !important; color: #1a1a1a !important; margin-bottom: 5px !important; display: block; }
+        .bb-prog-desc { font-size: 0.82rem; color: #6b6b6b; line-height: 1.55; font-family: 'Inter', sans-serif; display: block; }
+        @media (max-width: 1024px) { .bb-prog-section { padding: 64px 24px; } .bb-prog-grid { grid-template-columns: 1fr; gap: 16px; } }
+
+        /* Testimonies */
+        .bb-testi-section { background: #0a0a0a; padding: 88px 60px; }
+        .bb-testi-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 52px; flex-wrap: wrap; gap: 16px; }
+        .bb-testi-title { font-family: 'Bebas Neue', sans-serif !important; font-size: clamp(2.2rem,4.5vw,3.8rem) !important; color: #fff !important; letter-spacing: 0.04em !important; line-height: 1 !important; margin: 0 !important; }
+        .bb-share-btn { background: #c8102e; color: #fff; padding: 11px 22px; border-radius: 3px; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; font-family: 'Inter', sans-serif; transition: background 0.25s; white-space: nowrap; }
+        .bb-share-btn:hover { background: #a00c24; }
+        .bb-testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+        .bb-testi { background: #131313; border: 1px solid rgba(255,255,255,0.06); padding: 32px; border-radius: 4px; transition: border-color 0.3s, transform 0.3s; }
+        .bb-testi:hover { border-color: #c8102e; transform: translateY(-4px); }
+        .bb-testi-quote { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: rgba(255,255,255,0.68); line-height: 1.7; font-style: italic; font-weight: 300; margin-bottom: 24px; }
+        .bb-testi-author { display: flex; align-items: center; gap: 12px; }
+        .bb-testi-avatar { width: 40px; height: 40px; border-radius: 50%; background: #c8102e; display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; flex-shrink: 0; }
+        .bb-testi-name { color: #fff; font-size: 0.88rem; font-weight: 700; font-family: 'Outfit', sans-serif; display: block; }
+        .bb-testi-loc { color: rgba(255,255,255,0.3); font-size: 0.75rem; font-family: 'Inter', sans-serif; display: block; }
+        @media (max-width: 1024px) { .bb-testi-section { padding: 64px 24px; } .bb-testi-grid { grid-template-columns: 1fr; } }
+
+        /* CTA Band */
+        .bb-cta { background: #c8102e; padding: 70px 60px; display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+        .bb-cta-title { font-family: 'Bebas Neue', sans-serif !important; font-size: clamp(2.2rem,4.5vw,3.8rem) !important; color: #fff !important; letter-spacing: 0.04em !important; line-height: 1 !important; margin: 0 !important; }
+        .bb-cta-sub { color: rgba(255,255,255,0.78); margin-top: 10px; font-size: 1rem; font-family: 'Inter', sans-serif; }
+        .bb-btn-white { background: #fff; color: #c8102e; padding: 16px 36px; font-size: 12px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; border-radius: 2px; white-space: nowrap; transition: all 0.3s; flex-shrink: 0; font-family: 'Inter', sans-serif; display: inline-block; }
+        .bb-btn-white:hover { background: #0a0a0a; color: #fff; transform: translateY(-2px); }
+        @media (max-width: 1024px) { .bb-cta { padding: 56px 24px; } }
+        @media (max-width: 640px) { .bb-cta { padding: 48px 20px; flex-direction: column; align-items: flex-start; } }
+
+        /* Branches */
+        .bb-branches-section { background: #f5f1eb; padding: 88px 60px; }
+        .bb-branches-title { font-family: 'Bebas Neue', sans-serif !important; font-size: clamp(2.2rem,4vw,3.8rem) !important; color: #1a1a1a !important; letter-spacing: 0.04em !important; line-height: 1 !important; margin-bottom: 48px !important; }
+        .bb-branches-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; }
+        .bb-branch { position: relative; overflow: hidden; background: #ccc; display: block; text-decoration: none; min-height: 280px; }
+        .bb-branch img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; transition: transform 0.6s cubic-bezier(0.16,1,0.3,1), opacity 0.4s; display: block; }
+        .bb-branch:hover img { transform: scale(1.07); opacity: 0.6; }
+        .bb-branch-info { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 60%); display: flex; flex-direction: column; justify-content: flex-end; padding: 26px; }
+        .bb-branch-badge { display: inline-block; background: #c8102e; color: #fff; font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; padding: 4px 10px; border-radius: 2px; margin-bottom: 8px; width: fit-content; font-family: 'Inter', sans-serif; }
+        .bb-branch-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.65rem; color: #fff; letter-spacing: 0.04em; margin-bottom: 3px; display: block; }
+        .bb-branch-addr { color: rgba(255,255,255,0.55); font-size: 0.78rem; font-family: 'Inter', sans-serif; display: block; }
+        .bb-branch-cta { margin-top: 12px; color: #f0c842; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; font-family: 'Inter', sans-serif; opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s; display: block; }
+        .bb-branch:hover .bb-branch-cta { opacity: 1; transform: translateY(0); }
+        @media (max-width: 1024px) { .bb-branches-section { padding: 64px 24px; } .bb-branches-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 640px) { .bb-branches-grid { grid-template-columns: 1fr; } }
+
+        /* New Footer */
+        .bb-footer { background: #0a0a0a; padding: 72px 60px 36px; color: rgba(255,255,255,0.5); }
+        .bb-footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 52px; padding-bottom: 52px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 32px; }
+        .bb-footer-logo { height: 56px; margin-bottom: 20px; display: block; }
+        .bb-footer-brand p { font-size: 0.88rem; line-height: 1.7; max-width: 270px; color: rgba(255,255,255,0.45); font-family: 'Inter', sans-serif; }
+        .bb-footer-social { display: flex; gap: 12px; margin-top: 22px; }
+        .bb-social-icon { width: 38px; height: 38px; border: 1px solid rgba(255,255,255,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.45); text-decoration: none; font-size: 13px; transition: all 0.3s; }
+        .bb-social-icon:hover { border-color: #c8102e; color: #c8102e; }
+        .bb-footer-col h4 { color: #fff !important; font-size: 11px !important; font-weight: 700 !important; letter-spacing: 0.2em !important; text-transform: uppercase !important; margin-bottom: 18px !important; font-family: 'Inter', sans-serif !important; }
+        .bb-footer-col ul { list-style: none; padding: 0; margin: 0; }
+        .bb-footer-col ul li { margin-bottom: 11px; }
+        .bb-footer-col ul li a { color: rgba(255,255,255,0.38); text-decoration: none; font-size: 0.87rem; transition: color 0.25s; font-family: 'Inter', sans-serif; line-height: 1.5; }
+        .bb-footer-col ul li a:hover { color: #f0c842; }
+        .bb-footer-bottom { display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: rgba(255,255,255,0.28); flex-wrap: wrap; gap: 8px; font-family: 'Inter', sans-serif; }
+        @media (max-width: 1024px) { .bb-footer { padding: 56px 24px 28px; } .bb-footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; } }
+        @media (max-width: 640px) { .bb-footer-grid { grid-template-columns: 1fr; gap: 32px; } }
     </style>
 </head>
 <body class="bg-white text-gray-900">
 
+    <!-- ══ VERBATIM FROM ORIGINAL — DO NOT TOUCH ══ -->
     <div id="whatsapp-popup">
         <a href="https://wa.me/+2348032740443" target="_blank" class="wa-option">
             <i class="fab fa-whatsapp text-green-500 text-lg"></i> Chat with Us
         </a>
-        <!-- <a href="portal.html" class="wa-option border-t">
-            <i class="fas fa-file-alt text-red-700 text-lg"></i> 
-        </a> -->
     </div>
 
     <div class="whatsapp-float-container">
@@ -364,7 +204,6 @@
                     <img src="media/logos.png" alt="City of Champion Fire Logo" class="h-12 md:h-20 w-auto transition-transform group-hover:scale-105">
                 </a>
             </div>
-
             <div class="hidden lg:flex items-center space-x-10 nav-font font-bold uppercase text-[11px] tracking-widest">
                 <a href="#home" class="hover:text-red-700 transition relative after:content-[''] after:absolute after:w-0 after:h-[2px] after:bg-red-700 after:left-0 after:-bottom-1 hover:after:w-full after:transition-all">Home</a>
                 <a href="#about" class="hover:text-red-700 transition">About Us</a>
@@ -376,7 +215,6 @@
                     <i class="fas fa-coins text-amber-500"></i> GIVE
                 </a>
             </div>
-
             <div class="flex lg:hidden items-center gap-3">
                 <a href="give.html" class="flex items-center gap-2 bg-white border-2 border-gray-100 text-gray-800 px-4 py-2 rounded-full shadow-sm text-[11px] font-bold">
                     <i class="fas fa-coins text-amber-500"></i> <span>GIVE</span>
@@ -400,35 +238,54 @@
             </div>
         </div>
     </section>
+    <!-- ══ END OF VERBATIM ORIGINAL SECTION ══ -->
 
+    <!-- RED TICKER BAR -->
+    <div style="background:#c8102e; padding:11px 0; overflow:hidden; position:relative; z-index:10;">
+        <div style="display:flex; gap:72px; white-space:nowrap; animation:bb-ticker 28s linear infinite; width:max-content;">
+            <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Sunday Celebration Service — 8:00 AM &amp; 10:30 AM</span>
+            <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Healing &amp; Deliverance Service— Monday 5:00 PM</span>
+            <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Power Communion — Wednesday 5:30 PM</span>
+            <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Watch Live Online — Join Worldwide</span>
+ <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Sunday Celebration Service — 8:00 AM &amp; 10:30 AM</span>
+            <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Healing &amp; Deliverance Service— Monday 5:00 PM</span>
+            <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Power Communion — Wednesday 5:30 PM</span>
+            <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Watch Live Online — Join Worldwide</span>
+        </div>
+    </div>
+    <style>
+        @keyframes bb-ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    </style>
+
+
+    <!-- ══════════════════════════════════════════════
+         EVERYTHING BELOW IS NEW / UPGRADED
+         Starting from: About, Weekly Experiences,
+         Slider, Video, then all new sections
+    ══════════════════════════════════════════════ -->
+
+    <!-- ABOUT -->
     <section id="about" class="py-24 bg-white overflow-hidden">
         <div class="container mx-auto px-6 reveal">
             <div class="flex flex-col lg:flex-row items-center gap-16">
                 <div class="lg:w-1/2 relative flex justify-center items-center reveal">
                     <div class="relative w-full max-w-xl img-grounded border-4 border-gray-100 rounded-[2rem] shadow-2xl bg-navy p-6 flex items-center justify-center">
                         <img src="media/o1-removebg-preview.png" alt="Pastor" class="w-full h-auto max-h-[550px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
-                        </div>
+                    </div>
                 </div>
-
                 <div class="lg:w-1/2 reveal">
                     <h4 class="text-red-700 font-extrabold uppercase tracking-widest mb-4 text-sm">Establishing Champions</h4>
                     <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">About City of Champion Fire</h2>
-                    
                     <div id="about-text-container" class="mobile-truncate md:block">
                         <p class="text-gray-600 mb-6 text-lg leading-relaxed font-light">
-                          Welcome to the official website of City of Champions International Assembly. It is always a joy to connect with you and welcome you into our church family.
-
-    City of Champions International Assembly is a dynamic, people-focused ministry committed to restoring human destiny and dignity through the transforming power of God. We are passionate about teaching the Word of God with clarity, simplicity, and power so that lives can be changed and purpose can be discovered.
+                            Welcome to the official website of City of Champions International Assembly. It is always a joy to connect with you and welcome you into our church family.
+                            City of Champions International Assembly is a dynamic, people-focused ministry committed to restoring human destiny and dignity through the transforming power of God. We are passionate about teaching the Word of God with clarity, simplicity, and power so that lives can be changed and purpose can be discovered.
                         </p>
-
                         <p class="text-gray-600 mb-10 text-lg leading-relaxed font-light">
                             Under the leadership of our Senior Pastor, the ministry continues to witness lives being transformed, hope restored, and faith strengthened. Our mission is to raise a generation of champions who will impact and dominate their world through the fire and power of the Holy Spirit.
-
-    We invite you to take a step of faith and discover all that God has prepared for you. We believe that when you walk with God, your life cannot remain the same
-                            
+                            We invite you to take a step of faith and discover all that God has prepared for you. We believe that when you walk with God, your life cannot remain the same.
                         </p>
                     </div>
-
                     <a href="javascript:void(0)" onclick="readFullStory(this)" id="read-story-btn" class="group inline-flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-xl hover:bg-red-700 transition font-bold shadow-xl md:hidden">
                         READ OUR FULL STORY <i class="fas fa-arrow-right group-hover:translate-x-2 transition"></i>
                     </a>
@@ -437,6 +294,7 @@
         </div>
     </section>
 
+    <!-- WEEKLY EXPERIENCES -->
     <section class="py-24 bg-gray-50 reveal">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16 reveal">
@@ -447,49 +305,51 @@
                 <a href="underconst.html" class="service-card reveal bg-white rounded-3xl group shadow-sm">
                     <img src="media/worship.jpeg" class="service-card-img" alt="Sunday">
                     <i class="fa-solid fa-church text-5xl text-red-700 mb-6 transition-all group-hover:scale-110"></i>
-                    <h3 class="card-text text-2xl font-bold mb-2">Sunday Worship</h3>
-                    <p class="card-text text-gray-500 font-medium tracking-widest text-sm">6:30 AM | 9:00 AM</p>
+                    <h3 class="card-text text-2xl font-bold mb-2">Sunday Celebration Service</h3>
+                    <p class="card-text text-gray-500 font-medium tracking-widest text-sm">8:00 AM | 10:30 AM</p>
                 </a>
-                <a href="/underconst.html" class="service-card reveal bg-white rounded-3xl group shadow-sm" style="transition-delay: 100ms;">
+                <a href="underconst.html" class="service-card reveal bg-white rounded-3xl group shadow-sm" style="transition-delay:100ms;">
                     <img src="media/healing.jpeg" class="service-card-img" alt="Healing">
                     <i class="fa-solid fa-fire text-5xl text-red-700 mb-6 transition-all group-hover:scale-110"></i>
-                    <h3 class="card-text text-2xl font-bold mb-2">Healing & Deliverance</h3>
-                    <p class="card-text text-gray-500 font-medium tracking-widest text-sm">Tuesday: 9:30 AM</p>
+                    <h3 class="card-text text-2xl font-bold mb-2"> Healing &amp; Deliverance Service</h3>
+                    <p class="card-text text-gray-500 font-medium tracking-widest text-sm">Monday : 5:00 PM</p>
                 </a>
-                <a href="underconst.html" class="service-card reveal bg-white rounded-3xl group shadow-sm" style="transition-delay: 200ms;">
+                <a href="underconst.html" class="service-card reveal bg-white rounded-3xl group shadow-sm" style="transition-delay:200ms;">
                     <img src="media/uu.jpeg" class="service-card-img" alt="Communion">
                     <i class="fa-solid fa-dove text-5xl text-red-700 mb-6 transition-all group-hover:scale-110"></i>
-                    <h3 class="card-text text-2xl font-bold mb-2">Power Communion</h3>
-                    <p class="card-text text-gray-500 font-medium tracking-widest text-sm">Wednesday: 5:30 PM</p>
+                    <h3 class="card-text text-2xl font-bold mb-2">Power Communion Service</h3>
+                    <p class="card-text text-gray-500 font-medium tracking-widest text-sm">Wednesday: 5:00 PM</p>
                 </a>
             </div>
         </div>
     </section>
 
+    <!-- MOBILE: Upcoming Programs heading -->
     <div class="md:hidden py-10 bg-white text-center reveal">
         <h2 class="text-3xl font-extrabold text-gray-900 uppercase tracking-tighter">Upcoming Programs</h2>
         <div class="w-16 h-1 bg-red-700 mx-auto mt-3"></div>
     </div>
 
+    <!-- MOBILE SLIDER + VIDEO SECTION -->
     <section class="reveal">
         <div class="slider-container md:hidden reveal" id="banner-slider">
-            <div class="slide active" style="background-image: url('media/banner.jpeg');"></div>
-            <div class="slide" style="background-image: url('media/banner1.jpeg');"></div>
-            <div class="slide" style="background-image: url('media/banner2.jpeg');"></div>
-            <div class="slide" style="background-image: url('media/banner3.jpeg');"></div>
-            <div class="slide" style="background-image: url('media/banner4.jpeg');"></div>
-            <div class="slide" style="background-image: url('media/banner5.jpeg');"></div>
+            <div class="slide active" style="background-image:url('media/banner.jpeg');"></div>
+            <div class="slide" style="background-image:url('media/banner1.jpeg');"></div>
+            <div class="slide" style="background-image:url('media/banner2.jpeg');"></div>
+            <div class="slide" style="background-image:url('media/banner3.jpeg');"></div>
+            <div class="slide" style="background-image:url('media/banner4.jpeg');"></div>
+            <div class="slide" style="background-image:url('media/banner5.jpeg');"></div>
         </div>
 
         <div class="md:hidden w-full bg-zinc-900 py-10 px-6 text-center reveal">
             <h4 class="text-red-700 font-bold uppercase tracking-widest mb-4 text-xs">Live Stream</h4>
             <h2 class="text-white text-3xl font-extrabold mb-6 uppercase tracking-widest">Experience the Power</h2>
             <div class="relative w-full aspect-video mb-6 rounded-xl overflow-hidden shadow-2xl">
-                 <video id="replay-video-mobile" playsinline controls loop class="w-full h-full object-cover">
+                <video id="replay-video-mobile" playsinline controls loop class="w-full h-full object-cover">
                     <source src="media/vidpreach.mp4" type="video/mp4">
                 </video>
                 <div id="video-play-overlay-mobile" class="absolute inset-0 flex items-center justify-center bg-black/20">
-                     <button onclick="playMobileVideo()" class="w-16 h-16 bg-red-700 rounded-full flex items-center justify-center text-white text-xl hover:bg-white hover:text-red-700 transition-all shadow-2xl">
+                    <button onclick="playMobileVideo()" class="w-16 h-16 bg-red-700 rounded-full flex items-center justify-center text-white text-xl hover:bg-white hover:text-red-700 transition-all shadow-2xl">
                         <i class="fas fa-play ml-1"></i>
                     </button>
                 </div>
@@ -503,12 +363,11 @@
                     <source src="media/vidpreach.mp4" type="video/mp4">
                 </video>
                 <div id="video-play-overlay" class="absolute inset-0 flex items-center justify-center bg-black/20">
-                     <button onclick="playMainVideo()" class="play-button-outer w-20 h-20 bg-red-700 rounded-full flex items-center justify-center text-white text-2xl hover:bg-white hover:text-red-700 transition-all duration-500 shadow-2xl">
+                    <button onclick="playMainVideo()" class="play-button-outer w-20 h-20 bg-red-700 rounded-full flex items-center justify-center text-white text-2xl hover:bg-white hover:text-red-700 transition-all duration-500 shadow-2xl">
                         <i class="fas fa-play ml-1"></i>
                     </button>
                 </div>
             </div>
-            
             <div class="w-1/2 flex flex-col justify-center px-16 bg-zinc-900 reveal">
                 <h4 class="text-red-700 font-extrabold uppercase tracking-widest mb-4 text-sm">Live Stream</h4>
                 <h2 class="text-white text-5xl font-extrabold mb-8 uppercase tracking-widest leading-tight">Experience <br>the Power</h2>
@@ -518,152 +377,250 @@
         </div>
     </section>
 
-    <footer id="contact" class="bg-gray-950 text-white py-20 mt-0 reveal">
-        <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-16 reveal">
-            <div class="reveal">
-                <h3 class="text-xl font-bold mb-8 uppercase tracking-widest text-red-700">Find Us</h3>
-                <div class="footer-address-card flex items-start gap-4">
-                    <div class="bg-red-700/20 p-3 rounded-lg">
-                        <i class="fas fa-location-dot text-red-700 text-xl"></i>
-                    </div>
-                    <div>
-                        <p class="opacity-80 leading-relaxed text-md font-medium">
-                            City of Champions, Au Road, <br>
-                            by Auchi Bypass, Uselu N'Ahor,<br>
-                            Benin City.
-                        </p>
-                        <p class="text-red-700 text-xs font-bold uppercase mt-2 tracking-widest">International Worship Center</p>
-                    </div>
+    <!-- STATS BAR -->
+    <div class="bb-stats">
+        <div class="bb-stat fade-up">
+            <span class="bb-stat-num">5+</span>
+            <span class="bb-stat-lbl">Global Branches</span>
+        </div>
+        <div class="bb-stat fade-up d1">
+            <span class="bb-stat-num">10K+</span>
+            <span class="bb-stat-lbl">Lives Transformed</span>
+        </div>
+        <div class="bb-stat fade-up d2">
+            <span class="bb-stat-num">3</span>
+            <span class="bb-stat-lbl">Weekly Services</span>
+        </div>
+        <div class="bb-stat fade-up d3">
+            <span class="bb-stat-num">∞</span>
+            <span class="bb-stat-lbl">God's Faithfulness</span>
+        </div>
+    </div>
+
+    <!-- UPCOMING PROGRAMS (desktop only — mobile has the banner slider) -->
+    <section class="bb-prog-section hidden md:block">
+        <div class="fade-up">
+            <p class="bb-label">Coming Up</p>
+            <p class="bb-prog-title">UPCOMING PROGRAMS</p>
+        </div>
+        <div class="bb-prog-grid">
+            <div class="bb-prog-card fade-up d1">
+                <div class="bb-prog-date"><span class="bb-prog-day">01</span><span class="bb-prog-month">Jun</span></div>
+                <div class="bb-prog-body">
+                    <span class="bb-prog-tag">Annual</span>
+                    <span class="bb-prog-name">Champions' Convention 2026</span>
+                    <span class="bb-prog-desc">A power-packed gathering of champions from across the globe. Expect miracles, signs, and wonders.</span>
                 </div>
             </div>
-            <div class="reveal">
-                <h3 class="text-xl font-bold mb-8 uppercase tracking-widest text-red-700">Contact Details</h3>
-                <div class="space-y-6">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-red-700/20 p-3 rounded-lg">
-                            <i class="fas fa-phone text-red-700"></i>
-                        </div>
-                        <a href="tel:+2340000000000" class="opacity-80 hover:opacity-100 transition">+234 000 000 0000</a>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="bg-red-700/20 p-3 rounded-lg">
-                            <i class="fas fa-envelope text-red-700"></i>
-                        </div>
-                        <a href="mailto:info@cityofchampions.com" class="opacity-80 hover:opacity-100 transition">info@cityofchampions.com</a>
-                    </div>
+            <div class="bb-prog-card fade-up d2">
+                <div class="bb-prog-date"><span class="bb-prog-day">15</span><span class="bb-prog-month">Jun</span></div>
+                <div class="bb-prog-body">
+                    <span class="bb-prog-tag">Monthly</span>
+                    <span class="bb-prog-name">Power Night of Fire</span>
+                    <span class="bb-prog-desc">An all-night prayer and worship experience. Come with your burdens and leave with your breakthrough.</span>
                 </div>
             </div>
-            <div class="reveal">
-                <h3 class="text-xl font-bold mb-8 uppercase tracking-widest text-red-700">Connect</h3>
-                <div class="flex space-x-6">
-                    <a href="#" class="text-3xl hover:text-red-500 transition opacity-80 hover:opacity-100"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="#" class="text-3xl hover:text-red-500 transition opacity-80 hover:opacity-100"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="#" class="text-3xl hover:text-red-500 transition opacity-80 hover:opacity-100"><i class="fa-brands fa-instagram"></i></a>
+            <div class="bb-prog-card fade-up d3">
+                <div class="bb-prog-date"><span class="bb-prog-day">29</span><span class="bb-prog-month">Jun</span></div>
+                <div class="bb-prog-body">
+                    <span class="bb-prog-tag">Youth</span>
+                    <span class="bb-prog-name">Champions Youth Summit</span>
+                    <span class="bb-prog-desc">A dynamic gathering for the next generation. Equipping young people to walk in their God-given purpose.</span>
                 </div>
             </div>
         </div>
-        <div class="border-t border-white/5 mt-20 pt-10 text-center opacity-40 text-sm tracking-widest">
-            &copy; 2026 City of Champion Fire International Assembly.
+    </section>
+
+    <!-- TESTIMONIES -->
+    <section class="bb-testi-section">
+        <div class="bb-testi-header fade-up">
+            <div>
+                <p class="bb-label">The Fire Is Real</p>
+                <p class="bb-testi-title">TESTIMONIES<br>OF VICTORY</p>
+            </div>
+            <a href="testimonies.html" class="bb-share-btn">Share Yours →</a>
+        </div>
+        <div class="bb-testi-grid">
+            <div class="bb-testi fade-up d1">
+                <div class="bb-testi-quote">"I came in broken and without hope. The Word of God preached here gave me back my life. I am healed, restored, and walking in my purpose."</div>
+                <div class="bb-testi-author">
+                    <div class="bb-testi-avatar">A</div>
+                    <div><span class="bb-testi-name">Adaeze O.</span><span class="bb-testi-loc">Lagos, Nigeria</span></div>
+                </div>
+            </div>
+            <div class="bb-testi fade-up d2">
+                <div class="bb-testi-quote">"God healed my body completely during a Healing &amp; Deliverance service. The doctors confirmed it — what was medically impossible, God made possible."</div>
+                <div class="bb-testi-author">
+                    <div class="bb-testi-avatar">E</div>
+                    <div><span class="bb-testi-name">Emmanuel K.</span><span class="bb-testi-loc">Benin City, Nigeria</span></div>
+                </div>
+            </div>
+            <div class="bb-testi fade-up d3">
+                <div class="bb-testi-quote">"Watching the live stream from London changed my life. I gave my life to Christ and flew down to Benin City just to be part of this family in person."</div>
+                <div class="bb-testi-author">
+                    <div class="bb-testi-avatar">F</div>
+                    <div><span class="bb-testi-name">Favour A.</span><span class="bb-testi-loc">London, United Kingdom</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA BAND -->
+    <div class="bb-cta">
+        <div class="fade-up">
+            <p class="bb-cta-title">GIVE. PARTNER.<br>BUILD THE KINGDOM.</p>
+            <p class="bb-cta-sub">Every seed you sow fuels the mission of restoring human destiny and dignity.</p>
+        </div>
+        <a href="give.html" class="bb-btn-white fade-up d2">Give Online →</a>
+    </div>
+
+    <!-- BRANCHES -->
+    <section class="bb-branches-section">
+        <div class="fade-up">
+            <p class="bb-label">Our Locations</p>
+            <p class="bb-branches-title">A GLOBAL FAMILY</p>
+        </div>
+        <div class="bb-branches-grid fade-up d1">
+            <a href="branches.html" class="bb-branch">
+                <img src="media/building3.jpeg" alt="Champion Cathedral">
+                <div class="bb-branch-info">
+                    <span class="bb-branch-badge">Global HQ</span>
+                    <span class="bb-branch-name">Champion Cathedral</span>
+                    <span class="bb-branch-addr">Benin City, Edo State</span>
+                    <span class="bb-branch-cta">Get Directions →</span>
+                </div>
+            </a>
+            <a href="branches.html" class="bb-branch">
+                <img src="media/building3.jpeg" alt="Taberancle of David">
+                <div class="bb-branch-info">
+                    <span class="bb-branch-name">Taberancle of David</span>
+                    <span class="bb-branch-addr">Urora, Benin city</span>
+                    <span class="bb-branch-cta">Get Directions →</span>
+                </div>
+            </a>
+            <a href="branches.html" class="bb-branch">
+                <img src="media/building3.jpeg" alt="Grace and Mercy">
+                <div class="bb-branch-info">
+                    <span class="bb-branch-name">Grace and Mercy</span>
+                    <span class="bb-branch-addr">Upper Mission Benin City</span>
+                    <span class="bb-branch-cta">Get Directions →</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- NEW FOOTER -->
+    <footer id="contact" class="bb-footer">
+        <div class="bb-footer-grid">
+            <div class="bb-footer-brand">
+                <img src="media/logos.png" alt="City of Champion Fire" class="bb-footer-logo">
+                <p>City of Champions International Assembly — raising a generation of champions through the fire and power of the Holy Spirit.</p>
+                <div class="bb-footer-social">
+                    <a href="#" class="bb-social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="bb-social-icon"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="bb-social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/+2348032740443" class="bb-social-icon"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="bb-footer-col">
+                <h4>Navigate</h4>
+                <ul>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#home">Services</a></li>
+                    <li><a href="branches.html">Our Branches</a></li>
+                    <li><a href="testimonies.html">Testimonies</a></li>
+                    <li><a href="give.html">Give Online</a></li>
+                </ul>
+            </div>
+            <div class="bb-footer-col">
+                <h4>Services</h4>
+                <ul>
+                    <li><a href="underconst.html">Sunday Worship</a></li>
+                    <li><a href="underconst.html">Healing Service</a></li>
+                    <li><a href="underconst.html">Power Communion</a></li>
+                    <li><a href="#">Live Stream</a></li>
+                    <li><a href="underconst.html">Youth Ministry</a></li>
+                </ul>
+            </div>
+            <div class="bb-footer-col">
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="#">Au Road, by Auchi Bypass,<br>Uselu N'Ahor, Benin City.</a></li>
+                    <li><a href="tel:+2340000000000">+234 000 000 0000</a></li>
+                    <li><a href="mailto:info@cityofchampionfire.org">info@cityofchampionfire.org</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="bb-footer-bottom">
+            <span>© 2026 COC. All Rights Reserved.</span>
+          
         </div>
     </footer>
 
     <script>
         function toggleMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('open');
+            document.getElementById('mobile-menu').classList.toggle('open');
         }
-
-        // WhatsApp Popup Logic
         function toggleWAPopup(event) {
             event.stopPropagation();
-            const popup = document.getElementById('whatsapp-popup');
-            popup.classList.toggle('show');
+            document.getElementById('whatsapp-popup').classList.toggle('show');
         }
-
-        // Close popup when clicking outside
         window.onclick = function(event) {
             const popup = document.getElementById('whatsapp-popup');
-            if (popup.classList.contains('show')) {
-                popup.classList.remove('show');
-            }
+            if (popup.classList.contains('show')) popup.classList.remove('show');
         }
-
         function readFullStory(btn) {
-            const container = document.getElementById('about-text-container');
-            container.classList.add('expanded');
+            document.getElementById('about-text-container').classList.add('expanded');
             btn.style.display = 'none';
         }
-
         function reveal() {
             var reveals = document.querySelectorAll(".reveal");
             for (var i = 0; i < reveals.length; i++) {
                 var windowHeight = window.innerHeight;
                 var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 150;
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add("active");
-                }
+                if (elementTop < windowHeight - 150) reveals[i].classList.add("active");
             }
         }
-
         function playMainVideo() {
             const video = document.getElementById('replay-video');
             const overlay = document.getElementById('video-play-overlay');
-            if(video) {
-                video.play();
-                overlay.style.display = 'none';
-            }
+            if (video) { video.play(); overlay.style.display = 'none'; }
         }
-
         function playMobileVideo() {
             const video = document.getElementById('replay-video-mobile');
             const overlay = document.getElementById('video-play-overlay-mobile');
-            if(video) {
-                video.play();
-                overlay.style.display = 'none';
-            }
+            if (video) { video.play(); overlay.style.display = 'none'; }
         }
-
-        // FIXED: Mobile Autoplay Persistence Logic
         const bgVideo = document.getElementById('bg-video');
         if (bgVideo) {
-            // Force play on first user interaction to bypass browser restrictions
             document.body.addEventListener('touchstart', function() {
                 if (bgVideo.paused) bgVideo.play();
             }, { once: true });
-
-            // Detect if video pauses unexpectedly (e.g., due to power saving) and restart it
             bgVideo.addEventListener('pause', () => {
-                // Short delay before trying to play again
-                setTimeout(() => {
-                    bgVideo.play().catch(e => console.log("Autoplay blocked: ", e));
-                }, 100);
+                setTimeout(() => { bgVideo.play().catch(e => console.log("Autoplay blocked:", e)); }, 100);
             });
         }
-
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slider-container .slide');
-        
         function nextSlide() {
             if (slides.length === 0) return;
             slides[currentSlide].classList.remove('active');
             slides[currentSlide].classList.add('exit');
-            
-            const prevSlide = currentSlide;
+            const prev = currentSlide;
             currentSlide = (currentSlide + 1) % slides.length;
-            
             slides[currentSlide].classList.remove('exit');
             slides[currentSlide].classList.add('active');
-            
-            setTimeout(() => {
-                slides[prevSlide].classList.remove('exit');
-            }, 1000);
+            setTimeout(() => { slides[prev].classList.remove('exit'); }, 1000);
         }
-
         setInterval(nextSlide, 5000);
-
         window.addEventListener("scroll", reveal);
         window.addEventListener("load", reveal);
+
+        /* fade-up observer for new sections */
+        const fadeObs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); fadeObs.unobserve(e.target); } });
+        }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.fade-up').forEach(el => fadeObs.observe(el));
     </script>
 </body>
 </html>

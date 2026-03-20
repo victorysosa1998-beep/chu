@@ -3,178 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Under Construction</title>
+    <title>Coming Soon | City of Champion Fire</title>
+    <link rel="icon" type="image/png" href="media/logo1.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --safety-yellow: #fdd835;
-            --dark-bg: #1a1a1a;
-            --text-light: #ffffff;
+            --fire: #c8102e;
+            --gold-light: #f0c842;
+            --black: #0a0a0a;
         }
-
-        body, html {
-            height: 100%;
-            margin: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow-x: hidden; /* Prevent horizontal scroll */
-        }
-
-        .container {
-            text-align: center;
-            padding: 20px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        /* The Animated Worker Scene */
-        .animation-wrapper {
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--black);
+            color: #fff;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            min-height: 100vh; overflow: hidden;
             position: relative;
-            width: 100%;
-            max-width: 200px;
-            height: 150px;
-            margin: 0 auto 30px;
         }
 
-        /* Construction Cone */
-        .cone {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 100px;
-            background: var(--safety-yellow);
-            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
-            border-bottom: 10px solid #333;
+        /* ── BACKGROUND TAPE STRIPS ── */
+        .tape {
+            position: fixed;
+            width: 160%;
+            height: 44px;
+            background: repeating-linear-gradient(45deg, var(--gold-light), var(--gold-light) 22px, #000 22px, #000 44px);
+            opacity: 0.06;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .tape-top { top: 8%; transform: rotate(-4deg) translateX(-5%); }
+        .tape-bottom { bottom: 8%; transform: rotate(4deg) translateX(-5%); }
+
+        /* ── EMBER PARTICLES ── */
+        .embers { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .ember {
+            position: absolute; bottom: -10px; border-radius: 50%;
+            background: radial-gradient(circle, #f0c842 0%, #c8102e 60%, transparent 100%);
+            opacity: 0;
+            animation: floatUp var(--dur) ease-in var(--delay) infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 0.7; }
+            80% { opacity: 0.2; }
+            100% { transform: translateY(-100vh) translateX(var(--drift)) scale(0.1); opacity: 0; }
         }
 
-        .cone::after {
-            content: '';
-            position: absolute;
-            top: 30%;
-            left: 0;
-            width: 100%;
-            height: 20px;
-            background: white;
-            opacity: 0.8;
+        /* ── CONTENT ── */
+        .content {
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center; padding: 40px 28px;
+            max-width: 680px;
         }
 
-        /* The Worker (Stylized Emoji/Icon) */
-        .worker {
-            font-size: clamp(50px, 10vw, 80px);
-            position: absolute;
-            bottom: 20px;
-            left: 15%;
-            animation: bounce 2s ease-in-out infinite;
+        /* Logo */
+        .logo { margin-bottom: 40px; }
+        .logo img { height: 64px; width: auto; }
+
+        /* Icon scene */
+        .icon-scene {
+            display: flex; align-items: flex-end; gap: 20px;
+            margin-bottom: 40px; font-size: clamp(3rem, 10vw, 5rem);
+        }
+        .worker-bounce {
+            animation: workerBounce 2.2s ease-in-out infinite;
+            display: inline-block;
+        }
+        .cone-spin {
+            animation: coneSpin 4s ease-in-out infinite alternate;
+            display: inline-block;
+        }
+        .worker-bounce2 {
+            animation: workerBounce 2.2s ease-in-out 1.1s infinite;
+            display: inline-block;
+        }
+        @keyframes workerBounce {
+            0%, 100% { transform: translateY(0); }
+            45% { transform: translateY(-28px) rotate(8deg); }
+        }
+        @keyframes coneSpin {
+            0% { transform: rotate(-8deg) scale(0.95); }
+            100% { transform: rotate(8deg) scale(1.05); }
         }
 
-        .worker-right {
-            font-size: clamp(50px, 10vw, 80px);
-            position: absolute;
-            bottom: 20px;
-            right: 15%;
-            animation: bounce 2s ease-in-out infinite 1s;
+        /* Headline */
+        .uc-label {
+            color: var(--fire); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.25em; text-transform: uppercase;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 20px;
         }
+        .uc-label::before, .uc-label::after { content: ''; display: block; width: 30px; height: 1.5px; background: var(--fire); }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-40px) rotate(10deg); }
-        }
-
-        /* Text Styles - Made responsive with clamp */
         h1 {
-            font-size: clamp(1.8rem, 8vw, 3rem);
-            margin: 10px 0;
-            text-transform: uppercase;
-            letter-spacing: clamp(1px, 1vw, 4px);
-            line-height: 1.2;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(3rem, 10vw, 6.5rem);
+            letter-spacing: 0.04em; line-height: 0.95;
+            margin-bottom: 28px;
         }
-
-        .highlight {
-            color: var(--safety-yellow);
-        }
+        h1 span { color: var(--gold-light); }
 
         p {
-            font-size: clamp(1rem, 4vw, 1.2rem);
-            opacity: 0.8;
-            max-width: 500px;
-            margin: 0 auto 30px;
-            padding: 0 10px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: rgba(255,255,255,0.4); font-style: italic;
+            font-weight: 300; line-height: 1.65;
+            max-width: 500px; margin-bottom: 48px;
         }
 
-        /* Progress Bar - Width set to percentage for mobile */
-        .loader-bar {
-            width: 90%;
-            max-width: 300px;
-            height: 8px;
-            background: #333;
-            margin: 0 auto;
-            border-radius: 4px;
-            position: relative;
-            overflow: hidden;
+        /* Progress bar */
+        .progress-wrap {
+            width: 100%; max-width: 320px; margin: 0 auto 40px;
         }
-
-        .loader-fill {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .progress-label-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+        }
+        .progress-label-row span:first-child {
+            font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+            text-transform: uppercase; color: rgba(255,255,255,0.3);
+        }
+        .progress-label-row span:last-child {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.1rem; color: var(--gold-light); letter-spacing: 0.04em;
+        }
+        .progress-bar {
+            height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;
+        }
+        .progress-fill {
             height: 100%;
-            width: 60%;
-            background: var(--safety-yellow);
-            box-shadow: 0 0 15px var(--safety-yellow);
-            animation: progress 4s linear infinite;
+            background: linear-gradient(90deg, var(--fire), var(--gold-light));
+            border-radius: 3px;
+            animation: progressAnim 3.5s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @keyframes progressAnim {
+            from { width: 0; }
+            to { width: 65%; }
         }
 
-        @keyframes progress {
-            0% { left: -100%; width: 30%; }
-            50% { width: 50%; }
-            100% { left: 100%; width: 30%; }
+        /* Back button */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            color: rgba(255,255,255,0.4); text-decoration: none;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+            transition: color 0.25s;
         }
+        .back-btn:hover { color: var(--gold-light); }
+        .back-btn i { font-size: 10px; }
 
-        /* Safety Tape Decorations */
-        .tape {
-            position: absolute;
-            width: 150%;
-            height: 40px;
-            background: repeating-linear-gradient(
-                45deg,
-                var(--safety-yellow),
-                var(--safety-yellow) 20px,
-                #000 20px,
-                #000 40px
-            );
-            z-index: -1;
-            opacity: 0.1;
+        @media (max-width: 480px) {
+            .icon-scene { font-size: 2.8rem; gap: 12px; }
         }
-
-        .tape-top { top: 10%; transform: rotate(-5deg) translateX(-10%); }
-        .tape-bottom { bottom: 10%; transform: rotate(5deg) translateX(-10%); }
-
     </style>
 </head>
 <body>
 
     <div class="tape tape-top"></div>
     <div class="tape tape-bottom"></div>
+    <div class="embers" id="embers"></div>
 
-    <div class="container">
-        <div class="animation-wrapper">
-            <div class="worker">👷‍♂️</div>
-            <div class="cone"></div>
-            <div class="worker-right">🚧</div>
+    <div class="content">
+        <div class="logo">
+            <img src="media/logos.png" alt="City of Champion Fire">
         </div>
 
-        <h1>Webpage <span class="highlight">Under Construction</span></h1>
-        <p>Our digital architects are currently laying down some heavy-duty code. We'll be back online shortly with something amazing.</p>
-        
-        <div class="loader-bar">
-            <div class="loader-fill"></div>
+        <div class="icon-scene">
+            <span class="worker-bounce">👷‍♂️</span>
+            <span class="cone-spin">🚧</span>
+            <span class="worker-bounce2">⛏️</span>
         </div>
+
+        <div class="uc-label">Stay Tuned</div>
+
+        <h1>PAGE UNDER<br><span>CONSTRUCTION</span></h1>
+
+        <p>Our digital architects are laying down some holy infrastructure. This page will be ready very soon — check back shortly for something amazing.</p>
+
+        <div class="progress-wrap">
+            <div class="progress-label-row">
+                <span>Progress</span>
+                <span>65%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <a href="index.html" class="back-btn"><i class="fas fa-chevron-left"></i> Back to Home</a>
     </div>
 
+    <script>
+        // Embers
+        const container = document.getElementById('embers');
+        for(let i = 0; i < 16; i++) {
+            const e = document.createElement('div');
+            e.className = 'ember';
+            const size = Math.random() * 5 + 3;
+            e.style.cssText = `width:${size}px; height:${size}px; left:${Math.random()*100}%; --dur:${Math.random()*8+6}s; --delay:${Math.random()*8}s; --drift:${(Math.random()-0.5)*180}px;`;
+            container.appendChild(e);
+        }
+    </script>
 </body>
 </html>

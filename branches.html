@@ -5,145 +5,677 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Branches | City of Champion Fire</title>
     <link rel="icon" type="image/png" href="media/logo1.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #ffffff; }
-        h1, h2, h3, .font-outfit { font-family: 'Outfit', sans-serif; }
-        
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --red: #c0000a;
+            --red-bright: #e8000d;
+            --black: #0a0a0a;
+            --off-white: #f5f0eb;
+            --gray-light: #f0ece7;
+            --gray-mid: #c8c0b8;
+            --gray-text: #6b6560;
+        }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--off-white);
+            color: var(--black);
+            overflow-x: hidden;
+        }
+
+        /* ── NOISE TEXTURE OVERLAY ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background-color: var(--black);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .header-bg {
+            position: absolute;
+            inset: 0;
+        }
+        .header-bg img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0.18;
+            filter: grayscale(60%);
+        }
+        .header-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(192,0,10,0.18) 0%, rgba(0,0,0,0.6) 60%);
+        }
+
+        .header-inner {
+            position: relative;
+            z-index: 2;
+            padding: 90px 40px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .header-eyebrow {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--red-bright);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .header-eyebrow::before,
+        .header-eyebrow::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 1px;
+            background: var(--red-bright);
+        }
+
+        .header-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(5rem, 14vw, 11rem);
+            line-height: 0.88;
+            letter-spacing: 0.02em;
+            color: white;
+            text-transform: uppercase;
+        }
+        .header-title span {
+            display: block;
+            color: var(--red-bright);
+        }
+
+        /* ── SEARCH BAR ── */
+        .search-wrap {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            margin-top: -28px;
+            padding: 0 24px;
+        }
+        .search-box {
+            background: white;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 8px 8px 24px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 560px;
+            border: 1px solid rgba(0,0,0,0.07);
+        }
+        .search-box i { color: var(--gray-mid); font-size: 0.9rem; }
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.95rem;
+            color: var(--black);
+            background: transparent;
+        }
+        .search-box input::placeholder { color: var(--gray-mid); }
+        .search-btn {
+            background: var(--red);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 12px 26px;
+            border-radius: 100px;
+            transition: background 0.25s, transform 0.18s;
+        }
+        .search-btn:hover { background: var(--black); transform: scale(1.04); }
+
+        /* ── MAIN GRID ── */
+        main {
+            padding: 80px 32px 80px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--gray-text);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 48px;
+        }
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-mid);
+        }
+
+        .branches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        /* ── BRANCH CARD ── */
         .branch-card {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.06);
+            transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1),
+                        box-shadow 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            flex-direction: column;
         }
         .branch-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            transform: translateY(-6px);
+            box-shadow: 0 24px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
         }
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+
+        .card-image {
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            background: #1a1a1a;
+        }
+        .card-image img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: grayscale(30%) contrast(1.05);
+            transition: transform 0.5s ease, filter 0.4s ease;
+        }
+        .branch-card:hover .card-image img {
+            transform: scale(1.06);
+            filter: grayscale(0%) contrast(1.1);
+        }
+
+        /* Dark gradient over image */
+        .card-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 70%;
+            background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+            pointer-events: none;
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 14px; right: 14px;
+            background: var(--red);
+            color: white;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.6rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border-radius: 100px;
+            z-index: 2;
+        }
+
+        /* Branch number on image bottom-left */
+        .card-num {
+            position: absolute;
+            bottom: 14px; left: 16px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.4rem;
+            color: rgba(255,255,255,0.15);
+            line-height: 1;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .card-body {
+            padding: 28px 28px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: 1.65rem;
+            line-height: 1.05;
+            text-transform: uppercase;
+            letter-spacing: 0.01em;
+            color: var(--black);
+            margin-bottom: 8px;
+        }
+
+        .card-pastor {
+            font-family: 'Barlow', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--gray-text);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 22px;
+            line-height: 1.4;
+        }
+        .card-pastor i { color: var(--red); margin-top: 2px; flex-shrink: 0; font-size: 0.75rem; }
+
+        .divider {
+            height: 1px;
+            background: var(--gray-light);
+            margin-bottom: 20px;
+        }
+
+        .card-details {
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+            margin-bottom: 26px;
+            flex: 1;
+        }
+        .detail-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: #4a4540;
+            line-height: 1.5;
+        }
+        .detail-row i {
+            color: var(--red);
+            width: 16px;
+            text-align: center;
+            margin-top: 2px;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+        }
+
+        .card-cta {
+            display: block;
+            text-align: center;
+            background: var(--black);
+            color: white;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.78rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 12px;
+            transition: background 0.25s, transform 0.18s, letter-spacing 0.25s;
+        }
+        .card-cta:hover {
+            background: var(--red);
+            transform: scale(1.02);
+            letter-spacing: 0.24em;
+        }
+
+        /* ── CTA SECTION ── */
+        .cta-section {
+            background: var(--black);
+            padding: 80px 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section::before {
+            content: 'FIRE';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(10rem, 22vw, 22rem);
+            color: rgba(255,255,255,0.03);
+            line-height: 1;
+            pointer-events: none;
+        }
+        .cta-inner {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        .cta-eyebrow {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--red-bright);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+        .cta-eyebrow::before,
+        .cta-eyebrow::after {
+            content: '';
+            display: block;
+            width: 30px;
+            height: 1px;
+            background: var(--red-bright);
+        }
+        .cta-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.8rem, 7vw, 5.5rem);
+            line-height: 0.9;
+            letter-spacing: 0.03em;
+            color: white;
+            margin-bottom: 24px;
+        }
+        .cta-title span { color: var(--red-bright); display: block; }
+        .cta-quote {
+            font-family: 'Barlow', sans-serif;
+            font-weight: 300;
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.55);
+            margin-bottom: 40px;
+            line-height: 1.7;
+            font-style: italic;
+        }
+        .cta-btn {
+            display: inline-block;
+            background: var(--red);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            padding: 18px 48px;
+            border-radius: 100px;
+            transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+            box-shadow: 0 0 0 0 rgba(192,0,10,0);
+        }
+        .cta-btn:hover {
+            background: white;
+            color: var(--black);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(192,0,10,0.35);
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            padding: 36px 32px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            background: var(--off-white);
+        }
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        .footer-line {
+            width: 30px; height: 1px;
+            background: var(--gray-mid);
+        }
+        .footer-text {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 600;
+            font-size: 0.68rem;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: var(--gray-text);
+        }
+
+        /* ── SCROLL ANIMATION ── */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .header-inner { padding: 70px 24px 64px; }
+            main { padding: 60px 16px; }
+            .branches-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
-    <header class="bg-black text-white py-20 px-6 text-center relative overflow-hidden">
-        <div class="absolute inset-0 opacity-20">
-            <img src="media/building3.jpeg" alt="background" class="w-full h-full object-cover">
+    <header>
+        <div class="header-bg">
+            <img src="media/building3.jpeg" alt="background">
         </div>
-        <div class="relative z-10">
-            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tighter mb-4">OUR LOCATIONS</h1>
-            <p class="text-red-500 font-bold tracking-[0.2em] uppercase">Find a global home near you</p>
+        <div class="header-inner">
+            <div class="header-eyebrow">Find a global home near you</div>
+            <h1 class="header-title">
+                Our
+                <span>Locations</span>
+            </h1>
         </div>
     </header>
 
-    <div class="container mx-auto px-6 -mt-10 relative z-20">
-        <div class="bg-white p-4 rounded-2xl shadow-xl max-w-2xl mx-auto flex items-center border border-gray-100">
-            <i class="fas fa-search text-gray-400 ml-4"></i>
-            <input type="text" placeholder="Search by city or country..." class="w-full px-4 py-2 outline-none text-gray-700">
-            <button class="bg-red-700 text-white px-6 py-2 rounded-xl font-bold hover:bg-black transition">SEARCH</button>
+    <div class="search-wrap">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search by city or country...">
+            <button class="search-btn">Search</button>
         </div>
     </div>
 
-    <main class="container mx-auto px-6 py-20">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            
-            <div class="branch-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
-                <div class="h-48 bg-gray-200 relative">
-                    <img src="media/building3.jpeg" class="w-full h-full object-cover" alt="HQ">
-                    <div class="absolute top-4 right-4 bg-red-700 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Global HQ</div>
+    <main>
+        <div class="section-label">All branches &amp; outposts</div>
+
+        <div class="branches-grid">
+
+            <!-- Card 1 -->
+            <div class="branch-card fade-up">
+                <div class="card-image">
+                    <img src="media/building3.jpeg" alt="Champion Cathedral">
+                    <div class="card-badge">Global HQ</div>
+                    <div class="card-num">01</div>
                 </div>
-                <div class="p-8">
-                    <h3 class="text-2xl font-extrabold mb-1">Champion Cathedral</h3>
-                    <p class="text-gray-400 text-sm mb-6 flex items-center gap-2">
-                        <i class="fas fa-user-tie text-red-700"></i> Lead Pastor: john Doe
+                <div class="card-body">
+                    <h3 class="card-title">Champion Cathedral</h3>
+                    <p class="card-pastor">
+                        <i class="fas fa-user-tie"></i>
+                        Lead Pastor: APOSTLE PROF. &amp; REV DR. FAITH ALEGBE OSARO MAGNUS
                     </p>
-                    <div class="space-y-4 mb-8">
-                        <div class="flex items-start gap-4 text-gray-600">
-                            <i class="fas fa-map-marker-alt mt-1 text-red-700"></i>
-                            <p class="text-sm leading-relaxed"> City of Champions, Au Road, <br>
-                            by Auchi Bypass, Uselu N'Ahor,<br>
-                            Benin City.</p>
+                    <div class="divider"></div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>City of Champions, Au Road, by Auchi Bypass, Uselu N'Ahor, Benin City.</span>
                         </div>
-                        <div class="flex items-center gap-4 text-gray-600">
-                            <i class="fas fa-clock text-red-700"></i>
-                            <p class="text-sm">Sundays: 8:00 AM | Wednesdays: 5:00 PM</p>
+                        <div class="detail-row">
+                            <i class="fas fa-clock"></i>
+                            <span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span>
                         </div>
                     </div>
-                    <a href="https://maps.google.com" target="_blank" class="block text-center border-2 border-black text-black font-bold py-3 rounded-xl hover:bg-black hover:text-white transition">
-                        GET DIRECTIONS
-                    </a>
+                    <a href="https://maps.google.com" target="_blank" class="card-cta">Get Directions</a>
                 </div>
             </div>
 
-            <div class="branch-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
-                <div class="h-48 bg-gray-200">
-                    <img src="media/building3.jpeg" class="w-full h-full object-cover" alt="Lagos">
+            <!-- Card 2 -->
+            <div class="branch-card fade-up">
+                <div class="card-image">
+                    <img src="media/building3.jpeg" alt="Noah's Ark">
+                  
+                    <div class="card-num">02</div>
                 </div>
-                <div class="p-8">
-                    <h3 class="text-2xl font-extrabold mb-1">Lagos Island Center</h3>
-                    <p class="text-gray-400 text-sm mb-6 flex items-center gap-2">
-                        <i class="fas fa-user-tie text-red-700"></i> Resident Pastor: John Doe
+                <div class="card-body">
+                    <h3 class="card-title">Noah's Ark</h3>
+                    <p class="card-pastor">
+                        <i class="fas fa-user-tie"></i>
+                        Lead Pastor: John Doe
                     </p>
-                    <div class="space-y-4 mb-8">
-                        <div class="flex items-start gap-4 text-gray-600">
-                            <i class="fas fa-map-marker-alt mt-1 text-red-700"></i>
-                            <p class="text-sm leading-relaxed">Civic Center, Victoria Island, <br>Lagos State, Nigeria.</p>
+                    <div class="divider"></div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>By Ascon Fuel Station, Idokpa, Benin Auchi Road, Benin City.</span>
                         </div>
-                        <div class="flex items-center gap-4 text-gray-600">
-                            <i class="fas fa-clock text-red-700"></i>
-                            <p class="text-sm">Sundays: 9:00 AM | Thursdays: 6:00 PM</p>
+                        <div class="detail-row">
+                            <i class="fas fa-clock"></i>
+                            <span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span>
                         </div>
                     </div>
-                    <a href="#" class="block text-center border-2 border-black text-black font-bold py-3 rounded-xl hover:bg-black hover:text-white transition">
-                        GET DIRECTIONS
-                    </a>
+                    <a href="https://maps.google.com" target="_blank" class="card-cta">Get Directions</a>
                 </div>
             </div>
 
-            <div class="branch-card bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
-                <div class="h-48 bg-gray-200">
-                    <img src="media/building3.jpeg" class="w-full h-full object-cover" alt="Abuja">
+            <!-- Card 3 -->
+            <div class="branch-card fade-up">
+                <div class="card-image">
+                    <img src="media/building3.jpeg" alt="Bethel House">
+                  
+                    <div class="card-num">03</div>
                 </div>
-                <div class="p-8">
-                    <h3 class="text-2xl font-extrabold mb-1">Abuja City Church</h3>
-                    <p class="text-gray-400 text-sm mb-6 flex items-center gap-2">
-                        <i class="fas fa-user-tie text-red-700"></i> Resident Pastor: Jane Smith
+                <div class="card-body">
+                    <h3 class="card-title">Bethel House</h3>
+                    <p class="card-pastor">
+                        <i class="fas fa-user-tie"></i>
+                        Lead Pastor: John Doe
                     </p>
-                    <div class="space-y-4 mb-8">
-                        <div class="flex items-start gap-4 text-gray-600">
-                            <i class="fas fa-map-marker-alt mt-1 text-red-700"></i>
-                            <p class="text-sm leading-relaxed">Transcorp Hilton, Maitama, <br>Abuja, FCT, Nigeria.</p>
+                    <div class="divider"></div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Divine Baptist Church Road, Off Divine Grace Road, Idunmwungha, Benin City.</span>
                         </div>
-                        <div class="flex items-center gap-4 text-gray-600">
-                            <i class="fas fa-clock text-red-700"></i>
-                            <p class="text-sm">Sundays: 7:30 AM & 10:00 AM</p>
+                        <div class="detail-row">
+                            <i class="fas fa-clock"></i>
+                            <span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span>
                         </div>
                     </div>
-                    <a href="#" class="block text-center border-2 border-black text-black font-bold py-3 rounded-xl hover:bg-black hover:text-white transition">
-                        GET DIRECTIONS
-                    </a>
+                    <a href="https://maps.google.com" target="_blank" class="card-cta">Get Directions</a>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="branch-card fade-up">
+                <div class="card-image">
+                    <img src="media/building3.jpeg" alt="Grace and Mercy">
+                    <div class="card-num">04</div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">Grace and Mercy</h3>
+                    <p class="card-pastor">
+                        <i class="fas fa-user-tie"></i>
+                        Resident Pastor: John Doe
+                    </p>
+                    <div class="divider"></div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Ivie Obasuyi Street, Idunmwuoni Road, Upper Mission Extension, Benin City, Nigeria.</span>
+                        </div>
+                        <div class="detail-row">
+                            <i class="fas fa-clock"></i>
+                            <span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span>
+                        </div>
+                    </div>
+                    <a href="#" class="card-cta">Get Directions</a>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="branch-card fade-up">
+                <div class="card-image">
+                    <img src="media/building3.jpeg" alt="Tabernacle of David">
+                    <div class="card-num">05</div>
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">Tabernacle of David</h3>
+                    <p class="card-pastor">
+                        <i class="fas fa-user-tie"></i>
+                        Resident Pastor: Jane Smith
+                    </p>
+                    <div class="divider"></div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Dr. Abba One Quarter's, By Movic Motors, Urora, Benin City, Nigeria.</span>
+                        </div>
+                        <div class="detail-row">
+                            <i class="fas fa-clock"></i>
+                            <span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span>
+                        </div>
+                    </div>
+                    <a href="#" class="card-cta">Get Directions</a>
                 </div>
             </div>
 
         </div>
     </main>
 
-    <section class="bg-gray-100 py-20 px-6">
-        <div class="container mx-auto max-w-4xl text-center">
-            <h2 class="text-4xl font-extrabold tracking-tight mb-6">Can't find a branch near you?</h2>
-            <p class="text-xl text-gray-600 mb-10 italic">“Join thousands of people online worldwide and experience the fire of God from anywhere in the world.”</p>
-            <button class="bg-black text-white px-10 py-4 rounded-2xl font-extrabold hover:bg-red-700 transition transform hover:-translate-y-1">
-                JOIN ONLINE
-            </button>
+    <section class="cta-section">
+        <div class="cta-inner">
+            <div class="cta-eyebrow">Join us online</div>
+            <h2 class="cta-title">
+                Can't find a branch
+                <span>near you?</span>
+            </h2>
+            <p class="cta-quote">"Join thousands of people online worldwide and experience the fire of God from anywhere in the world."</p>
+            <button class="cta-btn">Join Online</button>
         </div>
     </section>
 
-    <footer class="py-12 border-t border-gray-200">
-        <div class="text-center text-gray-400 text-sm font-bold tracking-widest uppercase">
-            © 2026 City of Champion Fire. All Rights Reserved.
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-line"></div>
+            <p class="footer-text">© 2026 COC. All Rights Reserved.</p>
+            <div class="footer-line"></div>
         </div>
     </footer>
+
+    <script>
+        // Staggered scroll-triggered fade-up
+        const cards = document.querySelectorAll('.fade-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const delay = Array.from(cards).indexOf(el) % 3 * 100;
+                    setTimeout(() => el.classList.add('visible'), delay);
+                    observer.unobserve(el);
+                }
+            });
+        }, { threshold: 0.12 });
+        cards.forEach(c => observer.observe(c));
+    </script>
 
 </body>
 </html>
