@@ -12,14 +12,40 @@
         body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
         h1, h2, h3, .font-outfit { font-family: 'Outfit', sans-serif; }
         
-        .testimony-card {
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
+        /* ── ADMIN DELETE BUTTON ── */
+        .admin-delete-btn {
+            display: none;
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #b91c1c;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            flex-shrink: 0;
         }
-        .testimony-card:hover {
-            transform: translateY(-5px);
-            border-left: 4px solid #b91c1c;
+        .admin-delete-btn:hover { background: #b91c1c; color: #fff; border-color: #b91c1c; }
+        body.is-admin .admin-delete-btn { display: inline-flex; align-items: center; gap: 5px; }
+
+        /* Admin badge in nav */
+        .admin-badge {
+            display: none;
+            background: #b91c1c;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-family: 'Inter', sans-serif;
         }
+        body.is-admin .admin-badge { display: inline-block; }
 
         /* ── CUSTOM TOAST ── */
         #coc-toast {
@@ -92,7 +118,15 @@
             <a href="index.html" class="text-red-700 font-bold flex items-center gap-2">
                 <i class="fas fa-arrow-left"></i> BACK TO HOME
             </a>
-            <h1 class="text-xl font-extrabold uppercase tracking-tighter">Share Your Victory</h1>
+            <div class="flex items-center gap-3">
+                <h1 class="text-xl font-extrabold uppercase tracking-tighter">Share Your Victory</h1>
+                <span class="admin-badge">Admin</span>
+            </div>
+            <button onclick="cocAdminLogout()" class="admin-delete-btn" style="display:none;" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+            <!-- Hidden admin dot -->
+            <span onclick="cocAdminDot()" style="cursor:default;color:rgba(0,0,0,0.04);font-size:18px;line-height:1;user-select:none;position:absolute;right:8px;bottom:4px;" title="">.</span>
         </div>
     </nav>
 
@@ -166,12 +200,36 @@
         function cocHideToast() {
             document.getElementById('coc-toast').classList.remove('show');
         }
+
+        /* ── ADMIN SESSION ── */
+        const isAdmin = sessionStorage.getItem('coc_admin') === 'true';
+        if (isAdmin) {
+            document.body.classList.add('is-admin');
+            const lb = document.getElementById('logoutBtn');
+            if (lb) lb.style.display = 'inline-flex';
+        }
+        function cocAdminDot() {
+            if (isAdmin) { cocAdminLogout(); }
+            else {
+                sessionStorage.setItem('coc_admin_return', 'testimonies.html');
+                window.location.href = 'admin-login.html';
+            }
+        }
+        function cocAdminLogout() {
+            if (confirm('Sign out of admin mode?')) {
+                sessionStorage.removeItem('coc_admin');
+                sessionStorage.removeItem('coc_admin_return');
+                location.reload();
+            }
+        }
     </script>
 
     <script type="module">
         import { initializeApp }          from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
         import { getAnalytics }           from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }
+        import { getAuth, onAuthStateChanged, signOut }
+                                          from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, doc }
                                           from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -184,10 +242,37 @@
             measurementId:     "G-V0HL0CDXXD"
         };
 
-        const app = initializeApp(firebaseConfig);
+        const app  = initializeApp(firebaseConfig);
         getAnalytics(app);
+        const auth   = getAuth(app);
         const db     = getFirestore(app);
         const colRef = collection(db, 'testimonies');
+
+        const ADMIN_UID = 'tAqH3t6DX4OxHadWurRcBFBhmQA3';
+
+        // Watch Firebase Auth state — show admin UI only if UID matches
+        onAuthStateChanged(auth, user => {
+            if (user && user.uid === ADMIN_UID) {
+                sessionStorage.setItem('coc_admin', 'true');
+                document.body.classList.add('is-admin');
+                const lb = document.getElementById('logoutBtn');
+                if (lb) lb.style.display = 'inline-flex';
+            } else {
+                document.body.classList.remove('is-admin');
+                sessionStorage.removeItem('coc_admin');
+                const lb = document.getElementById('logoutBtn');
+                if (lb) lb.style.display = 'none';
+            }
+        });
+
+        // Expose logout so inline onclick can reach it
+        window.cocAdminLogout = async function() {
+            if (!confirm('Sign out of admin mode?')) return;
+            await signOut(auth);
+            sessionStorage.removeItem('coc_admin');
+            sessionStorage.removeItem('coc_admin_return');
+            location.reload();
+        };
 
         /* ── SUBMIT ── */
         document.getElementById('testimonyForm').addEventListener('submit', async (e) => {
@@ -227,25 +312,30 @@
             }
 
             let html = '';
-            snapshot.docs.forEach(doc => {
-                const data = doc.data();
-                const date = data.createdAt
+            snapshot.docs.forEach(docSnap => {
+                const data  = docSnap.data();
+                const docId = docSnap.id;
+                const date  = data.createdAt
                     ? data.createdAt.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
                     : 'Just now';
 
-                // Safely escape user content to prevent XSS
                 const safeName    = data.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 const safeContent = data.content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
                 html += `
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 testimony-card">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 testimony-card" id="tc-${docId}">
                         <div class="flex justify-between items-start mb-4">
                             <div>
                                 <h3 class="font-bold text-lg text-gray-900">${safeName}</h3>
                                 <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">${date}</p>
                             </div>
-                            <div class="text-red-700 opacity-20 text-3xl">
-                                <i class="fas fa-quote-right"></i>
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <button class="admin-delete-btn" onclick="deleteTestimony('${docId}')">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                                <div class="text-red-700 opacity-20 text-3xl">
+                                    <i class="fas fa-quote-right"></i>
+                                </div>
                             </div>
                         </div>
                         <p class="text-gray-600 leading-relaxed italic">"${safeContent}"</p>
@@ -259,6 +349,17 @@
             document.getElementById('testimoniesList').innerHTML =
                 '<p class="text-center text-red-400 py-10">Could not load testimonies. Please refresh.</p>';
         });
+
+        /* ── DELETE (Firebase Auth required by Firestore rules) ── */
+        window.deleteTestimony = async function(docId) {
+            if (!confirm('Delete this testimony? This cannot be undone.')) return;
+            try {
+                await deleteDoc(doc(db, 'testimonies', docId));
+            } catch (err) {
+                console.error('Delete error:', err);
+                alert('Could not delete. Make sure you are signed in as admin.');
+            }
+        };
     </script>
 </body>
 </html>

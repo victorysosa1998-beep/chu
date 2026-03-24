@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — City of Champion Fire</title>
+    <link rel="icon" type="image/png" href="media/logo1.png">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 50% 100%, rgba(200,16,46,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 30% at 20% 20%, rgba(200,16,46,0.05) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .card {
+            position: relative;
+            z-index: 1;
+            background: #111;
+            border: 1px solid rgba(200,16,46,0.2);
+            border-radius: 24px;
+            padding: 48px 44px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+        }
+        .logo-wrap { display: flex; justify-content: center; margin-bottom: 28px; }
+        .logo-wrap img { height: 56px; object-fit: contain; }
+        .eyebrow {
+            font-size: 10px; font-weight: 700; letter-spacing: 0.3em;
+            text-transform: uppercase; color: #c8102e; text-align: center;
+            margin-bottom: 10px; display: flex; align-items: center;
+            justify-content: center; gap: 10px;
+        }
+        .eyebrow::before, .eyebrow::after { content: ''; display: block; width: 24px; height: 1px; background: #c8102e; }
+        h1 { font-family: 'Bebas Neue', sans-serif; font-size: 2.6rem; color: #fff; text-align: center; letter-spacing: 0.04em; margin-bottom: 36px; line-height: 1; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+        .input-wrap { position: relative; }
+        .input-wrap i.icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.2); font-size: 13px; }
+        .input-wrap input { width: 100%; background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 13px 14px 13px 40px; color: #fff; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+        .input-wrap input:focus { border-color: rgba(200,16,46,0.6); }
+        .input-wrap input::placeholder { color: rgba(255,255,255,0.18); }
+        .toggle-pw { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(255,255,255,0.2); cursor: pointer; font-size: 13px; padding: 4px; transition: color 0.2s; }
+        .toggle-pw:hover { color: rgba(255,255,255,0.5); }
+        .login-btn { width: 100%; background: linear-gradient(135deg, #c8102e, #8b0000); color: #fff; border: none; border-radius: 12px; padding: 15px; font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; margin-top: 8px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,16,46,0.4); }
+        .login-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .error-msg { background: rgba(200,16,46,0.12); border: 1px solid rgba(200,16,46,0.3); border-radius: 10px; padding: 11px 14px; font-size: 13px; color: #ff6b6b; margin-top: 14px; display: none; text-align: center; }
+        .error-msg.show { display: block; }
+        .back-link { display: block; text-align: center; margin-top: 24px; font-size: 12px; color: rgba(255,255,255,0.2); text-decoration: none; transition: color 0.2s; }
+        .back-link:hover { color: rgba(255,255,255,0.5); }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
+        .shake { animation: shake 0.4s ease; }
+    </style>
+</head>
+<body>
+    <div class="card" id="loginCard">
+        <div class="logo-wrap">
+            <img src="media/logos.png" alt="COC" onerror="this.style.display='none'">
+        </div>
+        <div class="eyebrow">Admin Access</div>
+        <h1>Welcome Back</h1>
+
+        <div class="form-group">
+            <label>Email</label>
+            <div class="input-wrap">
+                <i class="fas fa-envelope icon"></i>
+                <input type="email" id="emailInput" placeholder="Admin email" value="victorysosa00@gmail.com" autocomplete="email">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrap">
+                <i class="fas fa-lock icon"></i>
+                <input type="password" id="pwInput" placeholder="Enter your Firebase password" autocomplete="current-password">
+                <button class="toggle-pw" type="button" onclick="togglePw()" tabindex="-1">
+                    <i class="fas fa-eye" id="eyeIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <button class="login-btn" id="loginBtn" onclick="doLogin()">
+            <i class="fas fa-shield-halved"></i> Sign In
+        </button>
+
+        <div class="error-msg" id="errorMsg">Incorrect email or password. Please try again.</div>
+        <a href="index.html" class="back-link">← Back to website</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp }       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged }
+                                       from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+        const ADMIN_UID = 'tAqH3t6DX4OxHadWurRcBFBhmQA3';
+
+        const firebaseConfig = {
+            apiKey:            "AIzaSyB2gU2QrpRnIevjhLqd1kTj-xsjiWBHGqQ",
+            authDomain:        "joincoc.firebaseapp.com",
+            projectId:         "joincoc",
+            storageBucket:     "joincoc.firebasestorage.app",
+            messagingSenderId: "322343274719",
+            appId:             "1:322343274719:web:689229a5dd1ca422c9c16a",
+            measurementId:     "G-V0HL0CDXXD"
+        };
+
+        const app  = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // If already signed in as the right admin, redirect immediately
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.uid === ADMIN_UID) {
+                const returnTo = sessionStorage.getItem('coc_admin_return') || 'index.html';
+                window.location.href = returnTo;
+            }
+        });
+
+        window.togglePw = function() {
+            const input = document.getElementById('pwInput');
+            const icon  = document.getElementById('eyeIcon');
+            if (input.type === 'password') { input.type = 'text'; icon.className = 'fas fa-eye-slash'; }
+            else                           { input.type = 'password'; icon.className = 'fas fa-eye'; }
+        };
+
+        document.getElementById('pwInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+        window.doLogin = async function() {
+            const email = document.getElementById('emailInput').value.trim();
+            const pw    = document.getElementById('pwInput').value;
+            const btn   = document.getElementById('loginBtn');
+            const err   = document.getElementById('errorMsg');
+            const card  = document.getElementById('loginCard');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Signing in…';
+            err.classList.remove('show');
+
+            try {
+                const cred = await signInWithEmailAndPassword(auth, email, pw);
+                if (cred.user.uid !== ADMIN_UID) {
+                    // Wrong account — sign out and show error
+                    await auth.signOut();
+                    throw new Error('not-admin');
+                }
+                // Success — store session flag and redirect
+                sessionStorage.setItem('coc_admin', 'true');
+                const returnTo = sessionStorage.getItem('coc_admin_return') || 'index.html';
+                window.location.href = returnTo;
+            } catch (e) {
+                err.classList.add('show');
+                card.classList.remove('shake');
+                void card.offsetWidth;
+                card.classList.add('shake');
+                document.getElementById('pwInput').value = '';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-shield-halved"></i> Sign In';
+            }
+        };
+    </script>
+</body>
+</html>

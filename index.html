@@ -611,8 +611,8 @@
         <div class="container mx-auto px-6 reveal">
             <div class="flex flex-col lg:flex-row items-center gap-16">
                 <div class="lg:w-1/2 relative flex justify-center items-center reveal">
-                    <div class="relative w-full max-w-xl img-grounded border-4 border-gray-100 rounded-[2rem] shadow-2xl bg-navy p-6 flex items-center justify-center">
-                        <img src="media/o1-removebg-preview.png" alt="Pastor" class="w-full h-auto max-h-[550px] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
+                    <div class="relative w-full max-w-xl img-grounded border-4 border-gray-100 rounded-[2rem] shadow-2xl bg-navy overflow-hidden flex items-end justify-center" style="min-height:480px;">
+                        <img src="media/pm.png" alt="Pastor" class="w-full h-auto object-contain object-bottom" style="display:block;">
                     </div>
                 </div>
                 <div class="lg:w-1/2 reveal">
@@ -878,6 +878,7 @@
         </div>
         <div class="bb-footer-bottom">
             <span>© 2026 COC. All Rights Reserved.</span>
+            <span onclick="cocAdminTrigger()" style="cursor:default;color:rgba(255,255,255,0.06);font-size:18px;line-height:1;user-select:none;" title="">.</span>
         </div>
     </footer>
 
@@ -1211,6 +1212,33 @@ TONE: Warm, welcoming, faith-affirming. If unsure, direct to WhatsApp or email. 
 
             cocBusy = false;
             document.getElementById('cocSendBtn').disabled = false;
+        }
+
+        /* ── ADMIN TRIGGER (hidden dot in footer) ── */
+        function cocAdminTrigger() {
+            if (sessionStorage.getItem('coc_admin') === 'true') {
+                if (confirm('Sign out of admin mode?')) {
+                    // Sign out of Firebase Auth
+                    import('https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js').then(({ initializeApp }) => {
+                        import('https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js').then(({ getAuth, signOut }) => {
+                            try {
+                                const app = initializeApp({
+                                    apiKey: "AIzaSyB2gU2QrpRnIevjhLqd1kTj-xsjiWBHGqQ",
+                                    authDomain: "joincoc.firebaseapp.com",
+                                    projectId: "joincoc"
+                                }, 'index-auth');
+                                signOut(getAuth(app)).catch(() => {});
+                            } catch(e) {}
+                        });
+                    });
+                    sessionStorage.removeItem('coc_admin');
+                    sessionStorage.removeItem('coc_admin_return');
+                    location.reload();
+                }
+            } else {
+                sessionStorage.setItem('coc_admin_return', 'index.html');
+                window.location.href = 'admin-login.html';
+            }
         }
     </script>
 
