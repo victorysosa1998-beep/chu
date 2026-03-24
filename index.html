@@ -1123,7 +1123,7 @@ TONE: Warm, welcoming, faith-affirming. If unsure, direct to WhatsApp or email. 
                 } else {
                     const reply = data.choices?.[0]?.message?.content || 'I\'m sorry, I couldn\'t get a response. Please try again.';
                     cocHistory.push({ role: 'assistant', content: reply });
-                    cocAddMsg('bot', reply.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+                    cocAddMsg('bot', reply);
                 }
             } catch (err) {
                 cocRemoveTyping();
