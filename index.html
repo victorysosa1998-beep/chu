@@ -163,6 +163,302 @@
         .bb-footer-bottom { display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: rgba(255,255,255,0.28); flex-wrap: wrap; gap: 8px; font-family: 'Inter', sans-serif; }
         @media (max-width: 1024px) { .bb-footer { padding: 56px 24px 28px; } .bb-footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; } }
         @media (max-width: 640px) { .bb-footer-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+
+        /* ═══════════════════════════════════════════════
+           COC AI CHAT WIDGET — NEW ADDITION ONLY
+        ═══════════════════════════════════════════════ */
+
+        /* Wider popup to fit both options */
+        #whatsapp-popup { width: 200px !important; }
+
+        /* COC AI option button */
+        .wa-option-coc {
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+            color: #374151;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+        }
+        .wa-option-coc:hover { background: #f3f4f6; }
+        .coc-ai-dot {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c8102e, #8b0000);
+            display: flex; align-items: center; justify-content: center;
+            color: #f0c842;
+            font-size: 13px;
+            flex-shrink: 0;
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0;
+        }
+
+        /* Overlay backdrop */
+        #coc-chat-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 1999;
+            backdrop-filter: blur(3px);
+            animation: coc-fade-in 0.25s ease;
+        }
+        #coc-chat-overlay.open { display: block; }
+        @keyframes coc-fade-in { from { opacity:0; } to { opacity:1; } }
+
+        /* Chat widget container */
+        #coc-chat-widget {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 20px;
+            width: 370px;
+            max-width: calc(100vw - 24px);
+            height: 560px;
+            max-height: calc(100vh - 48px);
+            z-index: 2000;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,16,46,0.25);
+            flex-direction: column;
+            font-family: 'Inter', sans-serif;
+            animation: coc-slide-up 0.35s cubic-bezier(0.16,1,0.3,1);
+            background: #0e0e0e;
+        }
+        #coc-chat-widget.open { display: flex; }
+        @keyframes coc-slide-up {
+            from { opacity: 0; transform: translateY(30px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Header */
+        .coc-chat-header {
+            background: linear-gradient(135deg, #c8102e 0%, #8b0000 100%);
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .coc-chat-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(240,200,66,0.5), transparent);
+        }
+        .coc-header-logo {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .coc-header-logo img { width: 30px; height: 30px; object-fit: contain; }
+        .coc-header-text { flex: 1; min-width: 0; }
+        .coc-header-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+        }
+        .coc-header-sub {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 2px;
+            font-weight: 400;
+        }
+        .coc-online-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 8px rgba(74,222,128,0.7);
+            flex-shrink: 0;
+            animation: coc-pulse-green 2.5s ease-in-out infinite;
+        }
+        @keyframes coc-pulse-green {
+            0%, 100% { opacity:1; box-shadow: 0 0 8px rgba(74,222,128,0.7); }
+            50%       { opacity:0.6; box-shadow: 0 0 14px rgba(74,222,128,0.3); }
+        }
+        .coc-close-btn {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+        .coc-close-btn:hover { background: rgba(255,255,255,0.22); }
+
+        /* Messages */
+        .coc-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            scroll-behavior: smooth;
+            background: #0e0e0e;
+        }
+        .coc-messages::-webkit-scrollbar { width: 3px; }
+        .coc-messages::-webkit-scrollbar-thumb { background: rgba(200,16,46,0.3); border-radius: 3px; }
+
+        .coc-msg { display: flex; gap: 9px; align-items: flex-end; animation: coc-msg-in 0.3s ease; }
+        .coc-msg.user { flex-direction: row-reverse; }
+        @keyframes coc-msg-in {
+            from { opacity:0; transform: translateY(10px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        .coc-avatar {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            font-size: 12px;
+        }
+        .coc-avatar.bot {
+            background: linear-gradient(135deg, #c8102e, #6b0000);
+            color: #f0c842;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 14px;
+            border: 1px solid rgba(200,16,46,0.4);
+        }
+        .coc-avatar.usr {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .coc-bubble {
+            max-width: 78%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            line-height: 1.6;
+        }
+        .coc-msg.bot .coc-bubble {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: rgba(255,255,255,0.85);
+            border-bottom-left-radius: 3px;
+        }
+        .coc-msg.user .coc-bubble {
+            background: linear-gradient(135deg, #c8102e, #9b0c23);
+            color: #fff;
+            border-bottom-right-radius: 3px;
+        }
+
+        /* Typing dots */
+        .coc-typing { display: flex; gap: 4px; align-items: center; padding: 2px 0; }
+        .coc-typing span {
+            width: 6px; height: 6px;
+            background: #c8102e;
+            border-radius: 50%;
+            animation: coc-bounce 1.1s ease-in-out infinite;
+        }
+        .coc-typing span:nth-child(2) { animation-delay: 0.18s; }
+        .coc-typing span:nth-child(3) { animation-delay: 0.36s; }
+        @keyframes coc-bounce {
+            0%,60%,100% { transform:translateY(0); opacity:0.5; }
+            30%          { transform:translateY(-5px); opacity:1; }
+        }
+
+        /* Suggestions */
+        .coc-suggestions {
+            padding: 0 14px 10px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+            background: #0e0e0e;
+        }
+        .coc-pill {
+            background: transparent;
+            border: 1px solid #2e2e2e;
+            color: rgba(255,255,255,0.45);
+            font-family: 'Inter', sans-serif;
+            font-size: 11.5px;
+            padding: 5px 11px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .coc-pill:hover { border-color: #c8102e; color: rgba(255,255,255,0.85); background: rgba(200,16,46,0.08); }
+
+        /* Input */
+        .coc-input-row {
+            border-top: 1px solid #1e1e1e;
+            background: #111;
+            padding: 12px 14px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+        .coc-input-row textarea {
+            flex: 1;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 10px 13px;
+            color: rgba(255,255,255,0.9);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+            max-height: 100px;
+            min-height: 40px;
+            transition: border-color 0.2s;
+        }
+        .coc-input-row textarea::placeholder { color: rgba(255,255,255,0.2); }
+        .coc-input-row textarea:focus { border-color: rgba(200,16,46,0.5); }
+        .coc-send-btn {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #c8102e, #8b0000);
+            color: #fff;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .coc-send-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(200,16,46,0.4); }
+        .coc-send-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+        .coc-send-btn svg { width: 17px; height: 17px; }
+
+        /* Footer bar */
+        .coc-footer-bar {
+            padding: 6px 14px 10px;
+            text-align: center;
+            font-size: 10.5px;
+            color: rgba(255,255,255,0.18);
+            background: #111;
+            flex-shrink: 0;
+        }
+        .coc-footer-bar a { color: rgba(200,16,46,0.6); text-decoration: none; }
     </style>
 </head>
 <body class="bg-white text-gray-900">
@@ -172,6 +468,11 @@
         <a href="https://wa.me/+2348032740443" target="_blank" class="wa-option">
             <i class="fab fa-whatsapp text-green-500 text-lg"></i> Chat with Us
         </a>
+        <!-- ▼ NEW: COC AI option added below the WhatsApp option ▼ -->
+        <button class="wa-option-coc" onclick="openCocChat(event)">
+            <div class="coc-ai-dot">✦</div>
+            Chat with COC AI
+        </button>
     </div>
 
     <div class="whatsapp-float-container">
@@ -247,7 +548,7 @@
             <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Healing &amp; Deliverance Service— Monday 5:00 PM</span>
             <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Power Communion — Wednesday 5:30 PM</span>
             <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Watch Live Online — Join Worldwide</span>
- <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Sunday Celebration Service — 8:00 AM &amp; 10:30 AM</span>
+            <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Sunday Celebration Service — 8:00 AM &amp; 10:30 AM</span>
             <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Healing &amp; Deliverance Service— Monday 5:00 PM</span>
             <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Power Communion — Wednesday 5:30 PM</span>
             <span style="color:#fff; font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-family:'Inter',sans-serif; flex-shrink:0;">✦ &nbsp; Watch Live Online — Join Worldwide</span>
@@ -405,27 +706,11 @@
         </div>
         <div class="bb-prog-grid">
             <div class="bb-prog-card fade-up d1">
-                <div class="bb-prog-date"><span class="bb-prog-day">01</span><span class="bb-prog-month">Jun</span></div>
+                <div class="bb-prog-date"><span class="bb-prog-day">25-29</span><span class="bb-prog-month">September</span></div>
                 <div class="bb-prog-body">
                     <span class="bb-prog-tag">Annual</span>
                     <span class="bb-prog-name">Champions' Convention 2026</span>
                     <span class="bb-prog-desc">A power-packed gathering of champions from across the globe. Expect miracles, signs, and wonders.</span>
-                </div>
-            </div>
-            <div class="bb-prog-card fade-up d2">
-                <div class="bb-prog-date"><span class="bb-prog-day">15</span><span class="bb-prog-month">Jun</span></div>
-                <div class="bb-prog-body">
-                    <span class="bb-prog-tag">Monthly</span>
-                    <span class="bb-prog-name">Power Night of Fire</span>
-                    <span class="bb-prog-desc">An all-night prayer and worship experience. Come with your burdens and leave with your breakthrough.</span>
-                </div>
-            </div>
-            <div class="bb-prog-card fade-up d3">
-                <div class="bb-prog-date"><span class="bb-prog-day">29</span><span class="bb-prog-month">Jun</span></div>
-                <div class="bb-prog-body">
-                    <span class="bb-prog-tag">Youth</span>
-                    <span class="bb-prog-name">Champions Youth Summit</span>
-                    <span class="bb-prog-desc">A dynamic gathering for the next generation. Equipping young people to walk in their God-given purpose.</span>
                 </div>
             </div>
         </div>
@@ -513,7 +798,6 @@
     <footer id="contact" class="bb-footer">
         <div class="bb-footer-grid">
             <div class="bb-footer-brand">
-                <img src="media/logos.png" alt="City of Champion Fire" class="bb-footer-logo">
                 <p>City of Champions International Assembly — raising a generation of champions through the fire and power of the Holy Spirit.</p>
                 <div class="bb-footer-social">
                     <a href="#" class="bb-social-icon"><i class="fab fa-facebook-f"></i></a>
@@ -546,17 +830,81 @@
                 <h4>Contact</h4>
                 <ul>
                     <li><a href="#">Au Road, by Auchi Bypass,<br>Uselu N'Ahor, Benin City.</a></li>
-                    <li><a href="tel:+2340000000000">+234 000 000 0000</a></li>
+                    <li><a href="tel:+2348032740443">+2348032740443</a></li>
                     <li><a href="mailto:info@cityofchampionfire.org">info@cityofchampionfire.org</a></li>
                 </ul>
             </div>
         </div>
         <div class="bb-footer-bottom">
             <span>© 2026 COC. All Rights Reserved.</span>
-          
         </div>
     </footer>
 
+
+    <!-- ═══════════════════════════════════════════════
+         COC AI CHAT WIDGET — HTML (new, added below body)
+    ═══════════════════════════════════════════════ -->
+
+    <!-- Backdrop -->
+    <div id="coc-chat-overlay" onclick="closeCocChat()"></div>
+
+    <!-- Chat window -->
+    <div id="coc-chat-widget">
+        <!-- Header -->
+        <div class="coc-chat-header">
+            <div class="coc-header-logo">
+                <img src="media/logos.png" alt="COC" onerror="this.style.display='none';this.parentElement.innerHTML='🔥'"/>
+            </div>
+            <div class="coc-header-text">
+                <div class="coc-header-name">COC AI Assistant</div>
+                <div class="coc-header-sub">Ask me anything about our church</div>
+            </div>
+            <div class="coc-online-dot"></div>
+            <button class="coc-close-btn" onclick="closeCocChat()" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Messages -->
+        <div class="coc-messages" id="cocMessages">
+            <div class="coc-msg bot">
+                <div class="coc-avatar bot">✦</div>
+                <div class="coc-bubble">
+                    Welcome! I'm the COC AI Assistant for <strong>City of Champions International Assembly</strong>.<br><br>Ask me about our services, locations, programs, giving, or anything about our church family. 🔥
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick suggestions -->
+        <div class="coc-suggestions" id="cocSuggestions">
+            <button class="coc-pill" onclick="cocSend(this.textContent)">Service times?</button>
+            <button class="coc-pill" onclick="cocSend(this.textContent)">Branch locations</button>
+            <button class="coc-pill" onclick="cocSend(this.textContent)">Upcoming programs</button>
+            <button class="coc-pill" onclick="cocSend(this.textContent)">How to give?</button>
+        </div>
+
+        <!-- Input -->
+        <div class="coc-input-row">
+            <textarea id="cocInput" placeholder="Ask about City of Champions…" rows="1"
+                onkeydown="cocHandleKey(event)" oninput="cocAutoResize(this)"></textarea>
+            <button class="coc-send-btn" id="cocSendBtn" onclick="cocSendMessage()" title="Send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="coc-footer-bar">
+            Powered by AI · <a href="https://www.joincoc.com" target="_blank">joincoc.com</a>
+        </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════════
+         ORIGINAL SCRIPTS — VERBATIM, UNTOUCHED
+    ═══════════════════════════════════════════════ -->
     <script>
         function toggleMenu() {
             document.getElementById('mobile-menu').classList.toggle('open');
@@ -622,5 +970,170 @@
         }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
         document.querySelectorAll('.fade-up').forEach(el => fadeObs.observe(el));
     </script>
+
+
+    <!-- ═══════════════════════════════════════════════
+         COC AI CHAT LOGIC — NEW ADDITION ONLY
+         Replace YOUR_OPENAI_KEY_HERE with your key
+    ═══════════════════════════════════════════════ -->
+    <script>
+        /* ── API key is stored securely on Vercel — not here ── */
+
+        const COC_SYSTEM = `You are the official AI assistant for City of Champions International Assembly (also known as COC or City of Champion Fire International Assembly). Your ONLY job is to answer questions about this church. Politely decline any off-topic requests.
+
+CHURCH OVERVIEW:
+- Full Name: City of Champions International Assembly / City of Champion Fire International Assembly
+- Website: https://www.joincoc.com
+- Mission: Restoring Human Destiny & Dignity
+- Scripture basis: Genesis 28:16 — "God is in this place"
+- Stats: 5+ global branches, 10,000+ lives transformed, 3 weekly services
+
+LEADERSHIP:
+- Senior/Lead Pastor (Global HQ): Apostle Prof. & Rev Dr. Faith Alegbe Osaro Magnus
+
+WEEKLY SERVICES:
+1. Sunday Celebration Service — 8:00 AM and 10:30 AM
+2. Healing & Deliverance Service — Monday 5:00 PM
+3. Power Communion Service — Wednesday 5:00–5:30 PM
+4. Live Stream — available worldwide online
+
+BRANCHES (all in Benin City, Nigeria):
+1. Champion Cathedral (Global HQ) — Au Road, by Auchi Bypass, Uselu N'Ahor, Benin City, Edo State
+2. Noah's Ark — By Ascon Fuel Station, Idokpa, Benin Auchi Road, Benin City
+3. Bethel House — Divine Baptist Church Road, Off Divine Grace Road, Idunmwungha, Benin City
+4. Grace and Mercy — Ivie Obasuyi Street, Idunmwuoni Road, Upper Mission Extension, Benin City
+5. Tabernacle of David — Dr. Abba One Quarter's, By Movic Motors, Urora, Benin City
+
+UPCOMING PROGRAMS:
+- Champions' Convention 2026 — September 25–29, 2026 (Annual, global gathering)
+- Power Night of Fire — Monthly all-night prayer & worship
+- Champions Youth Summit — Youth gathering for the next generation
+
+CONTACT:
+- WhatsApp: +2348032740443
+- Email: info@cityofchampionfire.org
+- Address: Au Road, by Auchi Bypass, Uselu N'Ahor, Benin City
+
+GIVING: Online at https://www.joincoc.com/give.html
+
+TONE: Warm, welcoming, faith-affirming. If unsure, direct to WhatsApp or email. Never fabricate details.`;
+
+        let cocHistory = [];
+        let cocBusy = false;
+
+        function openCocChat(e) {
+            e.stopPropagation();
+            document.getElementById('whatsapp-popup').classList.remove('show');
+            document.getElementById('coc-chat-overlay').classList.add('open');
+            document.getElementById('coc-chat-widget').classList.add('open');
+            setTimeout(() => document.getElementById('cocInput').focus(), 400);
+        }
+
+        function closeCocChat() {
+            document.getElementById('coc-chat-overlay').classList.remove('open');
+            document.getElementById('coc-chat-widget').classList.remove('open');
+        }
+
+        function cocHandleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); cocSendMessage(); }
+        }
+
+        function cocAutoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+        }
+
+        function cocSend(text) {
+            document.getElementById('cocInput').value = text;
+            document.getElementById('cocSuggestions').style.display = 'none';
+            cocSendMessage();
+        }
+
+        function cocAddMsg(role, html) {
+            const wrap = document.getElementById('cocMessages');
+            const div = document.createElement('div');
+            div.className = 'coc-msg ' + role;
+            const av = document.createElement('div');
+            av.className = 'coc-avatar ' + (role === 'bot' ? 'bot' : 'usr');
+            av.textContent = role === 'bot' ? '✦' : 'You';
+            const bub = document.createElement('div');
+            bub.className = 'coc-bubble';
+            bub.innerHTML = html;
+            div.appendChild(av);
+            div.appendChild(bub);
+            wrap.appendChild(div);
+            wrap.scrollTop = wrap.scrollHeight;
+            return bub;
+        }
+
+        function cocShowTyping() {
+            const wrap = document.getElementById('cocMessages');
+            const div = document.createElement('div');
+            div.className = 'coc-msg bot';
+            div.id = 'cocTyping';
+            const av = document.createElement('div');
+            av.className = 'coc-avatar bot';
+            av.textContent = '✦';
+            const bub = document.createElement('div');
+            bub.className = 'coc-bubble';
+            bub.innerHTML = '<div class="coc-typing"><span></span><span></span><span></span></div>';
+            div.appendChild(av); div.appendChild(bub);
+            wrap.appendChild(div);
+            wrap.scrollTop = wrap.scrollHeight;
+        }
+
+        function cocRemoveTyping() {
+            const el = document.getElementById('cocTyping');
+            if (el) el.remove();
+        }
+
+        async function cocSendMessage() {
+            if (cocBusy) return;
+            const input = document.getElementById('cocInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            input.style.height = 'auto';
+            document.getElementById('cocSuggestions').style.display = 'none';
+
+            cocAddMsg('user', text.replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+            cocHistory.push({ role: 'user', content: text });
+
+            cocBusy = true;
+            document.getElementById('cocSendBtn').disabled = true;
+            cocShowTyping();
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: [
+                            { role: 'system', content: COC_SYSTEM },
+                            ...cocHistory
+                        ]
+                    })
+                });
+                const data = await res.json();
+                cocRemoveTyping();
+
+                if (data.error) {
+                    cocAddMsg('bot', '⚠️ ' + (data.error.message || 'Something went wrong. Please try again.'));
+                } else {
+                    const reply = data.choices?.[0]?.message?.content || 'I\'m sorry, I couldn\'t get a response. Please try again.';
+                    cocHistory.push({ role: 'assistant', content: reply });
+                    cocAddMsg('bot', reply.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+                }
+            } catch (err) {
+                cocRemoveTyping();
+                cocAddMsg('bot', '⚠️ Network error. Please check your connection and try again.');
+            }
+
+            cocBusy = false;
+            document.getElementById('cocSendBtn').disabled = false;
+        }
+    </script>
+
 </body>
 </html>
