@@ -20,6 +20,69 @@
             transform: translateY(-5px);
             border-left: 4px solid #b91c1c;
         }
+
+        /* ── CUSTOM TOAST ── */
+        #coc-toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            z-index: 9999;
+            background: linear-gradient(135deg, #0a0a0a, #1a0505);
+            border: 1px solid rgba(185,28,28,0.4);
+            border-radius: 18px;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(185,28,28,0.15);
+            opacity: 0;
+            transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            min-width: 300px;
+            max-width: calc(100vw - 48px);
+        }
+        #coc-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .coc-toast-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            font-size: 18px;
+            color: #fcd34d;
+            box-shadow: 0 4px 14px rgba(185,28,28,0.4);
+        }
+        .coc-toast-body { min-width: 0; }
+        .coc-toast-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            color: #fff;
+            letter-spacing: -0.01em;
+            margin-bottom: 2px;
+        }
+        .coc-toast-sub {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            font-style: italic;
+            line-height: 1.4;
+        }
+        .coc-toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            font-size: 14px;
+            cursor: pointer;
+            flex-shrink: 0;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .coc-toast-close:hover { color: rgba(255,255,255,0.7); }
     </style>
 </head>
 <body>
@@ -32,6 +95,16 @@
             <h1 class="text-xl font-extrabold uppercase tracking-tighter">Share Your Victory</h1>
         </div>
     </nav>
+
+    <!-- Custom Toast Notification -->
+    <div id="coc-toast">
+        <div class="coc-toast-icon">🔥</div>
+        <div class="coc-toast-body">
+            <div class="coc-toast-title">Testimony Shared!</div>
+            <div class="coc-toast-sub">May the Lord give you more reasons to testify 🙌</div>
+        </div>
+        <button class="coc-toast-close" onclick="cocHideToast()"><i class="fas fa-times"></i></button>
+    </div>
 
     <main class="container mx-auto px-6 py-12 max-w-6xl">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -82,81 +155,109 @@
         </div>
     </main>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script>
+        let cocToastTimer = null;
+        function cocShowToast() {
+            const toast = document.getElementById('coc-toast');
+            toast.classList.add('show');
+            clearTimeout(cocToastTimer);
+            cocToastTimer = setTimeout(() => cocHideToast(), 5000);
+        }
+        function cocHideToast() {
+            document.getElementById('coc-toast').classList.remove('show');
+        }
+    </script>
 
-        // TODO: Replace with your actual project config
+    <script type="module">
+        import { initializeApp }          from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getAnalytics }           from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot }
+                                          from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey:            "AIzaSyB2gU2QrpRnIevjhLqd1kTj-xsjiWBHGqQ",
+            authDomain:        "joincoc.firebaseapp.com",
+            projectId:         "joincoc",
+            storageBucket:     "joincoc.firebasestorage.app",
+            messagingSenderId: "322343274719",
+            appId:             "1:322343274719:web:689229a5dd1ca422c9c16a",
+            measurementId:     "G-V0HL0CDXXD"
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        getAnalytics(app);
+        const db     = getFirestore(app);
         const colRef = collection(db, 'testimonies');
 
-        // ELEMENTS
-        const testimonyForm = document.getElementById('testimonyForm');
-        const testimoniesList = document.getElementById('testimoniesList');
-        const countBadge = document.getElementById('count');
-
-        // 1. SAVING & POSTING
-        testimonyForm.addEventListener('submit', async (e) => {
+        /* ── SUBMIT ── */
+        document.getElementById('testimonyForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> POSTING...';
+            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>&nbsp; POSTING...';
 
             try {
                 await addDoc(colRef, {
-                    name: document.getElementById('userName').value,
-                    content: document.getElementById('userTestimony').value,
+                    name:      document.getElementById('userName').value.trim(),
+                    content:   document.getElementById('userTestimony').value.trim(),
                     createdAt: serverTimestamp()
                 });
-                
-                testimonyForm.reset();
-                alert("Testimony shared successfully! To God be the glory.");
+                document.getElementById('testimonyForm').reset();
+                cocShowToast();
             } catch (err) {
-                console.error("Error adding document: ", err);
-                alert("Something went wrong. Please try again.");
+                console.error('Error posting testimony:', err);
+                alert('Something went wrong. Please try again.');
             }
 
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<span>SHARE TESTIMONY</span> <i class="fas fa-paper-plane"></i>';
         });
 
-        // 2. UPDATING (Real-time Fetching)
+        /* ── REAL-TIME FEED ── */
         const q = query(colRef, orderBy('createdAt', 'desc'));
-        
+
         onSnapshot(q, (snapshot) => {
+            const list = document.getElementById('testimoniesList');
+            const countBadge = document.getElementById('count');
+
+            if (snapshot.empty) {
+                list.innerHTML = '<p class="text-center text-gray-400 py-10">No testimonies yet. Be the first to share!</p>';
+                countBadge.innerText = '0 STORIES';
+                return;
+            }
+
             let html = '';
             snapshot.docs.forEach(doc => {
                 const data = doc.data();
-                const date = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : 'Just now';
-                
+                const date = data.createdAt
+                    ? data.createdAt.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+                    : 'Just now';
+
+                // Safely escape user content to prevent XSS
+                const safeName    = data.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const safeContent = data.content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
                 html += `
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 testimony-card">
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <h3 class="font-bold text-lg text-gray-900">${data.name}</h3>
+                                <h3 class="font-bold text-lg text-gray-900">${safeName}</h3>
                                 <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">${date}</p>
                             </div>
                             <div class="text-red-700 opacity-20 text-3xl">
                                 <i class="fas fa-quote-right"></i>
                             </div>
                         </div>
-                        <p class="text-gray-600 leading-relaxed italic">"${data.content}"</p>
-                    </div>
-                `;
+                        <p class="text-gray-600 leading-relaxed italic">"${safeContent}"</p>
+                    </div>`;
             });
-            
-            testimoniesList.innerHTML = html || '<p class="text-center text-gray-400 py-10">No testimonies yet. Be the first to share!</p>';
-            countBadge.innerText = `${snapshot.size} STORIES`;
+
+            list.innerHTML = html;
+            countBadge.innerText = `${snapshot.size} ${snapshot.size === 1 ? 'STORY' : 'STORIES'}`;
+        }, (error) => {
+            console.error('Firestore error:', error);
+            document.getElementById('testimoniesList').innerHTML =
+                '<p class="text-center text-red-400 py-10">Could not load testimonies. Please refresh.</p>';
         });
     </script>
 </body>

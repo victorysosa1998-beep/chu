@@ -25,7 +25,7 @@
         .video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.4), rgba(139,0,0,0.6)); z-index: 0; }
         .hero-content { position: relative; z-index: 10; text-align: center; color: white; }
 
-        .service-card { position: relative; overflow: hidden; transition: all 0.5s ease; cursor: pointer; min-height: 350px; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1; border: 1px solid rgba(0,0,0,0.1); }
+        .service-card { position: relative; overflow: hidden; transition: all 0.5s ease; cursor: default; min-height: 350px; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1; border: 1px solid rgba(0,0,0,0.1); }
         .service-card-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.1); transition: all 0.6s cubic-bezier(0.4,0,0.2,1); z-index: -1; }
         .service-card:hover .service-card-img { opacity: 1; transform: scale(1); }
         .service-card:hover .card-text, .service-card:hover i { color: white !important; text-shadow: 0px 4px 10px rgba(0,0,0,0.9); }
@@ -160,7 +160,7 @@
         .bb-footer-col ul li { margin-bottom: 11px; }
         .bb-footer-col ul li a { color: rgba(255,255,255,0.38); text-decoration: none; font-size: 0.87rem; transition: color 0.25s; font-family: 'Inter', sans-serif; line-height: 1.5; }
         .bb-footer-col ul li a:hover { color: #f0c842; }
-        .bb-footer-bottom { display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: rgba(255,255,255,0.28); flex-wrap: wrap; gap: 8px; font-family: 'Inter', sans-serif; }
+        .bb-footer-bottom { display: flex; align-items: center; justify-content: center; font-size: 0.78rem; color: rgba(255,255,255,0.28); flex-wrap: wrap; gap: 8px; font-family: 'Inter', sans-serif; }
         @media (max-width: 1024px) { .bb-footer { padding: 56px 24px 28px; } .bb-footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; } }
         @media (max-width: 640px) { .bb-footer-grid { grid-template-columns: 1fr; gap: 32px; } }
 
@@ -459,6 +459,46 @@
             flex-shrink: 0;
         }
         .coc-footer-bar a { color: rgba(200,16,46,0.6); text-decoration: none; }
+
+        /* ── PRAYER CARD ── */
+        .coc-prayer-card {
+            background: linear-gradient(135deg, #1a0a0a, #2a0a0a);
+            border: 1px solid rgba(200,16,46,0.35);
+            border-radius: 14px;
+            padding: 18px 16px 14px;
+            margin-top: 10px;
+            animation: coc-msg-in 0.4s ease;
+        }
+        .coc-prayer-label {
+            font-family: 'Outfit', sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: #c8102e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .coc-prayer-label::before {
+            content: '';
+            display: block;
+            width: 18px; height: 1px;
+            background: #c8102e;
+        }
+        /* Prayer text */
+        .coc-prayer-text {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 13.5px;
+            font-style: italic;
+            font-weight: 300;
+            color: rgba(255,255,255,0.72);
+            line-height: 1.75;
+            border-left: 2px solid rgba(200,16,46,0.4);
+            padding-left: 12px;
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body class="bg-white text-gray-900">
@@ -487,6 +527,7 @@
         <a href="#home" onclick="toggleMenu()" class="text-2xl font-bold hover:text-red-700">Home</a>
         <a href="#about" onclick="toggleMenu()" class="text-2xl font-bold hover:text-red-700">About Us</a>
         <a href="testimonies.html" onclick="toggleMenu()" class="text-2xl font-bold hover:text-red-700">Testimonies</a>
+        <a href="sermons.html" onclick="toggleMenu()" class="text-2xl font-bold hover:text-red-700">Sermons</a>
         <a href="#contact" onclick="toggleMenu()" class="text-2xl font-bold hover:text-red-700">Contact</a>
         <div class="flex flex-col w-full space-y-4 pt-8 border-t">
             <a href="#" class="bg-red-700 text-white text-center py-4 rounded-xl flex items-center justify-center gap-2">
@@ -603,24 +644,24 @@
                 <div class="w-24 h-1.5 bg-red-700 mx-auto mt-4 rounded-full"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                <a href="underconst.html" class="service-card reveal bg-white rounded-3xl group shadow-sm">
+                <div class="service-card reveal bg-white rounded-3xl group shadow-sm">
                     <img src="media/worship.jpeg" class="service-card-img" alt="Sunday">
                     <i class="fa-solid fa-church text-5xl text-red-700 mb-6 transition-all group-hover:scale-110"></i>
                     <h3 class="card-text text-2xl font-bold mb-2">Sunday Celebration Service</h3>
                     <p class="card-text text-gray-500 font-medium tracking-widest text-sm">8:00 AM | 10:30 AM</p>
-                </a>
-                <a href="underconst.html" class="service-card reveal bg-white rounded-3xl group shadow-sm" style="transition-delay:100ms;">
+                </div>
+                <div class="service-card reveal bg-white rounded-3xl group shadow-sm" style="transition-delay:100ms;">
                     <img src="media/healing.jpeg" class="service-card-img" alt="Healing">
                     <i class="fa-solid fa-fire text-5xl text-red-700 mb-6 transition-all group-hover:scale-110"></i>
                     <h3 class="card-text text-2xl font-bold mb-2"> Healing &amp; Deliverance Service</h3>
                     <p class="card-text text-gray-500 font-medium tracking-widest text-sm">Monday : 5:00 PM</p>
-                </a>
-                <a href="underconst.html" class="service-card reveal bg-white rounded-3xl group shadow-sm" style="transition-delay:200ms;">
+                </div>
+                <div class="service-card reveal bg-white rounded-3xl group shadow-sm" style="transition-delay:200ms;">
                     <img src="media/uu.jpeg" class="service-card-img" alt="Communion">
                     <i class="fa-solid fa-dove text-5xl text-red-700 mb-6 transition-all group-hover:scale-110"></i>
                     <h3 class="card-text text-2xl font-bold mb-2">Power Communion Service</h3>
                     <p class="card-text text-gray-500 font-medium tracking-widest text-sm">Wednesday: 5:00 PM</p>
-                </a>
+                </div>
             </div>
         </div>
     </section>
@@ -881,6 +922,7 @@
             <button class="coc-pill" onclick="cocSend(this.textContent)">Branch locations</button>
             <button class="coc-pill" onclick="cocSend(this.textContent)">Upcoming programs</button>
             <button class="coc-pill" onclick="cocSend(this.textContent)">How to give?</button>
+            <button class="coc-pill" onclick="cocSend(this.textContent)">Learn about the love of God</button>
         </div>
 
         <!-- Input -->
@@ -1087,6 +1129,31 @@ TONE: Warm, welcoming, faith-affirming. If unsure, direct to WhatsApp or email. 
             if (el) el.remove();
         }
 
+        /* ── PRAYER CARD: injected after salvation prayer response ── */
+        function cocInjectPrayerCard() {
+            const wrap = document.getElementById('cocMessages');
+
+            const card = document.createElement('div');
+            card.className = 'coc-msg bot';
+            card.innerHTML = `
+                <div class="coc-avatar bot">✦</div>
+                <div style="flex:1;min-width:0;">
+                    <div class="coc-prayer-card">
+                        <div class="coc-prayer-label">Salvation Prayer</div>
+                        <p class="coc-prayer-text">
+                            "Lord Jesus, I believe You are the Son of God. I believe You died for my sins and rose again. I confess my sins and ask You to forgive me. I invite You into my heart as my Lord and Saviour. From today, I belong to You. Thank You for saving me. Amen."
+                        </p>
+                    </div>
+                </div>`;
+            wrap.appendChild(card);
+            wrap.scrollTop = wrap.scrollHeight;
+        }
+
+        /* Detect if the AI reply contains the salvation prayer so we inject the card */
+        function cocShouldShowPrayer(text) {
+            return text.includes('Lord Jesus') && text.includes('Amen');
+        }
+
         async function cocSendMessage() {
             if (cocBusy) return;
             const input = document.getElementById('cocInput');
@@ -1123,7 +1190,19 @@ TONE: Warm, welcoming, faith-affirming. If unsure, direct to WhatsApp or email. 
                 } else {
                     const reply = data.choices?.[0]?.message?.content || 'I\'m sorry, I couldn\'t get a response. Please try again.';
                     cocHistory.push({ role: 'assistant', content: reply });
-                    cocAddMsg('bot', reply);
+
+                    if (cocShouldShowPrayer(reply)) {
+                        // Strip the prayer text from the bubble — it shows in the card instead
+                        const stripped = reply
+                            .replace(/<em>.*?Amen.*?<\/em>/gis, '')
+                            .replace(/[""]Lord Jesus[\s\S]*?Amen\.[""]?/gi, '')
+                            .replace(/<br>\s*<br>/g, '<br>')
+                            .trim();
+                        cocAddMsg('bot', stripped);
+                        cocInjectPrayerCard();
+                    } else {
+                        cocAddMsg('bot', reply);
+                    }
                 }
             } catch (err) {
                 cocRemoveTyping();
