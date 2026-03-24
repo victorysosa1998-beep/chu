@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       headers: {
         'Content-Type': 'application/json',
         // Key lives ONLY here on Vercel's servers — never sent to the browser
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        'Authorization': `Bearer ${process.env.openai_api_key}`
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
