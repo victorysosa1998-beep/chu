@@ -79,7 +79,7 @@ Email: info@cityofchampionfire.org
 ════════════════════════════════
 WEEKLY SERVICES
 ════════════════════════════════
-1. Sunday Celebration Service — 8:00 AM and 10:30 AM
+1. Sunday Celebration Service — 8:00 AM to 10:30 AM
 2. Healing & Deliverance Service — Monday 5:00 PM
 3. Power Communion Service — Wednesday 5:00–5:30 PM
 4. Live Stream — available worldwide at <a href="https://www.joincoc.com" style="color:#c8102e;font-weight:700;text-decoration:underline;" target="_blank">joincoc.com</a>
