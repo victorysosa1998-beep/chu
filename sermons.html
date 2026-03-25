@@ -743,7 +743,15 @@
                 </div>
                 <button class="modal-close" onclick="closeLiveModalBtn()"><i class="fas fa-times"></i></button>
             </div>
-            <div class="modal-video" style="position:relative;">
+            <!-- Checking state -->
+            <div id="liveChecking" style="display:none;background:#0a0a0a;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 24px;text-align:center;">
+                <div style="width:44px;height:44px;border-radius:50%;border:3px solid rgba(200,16,46,0.2);border-top-color:#c8102e;animation:spin 0.8s linear infinite;"></div>
+                <div style="font-size:13px;color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;">Checking live status…</div>
+            </div>
+            <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+            <!-- Video (shown when live) -->
+            <div id="liveVideoWrap" class="modal-video" style="display:none;">
                 <iframe
                     id="liveIframe"
                     src=""
@@ -751,31 +759,23 @@
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowfullscreen>
                 </iframe>
-                <!-- Shown when nothing is live -->
-                <div id="liveOffline" style="display:none;position:absolute;inset:0;background:linear-gradient(135deg,#0d0005,#1a0a0a);flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:32px;">
-                    <div style="width:64px;height:64px;border-radius:50%;background:rgba(200,16,46,0.15);border:2px solid rgba(200,16,46,0.3);display:flex;align-items:center;justify-content:center;font-size:28px;">📡</div>
-                    <div>
-                        <div style="font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:8px;">Not Live Right Now</div>
-                        <div style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.7;max-width:320px;font-family:'Inter',sans-serif;">
-                            We're not streaming at the moment.<br>Join us for our next service:
-                        </div>
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:8px;font-family:'Inter',sans-serif;">
-                        <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 20px;color:rgba(255,255,255,0.8);font-size:12.5px;">
-                            <strong style="color:#f0c842;">Sunday</strong> · Celebration Service · 8:00 AM & 10:30 AM
-                        </div>
-                        <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 20px;color:rgba(255,255,255,0.8);font-size:12.5px;">
-                            <strong style="color:#f0c842;">Monday</strong> · Healing & Deliverance · 5:00 PM
-                        </div>
-                        <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 20px;color:rgba(255,255,255,0.8);font-size:12.5px;">
-                            <strong style="color:#f0c842;">Wednesday</strong> · Power Communion · 5:30 PM
-                        </div>
-                    </div>
-                    <div style="margin-top:4px;font-size:12px;color:rgba(255,255,255,0.25);font-family:'Inter',sans-serif;">
-                        Browse past messages below ↓
-                    </div>
-                </div>
             </div>
+
+            <!-- Offline card (shown when not live) -->
+            <div id="liveOffline" style="display:none;background:linear-gradient(135deg,#0d0005,#1a0a0a);flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:36px 24px;">
+                <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,16,46,0.15);border:2px solid rgba(200,16,46,0.3);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">📡</div>
+                <div>
+                    <div style="font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:6px;">Not Live Right Now</div>
+                    <div style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.7;font-family:'Inter',sans-serif;">We're not streaming at the moment.<br>Join us for our next service:</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-family:'Inter',sans-serif;width:100%;max-width:340px;">
+                    <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 16px;color:rgba(255,255,255,0.8);font-size:12.5px;"><strong style="color:#f0c842;">Sunday</strong> · Celebration Service · 8:00 AM & 10:30 AM</div>
+                    <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 16px;color:rgba(255,255,255,0.8);font-size:12.5px;"><strong style="color:#f0c842;">Monday</strong> · Healing & Deliverance · 5:00 PM</div>
+                    <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 16px;color:rgba(255,255,255,0.8);font-size:12.5px;"><strong style="color:#f0c842;">Wednesday</strong> · Power Communion · 5:30 PM</div>
+                </div>
+                <div style="font-size:12px;color:rgba(255,255,255,0.25);font-family:'Inter',sans-serif;">Browse past messages below ↓</div>
+            </div>
+
             <div class="modal-info">
                 <div>
                     <div class="modal-title">Live Service</div>
@@ -847,12 +847,12 @@
     </footer>
 
     <script type="module">
-        import { initializeApp }                    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { initializeApp }                        from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
         const ADMIN_UID = 'tAqH3t6DX4OxHadWurRcBFBhmQA3';
 
-        const fbApp  = initializeApp({
+        const fbApp = initializeApp({
             apiKey:            "AIzaSyB2gU2QrpRnIevjhLqd1kTj-xsjiWBHGqQ",
             authDomain:        "joincoc.firebaseapp.com",
             projectId:         "joincoc",
@@ -870,61 +870,51 @@
                 document.body.classList.remove('is-admin');
                 sessionStorage.removeItem('coc_admin');
             }
-            if (typeof renderSermons === 'function') renderSermons();
+            // Signal the regular script that auth is resolved so it can re-render
+            window._cocAuthReady = true;
+            window.dispatchEvent(new CustomEvent('coc-auth-ready'));
         });
 
         window._cocSignOut = () => signOut(fbAuth);
     </script>
 
     <script>
-        // ─────────────────────────────────────────────────────────────────
-        // CONFIGURATION — fill these in:
-        //
-        // COC_YOUTUBE_CHANNEL_ID
-        //   Your YouTube Channel ID (starts with UC…)
-        //   Find it: YouTube Studio → Settings → Channel → Basic Info
-        //
-        // COC_FALLBACK_VIDEO_ID
-        //   A specific YouTube video ID to show when NOT live.
-        //   e.g. for https://www.youtube.com/watch?v=dQw4w9WgXcQ → 'dQw4w9WgXcQ'
-        //   Set to '' to show an "offline" screen instead.
-        // ─────────────────────────────────────────────────────────────────
-        const COC_YOUTUBE_CHANNEL_ID  = 'UCDxw1Au5TtwHhrDsf1hT83Q';
-        const COC_FALLBACK_VIDEO_ID   = '';   // ← paste a video ID here, or leave ''
+        const COC_CHANNEL_ID = 'UCDxw1Au5TtwHhrDsf1hT83Q';
+        const COC_API_KEY    = 'AIzaSyAnQGJdp4PNWu4AllG0cubXfi79to4xrUQ';
 
-        function openLiveModal() {
+        async function openLiveModal() {
+            const modal      = document.getElementById('liveModal');
+            const videoWrap  = document.getElementById('liveVideoWrap');
+            const offlineBox = document.getElementById('liveOffline');
+            const checking   = document.getElementById('liveChecking');
             const iframe     = document.getElementById('liveIframe');
-            const offlineBox = document.getElementById('liveOffline');
 
+            // Reset state
+            if (videoWrap)  videoWrap.style.display  = 'none';
             if (offlineBox) offlineBox.style.display = 'none';
-            iframe.style.display = 'block';
+            if (checking)   checking.style.display   = 'flex';
 
-            if (COC_FALLBACK_VIDEO_ID) {
-                iframe.src = `https://www.youtube-nocookie.com/embed/${COC_FALLBACK_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`;
-            } else if (COC_YOUTUBE_CHANNEL_ID && COC_YOUTUBE_CHANNEL_ID !== 'YOUR_YOUTUBE_CHANNEL_ID') {
-                iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-popups');
-                iframe.src = `https://www.youtube.com/embed/live_stream?channel=${COC_YOUTUBE_CHANNEL_ID}&autoplay=1&rel=0`;
-
-                clearTimeout(window._liveTimer);
-                window._liveTimer = setTimeout(() => {
-                    try { const _ = iframe.contentWindow.location.href; }
-                    catch(e) { showLiveOffline(); }
-                }, 4000);
-            } else {
-                iframe.style.display = 'none';
-                showLiveOffline();
-            }
-
-            document.getElementById('liveModal').classList.add('open');
+            modal.classList.add('open');
             document.body.style.overflow = 'hidden';
-        }
 
-        function showLiveOffline() {
-            const iframe = document.getElementById('liveIframe');
-            const offlineBox = document.getElementById('liveOffline');
-            iframe.src = '';
-            iframe.style.display = 'none';
-            if (offlineBox) offlineBox.style.display = 'flex';
+            try {
+                const url  = `https://www.googleapis.com/youtube/v3/search?part=id&channelId=${COC_CHANNEL_ID}&eventType=live&type=video&key=${COC_API_KEY}`;
+                const res  = await fetch(url);
+                const data = await res.json();
+                const liveVideoId = data.items && data.items.length > 0 ? data.items[0].id.videoId : null;
+
+                if (checking) checking.style.display = 'none';
+
+                if (liveVideoId) {
+                    iframe.src = `https://www.youtube-nocookie.com/embed/${liveVideoId}?autoplay=1&rel=0&modestbranding=1`;
+                    if (videoWrap) videoWrap.style.display = '';
+                } else {
+                    if (offlineBox) offlineBox.style.display = 'flex';
+                }
+            } catch(err) {
+                if (checking)   checking.style.display   = 'none';
+                if (offlineBox) offlineBox.style.display = 'flex';
+            }
         }
 
         function closeLiveModal(e) {
@@ -932,9 +922,14 @@
             closeLiveModalBtn();
         }
         function closeLiveModalBtn() {
-            clearTimeout(window._liveTimer);
             document.getElementById('liveModal').classList.remove('open');
             document.getElementById('liveIframe').src = '';
+            const videoWrap  = document.getElementById('liveVideoWrap');
+            const offlineBox = document.getElementById('liveOffline');
+            const checking   = document.getElementById('liveChecking');
+            if (videoWrap)  videoWrap.style.display  = 'none';
+            if (offlineBox) offlineBox.style.display = 'none';
+            if (checking)   checking.style.display   = 'none';
             document.body.style.overflow = '';
         }
 
@@ -1145,7 +1140,11 @@
         document.querySelectorAll('.fade-up').forEach(el => fadeObs.observe(el));
 
         // ── INIT ──
+        // Render immediately so content shows without waiting for Firebase
         renderSermons();
+
+        // Re-render once Firebase auth resolves (shows/hides admin delete buttons)
+        window.addEventListener('coc-auth-ready', () => renderSermons());
 
         // ESC to close modals
         document.addEventListener('keydown', e => {

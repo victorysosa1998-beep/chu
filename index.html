@@ -801,7 +801,15 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="live-modal-video" style="position:relative;">
+            <!-- Checking state (shown while API call is in progress) -->
+            <div id="liveChecking" style="display:none;background:#0a0a0a;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 24px;text-align:center;">
+                <div style="width:44px;height:44px;border-radius:50%;border:3px solid rgba(200,16,46,0.2);border-top-color:#c8102e;animation:spin 0.8s linear infinite;"></div>
+                <div style="font-size:13px;color:rgba(255,255,255,0.4);font-family:'Inter',sans-serif;">Checking live status…</div>
+            </div>
+            <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+            <!-- Video iframe (shown when live) -->
+            <div id="liveVideoWrap" class="live-modal-video" style="display:none;">
                 <iframe
                     id="liveIframe"
                     src=""
@@ -809,31 +817,33 @@
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowfullscreen>
                 </iframe>
-                <!-- Shown when nothing is live -->
-                <div id="liveOffline" style="display:none;position:absolute;inset:0;background:linear-gradient(135deg,#0d0005,#1a0a0a);flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:32px;">
-                    <div style="width:64px;height:64px;border-radius:50%;background:rgba(200,16,46,0.15);border:2px solid rgba(200,16,46,0.3);display:flex;align-items:center;justify-content:center;font-size:28px;">📡</div>
-                    <div>
-                        <div style="font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:8px;">Not Live Right Now</div>
-                        <div style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.7;max-width:320px;font-family:'Inter',sans-serif;">
-                            We're not streaming at the moment.<br>Join us for our next service:
-                        </div>
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:8px;font-family:'Inter',sans-serif;">
-                        <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 20px;color:rgba(255,255,255,0.8);font-size:12.5px;">
-                            <strong style="color:#f0c842;">Sunday</strong> · Celebration Service · 8:00 AM & 10:30 AM
-                        </div>
-                        <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 20px;color:rgba(255,255,255,0.8);font-size:12.5px;">
-                            <strong style="color:#f0c842;">Monday</strong> · Healing & Deliverance · 5:00 PM
-                        </div>
-                        <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 20px;color:rgba(255,255,255,0.8);font-size:12.5px;">
-                            <strong style="color:#f0c842;">Wednesday</strong> · Power Communion · 5:30 PM
-                        </div>
-                    </div>
-                    <a href="sermons.html" onclick="closeLiveModalBtn()" style="margin-top:4px;background:#c8102e;color:#fff;padding:12px 28px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;font-family:'Inter',sans-serif;transition:background 0.2s;" onmouseover="this.style.background='#a00c24'" onmouseout="this.style.background='#c8102e'">
-                        Watch Past Sermons →
-                    </a>
-                </div>
             </div>
+
+            <!-- Offline card (shown instead of video when not live) -->
+            <div id="liveOffline" style="display:none;background:linear-gradient(135deg,#0d0005,#1a0a0a);flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:36px 24px;">
+                <div style="width:60px;height:60px;border-radius:50%;background:rgba(200,16,46,0.15);border:2px solid rgba(200,16,46,0.3);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">📡</div>
+                <div>
+                    <div style="font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:6px;">Not Live Right Now</div>
+                    <div style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.7;font-family:'Inter',sans-serif;">
+                        We're not streaming at the moment.<br>Join us for our next service:
+                    </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-family:'Inter',sans-serif;width:100%;max-width:340px;">
+                    <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 16px;color:rgba(255,255,255,0.8);font-size:12.5px;">
+                        <strong style="color:#f0c842;">Sunday</strong> · Celebration Service · 8:00 AM & 10:30 AM
+                    </div>
+                    <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 16px;color:rgba(255,255,255,0.8);font-size:12.5px;">
+                        <strong style="color:#f0c842;">Monday</strong> · Healing & Deliverance · 5:00 PM
+                    </div>
+                    <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 16px;color:rgba(255,255,255,0.8);font-size:12.5px;">
+                        <strong style="color:#f0c842;">Wednesday</strong> · Power Communion · 5:30 PM
+                    </div>
+                </div>
+                <a href="sermons.html" onclick="closeLiveModalBtn()" style="background:#c8102e;color:#fff;padding:12px 28px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;font-family:'Inter',sans-serif;" onmouseover="this.style.background='#a00c24'" onmouseout="this.style.background='#c8102e'">
+                    Watch Past Sermons →
+                </a>
+            </div>
+
             <div class="live-modal-footer">
                 <div class="live-modal-info">
                     Streaming live from <strong>City of Champions International Assembly</strong> · Benin City, Nigeria
@@ -976,68 +986,46 @@
          ▶ e.g. UCxxxxxxxxxxxxxxxxxx  (found in your YouTube Studio URL)
     ═══════════════════════════════════════════════ -->
     <script>
-        // ─────────────────────────────────────────────────────────────────
-        // CONFIGURATION — fill these in:
-        //
-        // COC_YOUTUBE_CHANNEL_ID
-        //   Your YouTube Channel ID (starts with UC…)
-        //   Find it: YouTube Studio → Settings → Channel → Basic Info
-        //
-        // COC_FALLBACK_VIDEO_ID
-        //   A specific YouTube video ID to show when NOT live.
-        //   e.g. for https://www.youtube.com/watch?v=dQw4w9WgXcQ → 'dQw4w9WgXcQ'
-        //   Set to '' to show an "offline" screen instead of a video.
-        // ─────────────────────────────────────────────────────────────────
-        const COC_YOUTUBE_CHANNEL_ID  = 'UCDxw1Au5TtwHhrDsf1hT83Q';
-        const COC_FALLBACK_VIDEO_ID   = '';   // ← paste a video ID here, or leave ''
+        const COC_CHANNEL_ID = 'UCDxw1Au5TtwHhrDsf1hT83Q';
+        const COC_API_KEY    = 'AIzaSyAnQGJdp4PNWu4AllG0cubXfi79to4xrUQ';
 
-        function openLiveModal() {
-            const overlay  = document.getElementById('live-modal-overlay');
-            const iframe   = document.getElementById('liveIframe');
+        async function openLiveModal() {
+            const overlay   = document.getElementById('live-modal-overlay');
+            const videoWrap = document.getElementById('liveVideoWrap');
             const offlineBox = document.getElementById('liveOffline');
+            const iframe    = document.getElementById('liveIframe');
+            const checking  = document.getElementById('liveChecking');
 
-            // Always hide the offline screen first
+            // Reset state
+            if (videoWrap)  videoWrap.style.display  = 'none';
             if (offlineBox) offlineBox.style.display = 'none';
-            iframe.style.display = 'block';
-
-            if (COC_FALLBACK_VIDEO_ID) {
-                // Use a specific video as the fallback — safe, never redirects
-                iframe.src = `https://www.youtube-nocookie.com/embed/${COC_FALLBACK_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`;
-            } else if (COC_YOUTUBE_CHANNEL_ID && COC_YOUTUBE_CHANNEL_ID !== 'YOUR_YOUTUBE_CHANNEL_ID') {
-                // Try the live embed, but catch the redirect with sandbox restrictions
-                // We wrap in a sandboxed iframe that blocks top-level navigation
-                iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-popups');
-                iframe.src = `https://www.youtube.com/embed/live_stream?channel=${COC_YOUTUBE_CHANNEL_ID}&autoplay=1&rel=0`;
-
-                // If YouTube tries to redirect (nothing live), the sandbox blocks it.
-                // We detect a failed load after 4s and show the offline card instead.
-                clearTimeout(window._liveTimer);
-                window._liveTimer = setTimeout(() => {
-                    // Check if iframe navigated away (redirect attempt) — if src changed, show offline
-                    try {
-                        const iframeSrc = iframe.contentWindow.location.href;
-                        // If we can read location, it's still on the embed — fine
-                    } catch(e) {
-                        // Cross-origin error = YouTube tried to redirect → show offline
-                        showLiveOffline();
-                    }
-                }, 4000);
-            } else {
-                // Channel ID not set — just show offline card
-                iframe.style.display = 'none';
-                showLiveOffline();
-            }
+            if (checking)   checking.style.display   = 'flex';
 
             overlay.classList.add('open');
             document.body.style.overflow = 'hidden';
-        }
 
-        function showLiveOffline() {
-            const iframe = document.getElementById('liveIframe');
-            const offlineBox = document.getElementById('liveOffline');
-            iframe.src = '';
-            iframe.style.display = 'none';
-            if (offlineBox) offlineBox.style.display = 'flex';
+            try {
+                // Ask YouTube API if the channel has an active live broadcast
+                const url = `https://www.googleapis.com/youtube/v3/search?part=id&channelId=${COC_CHANNEL_ID}&eventType=live&type=video&key=${COC_API_KEY}`;
+                const res  = await fetch(url);
+                const data = await res.json();
+                const liveVideoId = data.items && data.items.length > 0 ? data.items[0].id.videoId : null;
+
+                if (checking) checking.style.display = 'none';
+
+                if (liveVideoId) {
+                    // Channel IS live — embed the exact live video
+                    iframe.src = `https://www.youtube-nocookie.com/embed/${liveVideoId}?autoplay=1&rel=0&modestbranding=1`;
+                    if (videoWrap) videoWrap.style.display = '';
+                } else {
+                    // Channel is NOT live — show offline card
+                    if (offlineBox) offlineBox.style.display = 'flex';
+                }
+            } catch(err) {
+                // Network/API error — show offline card
+                if (checking)   checking.style.display   = 'none';
+                if (offlineBox) offlineBox.style.display = 'flex';
+            }
         }
 
         function closeLiveModal(e) {
@@ -1046,9 +1034,14 @@
         }
 
         function closeLiveModalBtn() {
-            clearTimeout(window._liveTimer);
             document.getElementById('live-modal-overlay').classList.remove('open');
             document.getElementById('liveIframe').src = '';
+            const videoWrap  = document.getElementById('liveVideoWrap');
+            const offlineBox = document.getElementById('liveOffline');
+            const checking   = document.getElementById('liveChecking');
+            if (videoWrap)  videoWrap.style.display  = 'none';
+            if (offlineBox) offlineBox.style.display = 'none';
+            if (checking)   checking.style.display   = 'none';
             document.body.style.overflow = '';
         }
 
