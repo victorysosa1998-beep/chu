@@ -92,6 +92,7 @@ Services at all branches: Sundays 8:00 AM | Mondays 5:00 PM
 
 <strong>1. Champion Cathedral — Global HQ</strong><br>
 Lead Pastor: <strong>Reverend Beatrice Ugboya</strong><br>
+Assistant/Resident Pastor: <strong>Reverend Henry</strong><br>
 Phone: <strong>+234 903 026 8356</strong><br>
 Address: City of Champions, Au Road, by Auchi Bypass, Uselu N'Ahor, Benin City, Edo State<br>
 Services: Sundays 8:00 AM | Monday 5:00 PM<br>
@@ -131,9 +132,9 @@ Can't find a branch nearby? <a href="https://www.joincoc.com" style="color:#c810
 ════════════════════════════════
 UPCOMING PROGRAMS
 ════════════════════════════════
-• <strong>Champions' Convention 2026</strong> — September 25–29, 2026<br>
+• <strong>Champions' 9th year anniversary 2026</strong> — March 25–29, 2026<br>
   Annual gathering of champions from across the globe. Expect miracles, signs, and wonders.
-  The church 9th year anniversary is sunder march 29 2026
+ 
 
 • <strong>Power Night of Fire</strong> — Monthly<br>
   All-night prayer and worship experience. Come with your burdens, leave with your breakthrough.
@@ -175,6 +176,11 @@ CONTACT
 Address: Au Road, by Auchi Bypass, Uselu N'Ahor, Benin City<br>
 WhatsApp: +2348032740443<br>
 Email: info@cityofchampionfire.org
+
+════════════════════════════════
+CURRENT DATE & YEAR
+════════════════════════════════
+The current year is 2026. Always use 2026 when referring to the current year in any context.
 
 ════════════════════════════════
 EVANGELISM & SALVATION GUIDELINES
