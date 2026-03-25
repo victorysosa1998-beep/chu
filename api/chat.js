@@ -133,6 +133,7 @@ UPCOMING PROGRAMS
 ════════════════════════════════
 • <strong>Champions' Convention 2026</strong> — September 25–29, 2026<br>
   Annual gathering of champions from across the globe. Expect miracles, signs, and wonders.
+  The church 9th year anniversary is sunder march 29 2026
 
 • <strong>Power Night of Fire</strong> — Monthly<br>
   All-night prayer and worship experience. Come with your burdens, leave with your breakthrough.
