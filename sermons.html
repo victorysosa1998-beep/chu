@@ -116,6 +116,40 @@
             max-width: 480px;
             line-height: 1.7;
         }
+        .hero-actions {
+            margin-top: 32px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .hero-live-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            padding: 14px 28px;
+            border-radius: 100px;
+            transition: background 0.25s, transform 0.18s;
+        }
+        .hero-live-btn:hover { background: #a00c24; transform: translateY(-2px); }
+        .hero-live-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #ff4444;
+            box-shadow: 0 0 8px rgba(255,68,68,0.8);
+            animation: sdot-pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes sdot-pulse {
+            0%,100% { opacity:1; } 50% { opacity:0.5; }
+        }
 
         /* ── FILTER BAR ── */
         .filter-bar {
@@ -356,7 +390,6 @@
         }
         .sermon-card:hover .sermon-play { transform: scale(1.12); }
 
-        /* No-thumbnail fallback */
         .sermon-thumb-fallback {
             width: 100%; height: 100%;
             display: flex;
@@ -408,46 +441,57 @@
             padding: 80px 20px;
             grid-column: 1 / -1;
         }
-        .empty-icon {
-            font-size: 3rem;
-            color: rgba(200,16,46,0.2);
-            margin-bottom: 16px;
-        }
-        .empty-title {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            font-size: 1.3rem;
-            color: #333;
-            margin-bottom: 8px;
-        }
+        .empty-icon { font-size: 3rem; color: rgba(200,16,46,0.2); margin-bottom: 16px; }
+        .empty-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.3rem; color: #333; margin-bottom: 8px; }
         .empty-sub { font-size: 14px; color: #999; line-height: 1.6; }
 
-        /* Modal */
+        /* ── VIDEO MODAL (shared for sermons + live) ── */
         .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.88);
+            background: rgba(0,0,0,0.92);
             z-index: 9999;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(6px);
+            padding: 16px;
+            backdrop-filter: blur(8px);
         }
         .modal-overlay.open { display: flex; }
         .modal-box {
             background: #0d0d0d;
             border-radius: 20px;
             width: 100%;
-            max-width: 860px;
+            max-width: 960px;
             overflow: hidden;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(200,16,46,0.25);
             animation: modal-in 0.35s cubic-bezier(0.16,1,0.3,1);
         }
         @keyframes modal-in {
             from { opacity:0; transform: scale(0.95) translateY(20px); }
             to   { opacity:1; transform: scale(1) translateY(0); }
         }
+
+        /* Modal header (used for live) */
+        .modal-header {
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .modal-header-left { display: flex; align-items: center; gap: 12px; }
+        .modal-live-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #ff4444;
+            box-shadow: 0 0 10px rgba(255,68,68,0.8);
+            animation: sdot-pulse 1.5s ease-in-out infinite;
+        }
+        .modal-header-title { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 800; color: #fff; }
+        .modal-header-sub { font-size: 11px; color: rgba(255,255,255,0.65); font-family: 'Inter', sans-serif; }
+
         .modal-video {
             width: 100%;
             aspect-ratio: 16/9;
@@ -457,21 +501,17 @@
         .modal-video video {
             width: 100%; height: 100%;
             display: block;
+            border: none;
         }
         .modal-info {
-            padding: 28px 32px;
+            padding: 22px 28px;
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
             gap: 20px;
+            border-top: 1px solid rgba(255,255,255,0.06);
         }
-        .modal-title {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            font-size: 1.2rem;
-            color: #fff;
-            margin-bottom: 6px;
-        }
+        .modal-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; margin-bottom: 6px; }
         .modal-meta { font-size: 12.5px; color: rgba(255,255,255,0.4); }
         .modal-close {
             width: 36px; height: 36px;
@@ -532,84 +572,28 @@
             box-shadow: 0 30px 80px rgba(0,0,0,0.3);
             animation: modal-in 0.3s ease;
         }
-        .admin-box h2 {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            font-size: 1.4rem;
-            margin-bottom: 6px;
-        }
+        .admin-box h2 { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.4rem; margin-bottom: 6px; }
         .admin-box p { font-size: 13px; color: #888; margin-bottom: 24px; }
         .form-group { margin-bottom: 16px; }
-        .form-group label {
-            display: block;
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: #777;
-            margin-bottom: 7px;
-        }
+        .form-group label { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #777; margin-bottom: 7px; }
         .form-group input,
         .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: 13.5px;
-            color: #111;
-            outline: none;
-            transition: border-color 0.2s;
-            background: #fafafa;
-        }
+        .form-group select { width: 100%; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 13.5px; color: #111; outline: none; transition: border-color 0.2s; background: #fafafa; }
         .form-group input:focus,
         .form-group textarea:focus,
         .form-group select:focus { border-color: var(--red); background: #fff; }
         .form-group textarea { resize: vertical; min-height: 70px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .admin-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-primary {
-            flex: 1;
-            background: var(--red);
-            color: #fff;
-            border: none;
-            padding: 13px;
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 13px;
-            letter-spacing: 0.08em;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+        .btn-primary { flex: 1; background: var(--red); color: #fff; border: none; padding: 13px; border-radius: 10px; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.08em; cursor: pointer; transition: background 0.2s; }
         .btn-primary:hover { background: var(--red-dark); }
-        .btn-secondary {
-            padding: 13px 20px;
-            border: 1.5px solid #e5e7eb;
-            background: #fff;
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 13px;
-            color: #555;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
+        .btn-secondary { padding: 13px 20px; border: 1.5px solid #e5e7eb; background: #fff; border-radius: 10px; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; color: #555; cursor: pointer; transition: border-color 0.2s; }
         .btn-secondary:hover { border-color: #aaa; }
 
         /* Footer */
-        footer {
-            background: var(--black);
-            padding: 28px 40px;
-            text-align: center;
-            font-size: 12px;
-            color: rgba(255,255,255,0.2);
-            font-family: 'Inter', sans-serif;
-            position: relative;
-        }
+        footer { background: var(--black); padding: 28px 40px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.2); font-family: 'Inter', sans-serif; position: relative; }
 
-        /* Admin delete on sermon cards */
+        /* Admin delete */
         .sermon-delete-btn {
             display: none;
             position: absolute;
@@ -648,7 +632,6 @@
             .form-row { grid-template-columns: 1fr; }
         }
 
-        /* Fade in */
         .fade-up { opacity:0; transform:translateY(24px); transition: opacity 0.5s ease, transform 0.5s ease; }
         .fade-up.visible { opacity:1; transform:translateY(0); }
     </style>
@@ -670,6 +653,13 @@
             <div class="hero-eyebrow">The Word of God</div>
             <h1 class="hero-title">Sermons &<br><span>Messages</span></h1>
             <p class="hero-sub">Life-transforming messages from City of Champions International Assembly. Every word is fire.</p>
+            <!-- ▼ WATCH LIVE button in hero ▼ -->
+            <div class="hero-actions">
+                <button class="hero-live-btn" onclick="openLiveModal()">
+                    <div class="hero-live-dot"></div>
+                    Watch Live Now
+                </button>
+            </div>
         </div>
     </div>
 
@@ -722,8 +712,10 @@
 
     </main>
 
-    <!-- VIDEO MODAL -->
-    <div class="modal-overlay" id="sermonModal" onclick="closeModal(event)">
+    <!-- ═══════════════════════════════════
+         SERMON VIDEO MODAL (in-page playback)
+    ═══════════════════════════════════ -->
+    <div class="modal-overlay" id="sermonModal" onclick="closeSermonModal(event)">
         <div class="modal-box" onclick="event.stopPropagation()">
             <div class="modal-video" id="modalVideoArea"></div>
             <div class="modal-info">
@@ -731,7 +723,64 @@
                     <div class="modal-title" id="modalTitle"></div>
                     <div class="modal-meta" id="modalMeta"></div>
                 </div>
-                <button class="modal-close" onclick="closeModalBtn()"><i class="fas fa-times"></i></button>
+                <button class="modal-close" onclick="closeSermonModalBtn()"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         LIVE STREAM MODAL
+    ═══════════════════════════════════ -->
+    <div class="modal-overlay" id="liveModal" onclick="closeLiveModal(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-live-dot"></div>
+                    <div>
+                        <div class="modal-header-title">City of Champions — Live</div>
+                        <div class="modal-header-sub">City of Champions International Assembly</div>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeLiveModalBtn()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-video" style="position:relative;">
+                <iframe
+                    id="liveIframe"
+                    src=""
+                    title="COC Live Stream"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen>
+                </iframe>
+                <!-- Shown when nothing is live -->
+                <div id="liveOffline" style="display:none;position:absolute;inset:0;background:linear-gradient(135deg,#0d0005,#1a0a0a);flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:32px;">
+                    <div style="width:64px;height:64px;border-radius:50%;background:rgba(200,16,46,0.15);border:2px solid rgba(200,16,46,0.3);display:flex;align-items:center;justify-content:center;font-size:28px;">📡</div>
+                    <div>
+                        <div style="font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:8px;">Not Live Right Now</div>
+                        <div style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.7;max-width:320px;font-family:'Inter',sans-serif;">
+                            We're not streaming at the moment.<br>Join us for our next service:
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;font-family:'Inter',sans-serif;">
+                        <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 20px;color:rgba(255,255,255,0.8);font-size:12.5px;">
+                            <strong style="color:#f0c842;">Sunday</strong> · Celebration Service · 8:00 AM & 10:30 AM
+                        </div>
+                        <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 20px;color:rgba(255,255,255,0.8);font-size:12.5px;">
+                            <strong style="color:#f0c842;">Monday</strong> · Healing & Deliverance · 5:00 PM
+                        </div>
+                        <div style="background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:8px;padding:10px 20px;color:rgba(255,255,255,0.8);font-size:12.5px;">
+                            <strong style="color:#f0c842;">Wednesday</strong> · Power Communion · 5:30 PM
+                        </div>
+                    </div>
+                    <div style="margin-top:4px;font-size:12px;color:rgba(255,255,255,0.25);font-family:'Inter',sans-serif;">
+                        Browse past messages below ↓
+                    </div>
+                </div>
+            </div>
+            <div class="modal-info">
+                <div>
+                    <div class="modal-title">Live Service</div>
+                    <div class="modal-meta">Streaming live from City of Champions International Assembly · Benin City, Nigeria</div>
+                </div>
             </div>
         </div>
     </div>
@@ -745,7 +794,7 @@
     <div class="admin-panel" id="adminPanel" onclick="closeAdmin(event)">
         <div class="admin-box" onclick="event.stopPropagation()">
             <h2>Add New Sermon</h2>
-            <p>Paste a YouTube link or upload a video URL to add a sermon to this page.</p>
+            <p>Paste a YouTube link or video URL to add a sermon to this page.</p>
 
             <div class="form-group">
                 <label>Sermon Title *</label>
@@ -821,15 +870,74 @@
                 document.body.classList.remove('is-admin');
                 sessionStorage.removeItem('coc_admin');
             }
-            // Re-render after auth state is known so delete buttons show correctly
             if (typeof renderSermons === 'function') renderSermons();
         });
 
-        // Expose sign-out globally so the dot trigger can call it
         window._cocSignOut = () => signOut(fbAuth);
     </script>
 
     <script>
+        // ─────────────────────────────────────────────────────────────────
+        // CONFIGURATION — fill these in:
+        //
+        // COC_YOUTUBE_CHANNEL_ID
+        //   Your YouTube Channel ID (starts with UC…)
+        //   Find it: YouTube Studio → Settings → Channel → Basic Info
+        //
+        // COC_FALLBACK_VIDEO_ID
+        //   A specific YouTube video ID to show when NOT live.
+        //   e.g. for https://www.youtube.com/watch?v=dQw4w9WgXcQ → 'dQw4w9WgXcQ'
+        //   Set to '' to show an "offline" screen instead.
+        // ─────────────────────────────────────────────────────────────────
+        const COC_YOUTUBE_CHANNEL_ID  = 'UCDxw1Au5TtwHhrDsf1hT83Q';
+        const COC_FALLBACK_VIDEO_ID   = '';   // ← paste a video ID here, or leave ''
+
+        function openLiveModal() {
+            const iframe     = document.getElementById('liveIframe');
+            const offlineBox = document.getElementById('liveOffline');
+
+            if (offlineBox) offlineBox.style.display = 'none';
+            iframe.style.display = 'block';
+
+            if (COC_FALLBACK_VIDEO_ID) {
+                iframe.src = `https://www.youtube-nocookie.com/embed/${COC_FALLBACK_VIDEO_ID}?autoplay=1&rel=0&modestbranding=1`;
+            } else if (COC_YOUTUBE_CHANNEL_ID && COC_YOUTUBE_CHANNEL_ID !== 'YOUR_YOUTUBE_CHANNEL_ID') {
+                iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-popups');
+                iframe.src = `https://www.youtube.com/embed/live_stream?channel=${COC_YOUTUBE_CHANNEL_ID}&autoplay=1&rel=0`;
+
+                clearTimeout(window._liveTimer);
+                window._liveTimer = setTimeout(() => {
+                    try { const _ = iframe.contentWindow.location.href; }
+                    catch(e) { showLiveOffline(); }
+                }, 4000);
+            } else {
+                iframe.style.display = 'none';
+                showLiveOffline();
+            }
+
+            document.getElementById('liveModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showLiveOffline() {
+            const iframe = document.getElementById('liveIframe');
+            const offlineBox = document.getElementById('liveOffline');
+            iframe.src = '';
+            iframe.style.display = 'none';
+            if (offlineBox) offlineBox.style.display = 'flex';
+        }
+
+        function closeLiveModal(e) {
+            if (e && e.target !== document.getElementById('liveModal')) return;
+            closeLiveModalBtn();
+        }
+        function closeLiveModalBtn() {
+            clearTimeout(window._liveTimer);
+            document.getElementById('liveModal').classList.remove('open');
+            document.getElementById('liveIframe').src = '';
+            document.body.style.overflow = '';
+        }
+
         // ── ADMIN DOT & DELETE ──
         function cocAdminDot() {
             if (document.body.classList.contains('is-admin')) {
@@ -852,20 +960,22 @@
             renderSermons();
         }
 
-        // ── DATA STORE (persisted to localStorage) ──
+        // ── DATA STORE ──
         let sermons = JSON.parse(localStorage.getItem('coc_sermons') || '[]');
         let currentFilter = 'all';
         let featuredSermon = null;
 
         // ── YOUTUBE HELPERS ──
         function getYouTubeId(url) {
+            if (!url) return null;
             const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^&?\s]+)/);
             return match ? match[1] : null;
         }
         function getEmbedUrl(url) {
             const ytId = getYouTubeId(url);
-            if (ytId) return `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`;
-            return url; // treat as direct video URL
+            // Use privacy-enhanced embed + autoplay
+            if (ytId) return `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`;
+            return url;
         }
         function getThumbnail(url, customThumb) {
             if (customThumb) return customThumb;
@@ -891,21 +1001,21 @@
                         <div class="empty-title">${currentFilter === 'all' ? 'Sermons Coming Soon' : 'No messages in this category yet'}</div>
                         <div class="empty-sub">Messages will appear here once they are uploaded.<br>Check back after Sunday service!</div>
                     </div>`;
+                document.getElementById('featuredSection').style.display = 'none';
                 return;
             }
 
             grid.innerHTML = filtered.map((s, i) => {
                 const thumb = getThumbnail(s.url, s.thumb);
-                const thumbHtml = thumb
-                    ? `<img src="${thumb}" alt="${s.title}" onerror="this.parentElement.innerHTML='<div class=\\'sermon-thumb-fallback\\'><div class=\\'sermon-play\\'><i class=\\'fas fa-play\\'></i></div><span class=\\'thumb-text\\'>Play Message</span></div>'">`
-                    : '';
                 return `
                 <div class="sermon-card fade-up" style="transition-delay:${(i % 3) * 80}ms;position:relative;" onclick="playSermon(${sermons.indexOf(s)})">
                     <button class="sermon-delete-btn" onclick="event.stopPropagation();deleteSermon(${sermons.indexOf(s)})"><i class="fas fa-trash-alt"></i> Delete</button>
                     <div class="sermon-thumb">
-                        ${thumb ? `<img src="${thumb}" alt="${s.title}" onerror="this.style.display='none'">
-                        <div class="sermon-thumb-overlay"><div class="sermon-play"><i class="fas fa-play"></i></div></div>`
-                        : `<div class="sermon-thumb-fallback"><div class="sermon-play"><i class="fas fa-play"></i></div><span class="thumb-text">Play Message</span></div>`}
+                        ${thumb
+                            ? `<img src="${thumb}" alt="${s.title}" onerror="this.parentElement.innerHTML='<div class=\\'sermon-thumb-fallback\\'><div class=\\'sermon-play\\'><i class=\\'fas fa-play\\'></i></div><span class=\\'thumb-text\\'>Play Message</span></div>'">
+                               <div class="sermon-thumb-overlay"><div class="sermon-play"><i class="fas fa-play"></i></div></div>`
+                            : `<div class="sermon-thumb-fallback"><div class="sermon-play"><i class="fas fa-play"></i></div><span class="thumb-text">Play Message</span></div>`
+                        }
                     </div>
                     <div class="sermon-body">
                         <div class="sermon-series">${categoryLabel(s.category)}</div>
@@ -942,7 +1052,6 @@
                 document.getElementById('featuredSection').style.display = 'none';
             }
 
-            // Re-observe fade-ups
             document.querySelectorAll('.fade-up:not(.visible)').forEach(el => fadeObs.observe(el));
         }
 
@@ -964,17 +1073,21 @@
             renderSermons();
         }
 
-        // ── PLAY MODAL ──
+        // ── SERMON MODAL (in-page YouTube embed) ──
         function playSermon(idx) {
             const s = sermons[idx];
             document.getElementById('modalTitle').textContent = s.title;
             document.getElementById('modalMeta').textContent = `${s.pastor}  ·  ${formatDate(s.date)}  ·  ${categoryLabel(s.category)}`;
-            const embed = getEmbedUrl(s.url);
+
             const ytId = getYouTubeId(s.url);
+            const embed = getEmbedUrl(s.url);
+
             document.getElementById('modalVideoArea').innerHTML = ytId
-                ? `<iframe src="${embed}" frameborder="0" allow="autoplay;encrypted-media" allowfullscreen></iframe>`
+                ? `<iframe src="${embed}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
                 : `<video src="${s.url}" controls autoplay style="width:100%;height:100%;"></video>`;
+
             document.getElementById('sermonModal').classList.add('open');
+            document.body.style.overflow = 'hidden';
         }
 
         function openFeaturedModal() {
@@ -982,12 +1095,13 @@
             playSermon(0);
         }
 
-        function closeModal(e) {
-            if (e.target === document.getElementById('sermonModal')) closeModalBtn();
+        function closeSermonModal(e) {
+            if (e.target === document.getElementById('sermonModal')) closeSermonModalBtn();
         }
-        function closeModalBtn() {
+        function closeSermonModalBtn() {
             document.getElementById('sermonModal').classList.remove('open');
             document.getElementById('modalVideoArea').innerHTML = '';
+            document.body.style.overflow = '';
         }
 
         // ── ADMIN ──
@@ -1001,24 +1115,22 @@
         }
 
         function saveSermon() {
-            const title = document.getElementById('inputTitle').value.trim();
-            const pastor = document.getElementById('inputPastor').value.trim();
-            const date = document.getElementById('inputDate').value;
-            const url = document.getElementById('inputUrl').value.trim();
+            const title   = document.getElementById('inputTitle').value.trim();
+            const pastor  = document.getElementById('inputPastor').value.trim();
+            const date    = document.getElementById('inputDate').value;
+            const url     = document.getElementById('inputUrl').value.trim();
             const category = document.getElementById('inputCategory').value;
-            const desc = document.getElementById('inputDesc').value.trim();
-            const thumb = document.getElementById('inputThumb').value.trim();
+            const desc    = document.getElementById('inputDesc').value.trim();
+            const thumb   = document.getElementById('inputThumb').value.trim();
 
             if (!title || !pastor || !date || !url) {
                 alert('Please fill in the required fields: Title, Preacher, Date, and Video URL.');
                 return;
             }
 
-            const sermon = { title, pastor, date, url, category, desc, thumb };
-            sermons.unshift(sermon); // newest first
+            sermons.unshift({ title, pastor, date, url, category, desc, thumb });
             localStorage.setItem('coc_sermons', JSON.stringify(sermons));
 
-            // Clear form
             ['inputTitle','inputPastor','inputUrl','inputDesc','inputThumb'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('adminPanel').classList.remove('open');
             renderSermons();
@@ -1038,7 +1150,8 @@
         // ESC to close modals
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') {
-                closeModalBtn();
+                closeSermonModalBtn();
+                closeLiveModalBtn();
                 document.getElementById('adminPanel').classList.remove('open');
             }
         });
