@@ -841,14 +841,37 @@
         </div>
     </div>
 
+    <!-- SNACKBAR -->
+    <div id="coc-snackbar" style="
+        position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(120px);
+        z-index:9999;display:flex;align-items:center;gap:14px;
+        background:linear-gradient(135deg,#0d0005 0%,#1a0505 100%);
+        border:1px solid rgba(200,16,46,0.35);border-radius:20px;
+        padding:16px 22px;min-width:300px;max-width:calc(100vw - 48px);
+        box-shadow:0 20px 60px rgba(0,0,0,0.45),0 0 0 1px rgba(200,16,46,0.12),inset 0 1px 0 rgba(255,255,255,0.05);
+        opacity:0;transition:all 0.5s cubic-bezier(0.16,1,0.3,1);pointer-events:none;">
+        <div id="coc-snackbar-icon" style="
+            width:40px;height:40px;border-radius:12px;flex-shrink:0;
+            display:flex;align-items:center;justify-content:center;font-size:20px;
+            background:linear-gradient(135deg,#c8102e,#8b0000);
+            box-shadow:0 4px 14px rgba(200,16,46,0.5);">🔥</div>
+        <div style="min-width:0;flex:1;">
+            <div id="coc-snackbar-title" style="font-family:'Outfit',sans-serif;font-weight:800;font-size:13px;color:#fff;letter-spacing:-0.01em;margin-bottom:2px;"></div>
+            <div id="coc-snackbar-sub" style="font-size:11.5px;color:rgba(255,255,255,0.45);font-style:italic;line-height:1.4;"></div>
+        </div>
+        <button onclick="cocHideSnackbar()" style="background:none;border:none;color:rgba(255,255,255,0.25);font-size:14px;cursor:pointer;flex-shrink:0;padding:4px;transition:color 0.2s;line-height:1;" onmouseover="this.style.color='rgba(255,255,255,0.6)'" onmouseout="this.style.color='rgba(255,255,255,0.25)'"><i class="fas fa-times"></i></button>
+    </div>
+
     <footer>
         <span>© 2026 COC. All Rights Reserved. · <a href="index.html" style="color:rgba(255,255,255,0.3);text-decoration:none;">City of Champions International Assembly</a></span>
         <span onclick="cocAdminDot()" style="cursor:default;color:rgba(255,255,255,0.04);font-size:18px;line-height:1;user-select:none;position:absolute;right:12px;bottom:8px;" title="">.</span>
     </footer>
 
     <script type="module">
-        import { initializeApp }                        from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { initializeApp }                                          from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut }                   from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp,
+                 query, orderBy, onSnapshot, deleteDoc, doc }             from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
         const ADMIN_UID = 'tAqH3t6DX4OxHadWurRcBFBhmQA3';
 
@@ -861,6 +884,8 @@
             appId:             "1:322343274719:web:689229a5dd1ca422c9c16a"
         });
         const fbAuth = getAuth(fbApp);
+        const db     = getFirestore(fbApp);
+        const colRef = collection(db, 'sermons');
 
         onAuthStateChanged(fbAuth, (user) => {
             if (user && user.uid === ADMIN_UID) {
@@ -870,12 +895,20 @@
                 document.body.classList.remove('is-admin');
                 sessionStorage.removeItem('coc_admin');
             }
-            // Signal the regular script that auth is resolved so it can re-render
             window._cocAuthReady = true;
             window.dispatchEvent(new CustomEvent('coc-auth-ready'));
         });
 
-        window._cocSignOut = () => signOut(fbAuth);
+        window._cocSignOut    = () => signOut(fbAuth);
+        window._cocAddSermon  = (data) => addDoc(colRef, { ...data, createdAt: serverTimestamp() });
+        window._cocDeleteSermon = (id) => deleteDoc(doc(db, 'sermons', id));
+
+        // Real-time feed — keeps sermons[] in sync
+        const q = query(colRef, orderBy('createdAt', 'desc'));
+        onSnapshot(q, snapshot => {
+            sermons = snapshot.docs.map(d => ({ _id: d.id, ...d.data() }));
+            renderSermons();
+        }, err => console.error('Firestore error:', err));
     </script>
 
     <script>
@@ -947,16 +980,19 @@
             }
         }
 
-        function deleteSermon(idx) {
+        async function deleteSermon(idx) {
             if (!document.body.classList.contains('is-admin')) return;
             if (!confirm('Delete this sermon? This cannot be undone.')) return;
-            sermons.splice(idx, 1);
-            localStorage.setItem('coc_sermons', JSON.stringify(sermons));
-            renderSermons();
+            try {
+                await window._cocDeleteSermon(sermons[idx]._id);
+            } catch(err) {
+                console.error('Delete error:', err);
+                alert('Could not delete. Make sure you are signed in as admin.');
+            }
         }
 
         // ── DATA STORE ──
-        let sermons = JSON.parse(localStorage.getItem('coc_sermons') || '[]');
+        let sermons = [];
         let currentFilter = 'all';
         let featuredSermon = null;
 
@@ -1101,6 +1137,12 @@
 
         // ── ADMIN ──
         function openAdmin() {
+            // Must be Firebase-confirmed admin, not just sessionStorage
+            if (!document.body.classList.contains('is-admin')) {
+                sessionStorage.setItem('coc_admin_return', 'sermons.html');
+                window.location.href = 'admin-login.html';
+                return;
+            }
             document.getElementById('adminPanel').classList.add('open');
             document.getElementById('inputDate').value = new Date().toISOString().split('T')[0];
         }
@@ -1109,26 +1151,64 @@
                 document.getElementById('adminPanel').classList.remove('open');
         }
 
-        function saveSermon() {
-            const title   = document.getElementById('inputTitle').value.trim();
-            const pastor  = document.getElementById('inputPastor').value.trim();
-            const date    = document.getElementById('inputDate').value;
-            const url     = document.getElementById('inputUrl').value.trim();
+        async function saveSermon() {
+            const title    = document.getElementById('inputTitle').value.trim();
+            const pastor   = document.getElementById('inputPastor').value.trim();
+            const date     = document.getElementById('inputDate').value;
+            const url      = document.getElementById('inputUrl').value.trim();
             const category = document.getElementById('inputCategory').value;
-            const desc    = document.getElementById('inputDesc').value.trim();
-            const thumb   = document.getElementById('inputThumb').value.trim();
+            const desc     = document.getElementById('inputDesc').value.trim();
+            const thumb    = document.getElementById('inputThumb').value.trim();
 
             if (!title || !pastor || !date || !url) {
                 alert('Please fill in the required fields: Title, Preacher, Date, and Video URL.');
                 return;
             }
 
-            sermons.unshift({ title, pastor, date, url, category, desc, thumb });
-            localStorage.setItem('coc_sermons', JSON.stringify(sermons));
+            const btn = document.querySelector('#adminPanel .btn-primary');
+            const origHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving...';
 
-            ['inputTitle','inputPastor','inputUrl','inputDesc','inputThumb'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('adminPanel').classList.remove('open');
-            renderSermons();
+            try {
+                if (typeof window._cocAddSermon !== 'function') throw new Error('Firebase not ready');
+                await window._cocAddSermon({ title, pastor, date, url, category, desc, thumb });
+                ['inputTitle','inputPastor','inputUrl','inputDesc','inputThumb'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('adminPanel').classList.remove('open');
+                cocShowSnackbar('🔥', 'Sermon Saved!', `"${title}" is now live on the sermons page.`, false);
+            } catch(err) {
+                console.error('Firestore save error:', err.code, err.message);
+                const msg = err.code === 'permission-denied'
+                    ? 'Permission denied — check Firestore rules.'
+                    : err.message || 'Unknown error.';
+                cocShowSnackbar('⚠️', 'Could Not Save', msg, true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origHTML;
+            }
+        }
+
+        // ── SNACKBAR ──
+        let _snackTimer = null;
+        function cocShowSnackbar(icon, title, sub, isError) {
+            const el = document.getElementById('coc-snackbar');
+            document.getElementById('coc-snackbar-icon').textContent = icon;
+            document.getElementById('coc-snackbar-icon').style.background = isError
+                ? 'linear-gradient(135deg,#7f1d1d,#450a0a)'
+                : 'linear-gradient(135deg,#c8102e,#8b0000)';
+            document.getElementById('coc-snackbar-title').textContent = title;
+            document.getElementById('coc-snackbar-sub').textContent = sub;
+            el.style.opacity = '1';
+            el.style.transform = 'translateX(-50%) translateY(0)';
+            el.style.pointerEvents = 'auto';
+            clearTimeout(_snackTimer);
+            _snackTimer = setTimeout(cocHideSnackbar, 4500);
+        }
+        function cocHideSnackbar() {
+            const el = document.getElementById('coc-snackbar');
+            el.style.opacity = '0';
+            el.style.transform = 'translateX(-50%) translateY(120px)';
+            el.style.pointerEvents = 'none';
         }
 
         // ── FADE UP OBSERVER ──
