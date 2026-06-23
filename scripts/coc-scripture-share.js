@@ -1,411 +1,371 @@
 /**
- * COC Scripture Share - Generate shareable images
- * Uses html2canvas to create beautiful scripture cards
- * Enhanced for WhatsApp sharing
+ * COC Scripture Share
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Button behaviours (no modal pop-up):
+ *   Share    → navigator.share(text) / clipboard fallback  — instant, no image
+ *   WhatsApp → generate image → native share / download fallback
+ *   Download → generate image → save as PNG
+ *
+ * Card rendering fix: card is appended to a dedicated off-screen wrapper that
+ * is 800 px wide and fully visible to html2canvas (no clipping, no transform).
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 
-(function(global) {
+(function (global) {
     'use strict';
 
-    // Load html2canvas dynamically
+    // ── html2canvas lazy-loader ───────────────────────────────────────────────
+    let _h2cPromise = null;
     function loadHtml2Canvas() {
-        return new Promise((resolve, reject) => {
-            if (typeof html2canvas !== 'undefined') {
-                resolve(html2canvas);
-                return;
-            }
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-            script.onload = () => resolve(window.html2canvas);
-            script.onerror = () => reject(new Error('Failed to load html2canvas'));
-            document.head.appendChild(script);
+        if (_h2cPromise) return _h2cPromise;
+        _h2cPromise = new Promise((resolve, reject) => {
+            if (typeof html2canvas !== 'undefined') { resolve(html2canvas); return; }
+            const s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+            s.onload  = () => typeof html2canvas !== 'undefined' ? resolve(html2canvas) : reject(new Error('h2c missing'));
+            s.onerror = () => reject(new Error('Failed to load html2canvas'));
+            document.head.appendChild(s);
         });
+        return _h2cPromise;
     }
 
-    // Create the share card HTML
-    function createShareCard(scripture, customOptions = {}) {
-        const options = {
-            verse: scripture.verse || 'Trust in the Lord with all your heart.',
-            reference: scripture.reference || 'Proverbs 3:5',
-            reflection: scripture.reflection || '',
-            date: new Date().toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            }),
-            ...customOptions
-        };
+    // ── safe HTML escape (used inside card innerHTML) ─────────────────────────
+    function esc(str) {
+        return String(str == null ? '' : str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
 
-        // Build the card HTML
+    // ── off-screen render host ────────────────────────────────────────────────
+    // A fixed-size container parked way off the left of the screen.
+    // html2canvas captures from (0,0) inside this element, so nothing is clipped.
+    function getRenderHost() {
+        let host = document.getElementById('_sotd_render_host');
+        if (!host) {
+            host = document.createElement('div');
+            host.id = '_sotd_render_host';
+            host.style.cssText = [
+                'position:fixed',
+                'top:0',
+                'left:-9999px',
+                'width:1080px',   // card width
+                'height:1080px',  // card height
+                'overflow:hidden',
+                'pointer-events:none',
+                'z-index:-1',
+            ].join(';');
+            document.body.appendChild(host);
+        }
+        return host;
+    }
+
+    // ── scripture card DOM (1080 × 1080 — square, perfect for IG/WA status) ──
+    function buildCard(scripture) {
+        const verse      = scripture.verse      || '"Trust in the Lord with all your heart."';
+        const reference  = scripture.reference  || 'Proverbs 3:5';
+        const reflection = scripture.reflection || '';
+        const date = new Date().toLocaleDateString('en-US', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
         const card = document.createElement('div');
-        card.id = 'scripture-share-card';
-        card.style.cssText = `
-            position: fixed;
-            top: -9999px;
-            left: -9999px;
-            width: 800px;
-            height: 600px;
-            background: linear-gradient(145deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%);
-            border: 2px solid rgba(200,16,46,0.3);
-            border-radius: 24px;
-            padding: 48px 52px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.8);
-            position: relative;
-            overflow: hidden;
-            z-index: 99999;
-        `;
+        card.style.cssText = [
+            'width:1080px',
+            'height:1080px',
+            'box-sizing:border-box',
+            'background:linear-gradient(150deg,#0d0000 0%,#1c0404 40%,#0a0000 100%)',
+            'display:flex',
+            'flex-direction:column',
+            'align-items:center',
+            'justify-content:center',
+            'padding:80px 90px',
+            'position:relative',
+            'overflow:hidden',
+            'font-family:Georgia,serif',
+        ].join(';');
 
-        // Background decorations
         card.innerHTML = `
-            <!-- Glow effects -->
-            <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(200,16,46,0.08),transparent 70%);pointer-events:none;"></div>
-            <div style="position:absolute;bottom:-80px;left:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(240,200,66,0.05),transparent 70%);pointer-events:none;"></div>
-            
-            <!-- Decorative cross watermark -->
-            <div style="position:absolute;bottom:20px;right:30px;font-size:120px;color:rgba(200,16,46,0.04);font-family:'Times New Roman',serif;pointer-events:none;line-height:1;">✝</div>
-            
-            <!-- Top bar with church name -->
-            <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;position:relative;z-index:1;width:100%;">
-                <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#c8102e,#8b0000);display:flex;align-items:center;justify-content:center;font-size:18px;color:#f0c842;font-weight:700;font-family:'Bebas Neue',sans-serif;">COC</div>
-                <div style="text-align:left;">
-                    <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#f0c842;letter-spacing:0.15em;text-transform:uppercase;line-height:1.2;">City of Champions</div>
-                    <div style="font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:0.08em;text-transform:uppercase;font-family:'Inter',sans-serif;">International Assembly</div>
+            <!-- bg glow top-right -->
+            <div style="position:absolute;top:-160px;right:-160px;width:600px;height:600px;
+                border-radius:50%;background:radial-gradient(circle,rgba(200,16,46,0.12) 0%,transparent 70%);
+                pointer-events:none;"></div>
+            <!-- bg glow bottom-left -->
+            <div style="position:absolute;bottom:-120px;left:-120px;width:480px;height:480px;
+                border-radius:50%;background:radial-gradient(circle,rgba(240,200,66,0.06) 0%,transparent 70%);
+                pointer-events:none;"></div>
+            <!-- cross watermark -->
+            <div style="position:absolute;bottom:40px;right:60px;font-size:260px;line-height:1;
+                color:rgba(200,16,46,0.05);font-family:'Times New Roman',serif;
+                pointer-events:none;user-select:none;">✝</div>
+            <!-- bottom glow line -->
+            <div style="position:absolute;bottom:0;left:0;right:0;height:3px;
+                background:linear-gradient(90deg,transparent,#c8102e 50%,transparent);
+                opacity:0.5;"></div>
+
+            <!-- ── HEADER ── -->
+            <div style="display:flex;align-items:center;justify-content:space-between;
+                width:100%;margin-bottom:60px;position:relative;z-index:1;">
+                <!-- Church badge -->
+                <div style="display:flex;align-items:center;gap:18px;">
+                    <div style="width:56px;height:56px;border-radius:14px;flex-shrink:0;
+                        background:linear-gradient(135deg,#c8102e,#8b0000);
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:14px;font-weight:900;color:#f0c842;
+                        font-family:'Bebas Neue',Arial Narrow,sans-serif;letter-spacing:0.05em;">COC</div>
+                    <div>
+                        <div style="font-family:'Bebas Neue',Arial Narrow,sans-serif;font-size:20px;
+                            color:#f0c842;letter-spacing:0.18em;text-transform:uppercase;line-height:1.2;">
+                            City of Champions</div>
+                        <div style="font-size:12px;color:rgba(255,255,255,0.28);letter-spacing:0.1em;
+                            text-transform:uppercase;font-family:Inter,Arial,sans-serif;margin-top:2px;">
+                            International Assembly</div>
+                    </div>
                 </div>
-                <div style="margin-left:auto;text-align:right;">
-                    <div style="font-size:9px;color:rgba(255,255,255,0.15);letter-spacing:0.1em;text-transform:uppercase;font-family:'Inter',sans-serif;">Scripture of the Day</div>
-                    <div style="font-size:10px;color:rgba(255,255,255,0.1);font-family:'Inter',sans-serif;">${options.date}</div>
+                <!-- Label -->
+                <div style="text-align:right;">
+                    <div style="font-size:12px;color:rgba(200,16,46,0.8);letter-spacing:0.22em;
+                        text-transform:uppercase;font-family:Inter,Arial,sans-serif;font-weight:700;">
+                        Scripture of the Day</div>
+                    <div style="font-size:12px;color:rgba(255,255,255,0.15);font-family:Inter,Arial,sans-serif;
+                        margin-top:4px;">${esc(date)}</div>
                 </div>
             </div>
 
-            <!-- Decorative line -->
-            <div style="width:80px;height:1.5px;background:linear-gradient(90deg,transparent,#c8102e,transparent);margin-bottom:30px;"></div>
+            <!-- ── DIVIDER ── -->
+            <div style="width:100px;height:2px;
+                background:linear-gradient(90deg,transparent,#c8102e,transparent);
+                margin-bottom:50px;position:relative;z-index:1;"></div>
 
-            <!-- Main verse -->
-            <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;z-index:1;padding:10px 0;width:100%;">
-                <div style="font-family:'Georgia','Cormorant Garamond',serif;font-size:32px;font-style:italic;font-weight:300;color:rgba(255,255,255,0.92);line-height:1.5;max-width:90%;margin-bottom:16px;">
-                    ${options.verse}
+            <!-- ── VERSE ── -->
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;
+                justify-content:center;width:100%;position:relative;z-index:1;">
+                <div style="font-family:Georgia,'Times New Roman',serif;font-size:44px;
+                    font-style:italic;font-weight:400;color:rgba(255,255,255,0.93);
+                    line-height:1.55;text-align:center;max-width:900px;margin-bottom:28px;">
+                    ${esc(verse)}
                 </div>
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#f0c842;letter-spacing:0.08em;">
-                    — ${options.reference}
+                <div style="font-family:'Bebas Neue',Arial Narrow,sans-serif;font-size:36px;
+                    color:#f0c842;letter-spacing:0.12em;text-align:center;">
+                    — ${esc(reference)}
                 </div>
-                ${options.reflection ? `
-                <div style="margin-top:20px;font-family:'Georgia','Cormorant Garamond',serif;font-size:14px;color:rgba(255,255,255,0.35);font-style:italic;line-height:1.6;max-width:75%;">
-                    ${options.reflection}
+                ${reflection ? `
+                <div style="margin-top:32px;font-family:Georgia,serif;font-size:20px;
+                    color:rgba(255,255,255,0.32);font-style:italic;line-height:1.65;
+                    text-align:center;max-width:780px;">
+                    ${esc(reflection)}
                 </div>` : ''}
             </div>
 
-            <!-- Decorative line -->
-            <div style="width:60px;height:1px;background:rgba(255,255,255,0.06);margin-bottom:16px;"></div>
-
-            <!-- Footer -->
-            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;position:relative;z-index:1;">
-                <div style="font-size:10px;color:rgba(255,255,255,0.12);letter-spacing:0.12em;text-transform:uppercase;font-family:'Inter',sans-serif;">
-                    <i class="fas fa-fire" style="color:rgba(200,16,46,0.3);margin-right:6px;"></i>
-                    Restoring Human Destiny & Dignity
+            <!-- ── FOOTER ── -->
+            <div style="display:flex;align-items:center;justify-content:space-between;
+                width:100%;margin-top:60px;position:relative;z-index:1;">
+                <div style="font-size:14px;color:rgba(255,255,255,0.18);letter-spacing:0.12em;
+                    text-transform:uppercase;font-family:Inter,Arial,sans-serif;">
+                    🔥 Restoring Human Destiny &amp; Dignity
                 </div>
-                <div style="font-size:10px;color:rgba(255,255,255,0.08);letter-spacing:0.08em;font-family:'Inter',sans-serif;">
+                <div style="font-size:16px;color:rgba(255,255,255,0.35);letter-spacing:0.08em;
+                    font-family:Inter,Arial,sans-serif;font-weight:600;">
                     joincoc.com
                 </div>
             </div>
-
-            <!-- Fire ember particles -->
-            <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#c8102e,transparent);opacity:0.3;"></div>
         `;
 
         return card;
     }
 
-    // Generate the image and return as data URL
-    async function generateImage(scripture, options = {}) {
-        try {
-            await loadHtml2Canvas();
-            const card = createShareCard(scripture, options);
-            document.body.appendChild(card);
-            await new Promise(resolve => setTimeout(resolve, 300));
-            const canvas = await html2canvas(card, {
-                scale: 2,
-                backgroundColor: null,
-                useCORS: true,
-                logging: false,
-                allowTaint: true,
-                width: 800,
-                height: 600
-            });
-            card.remove();
-            return canvas.toDataURL('image/png');
-        } catch (error) {
-            console.error('Generate image error:', error);
-            throw error;
-        }
-    }
+    // ── image generation ──────────────────────────────────────────────────────
+    async function generateImage(scripture) {
+        await loadHtml2Canvas();
 
-    // Show loading toast
-    function showLoading(message) {
-        const toast = document.createElement('div');
-        toast.id = 'share-loading-toast';
-        toast.style.cssText = `
-            position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
-            background: #1a1a1e; border: 1px solid rgba(200,16,46,0.3);
-            border-radius: 16px; padding: 14px 24px; color: #fff;
-            font-family: 'Inter', sans-serif; font-size: 14px;
-            z-index: 999999; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            display: flex; align-items: center; gap: 12px;
-        `;
-        toast.innerHTML = `
-            <div style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(200,16,46,0.2);border-top-color:#c8102e;animation:spin 0.8s linear infinite;"></div>
-            <span>${message || 'Generating image...'}</span>
-            <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-        `;
-        document.body.appendChild(toast);
-        return toast;
-    }
+        const host = getRenderHost();
+        host.innerHTML = '';                       // clear previous card
+        const card = buildCard(scripture);
+        host.appendChild(card);
 
-    function hideLoading() {
-        const toast = document.getElementById('share-loading-toast');
-        if (toast) toast.remove();
-    }
+        // one rAF so the browser paints the card before html2canvas reads it
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-    // Show success toast
-    function showSuccess(message) {
-        const toast = document.createElement('div');
-        toast.style.cssText = `
-            position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
-            background: #1a1a1e; border: 1px solid rgba(74,222,128,0.3);
-            border-radius: 16px; padding: 14px 24px; color: #4ade80;
-            font-family: 'Inter', sans-serif; font-size: 14px;
-            z-index: 999999; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            display: flex; align-items: center; gap: 10px;
-            animation: slideUp 0.3s ease;
-        `;
-        toast.innerHTML = `<span>✅</span><span>${message || 'Done!'}</span>`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-
-    // Show error toast
-    function showError(message) {
-        const toast = document.createElement('div');
-        toast.style.cssText = `
-            position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
-            background: #1a1a1e; border: 1px solid rgba(239,68,68,0.3);
-            border-radius: 16px; padding: 14px 24px; color: #ef4444;
-            font-family: 'Inter', sans-serif; font-size: 14px;
-            z-index: 999999; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            display: flex; align-items: center; gap: 10px;
-        `;
-        toast.innerHTML = `<span>⚠️</span><span>${message || 'Something went wrong'}</span>`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 4000);
-    }
-
-    // Share to WhatsApp specifically
-    async function shareToWhatsApp(scripture) {
-        try {
-            const loading = showLoading('Preparing image for WhatsApp...');
-            
-            // Generate the image
-            const imageDataUrl = await generateImage(scripture);
-            hideLoading();
-
-            // Convert data URL to blob
-            const response = await fetch(imageDataUrl);
-            const blob = await response.blob();
-            
-            // Create a file
-            const file = new File([blob], 'scripture-of-the-day.png', { type: 'image/png' });
-
-            // Check if we can use native share with file
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        title: 'Scripture of the Day - City of Champions',
-                        text: `${scripture.verse} — ${scripture.reference}`,
-                        files: [file]
-                    });
-                    showSuccess('Shared to WhatsApp successfully!');
-                    return { success: true, method: 'native-share' };
-                } catch (shareError) {
-                    // User cancelled or share failed
-                    if (shareError.name === 'AbortError') {
-                        return { success: false, method: 'cancelled' };
-                    }
-                    // Fall through to fallback
-                }
-            }
-
-            // Fallback: Download the image and let user share manually
-            const link = document.createElement('a');
-            link.download = `scripture-${scripture.reference.replace(/\s/g, '-')}.png`;
-            link.href = imageDataUrl;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showSuccess('Image downloaded! Share it on WhatsApp manually.');
-            return { success: true, method: 'download' };
-
-        } catch (error) {
-            hideLoading();
-            console.error('Share to WhatsApp error:', error);
-            showError('Could not share. Please try downloading the image instead.');
-            return { success: false, error: error.message };
-        }
-    }
-
-    // Share as image (main function)
-    async function shareAsImage(scripture, method = 'native') {
-        try {
-            const loading = showLoading('Creating your scripture image...');
-            
-            // Generate the image
-            const imageDataUrl = await generateImage(scripture);
-            hideLoading();
-
-            if (method === 'whatsapp') {
-                // WhatsApp specific sharing
-                return await shareToWhatsApp(scripture);
-            }
-
-            // For other sharing methods
-            const response = await fetch(imageDataUrl);
-            const blob = await response.blob();
-            const file = new File([blob], 'scripture-of-the-day.png', { type: 'image/png' });
-
-            // Try native share with file
-            if (method === 'native' && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        title: 'Scripture of the Day - City of Champions',
-                        text: `${scripture.verse} — ${scripture.reference}`,
-                        files: [file]
-                    });
-                    showSuccess('Shared successfully!');
-                    return { success: true, method: 'native-share' };
-                } catch (shareError) {
-                    if (shareError.name === 'AbortError') {
-                        return { success: false, method: 'cancelled' };
-                    }
-                    // Fall through to download
-                }
-            }
-
-            // Download as fallback
-            const link = document.createElement('a');
-            link.download = `scripture-${scripture.reference.replace(/\s/g, '-')}.png`;
-            link.href = imageDataUrl;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showSuccess('Image downloaded!');
-            return { success: true, method: 'download' };
-
-        } catch (error) {
-            hideLoading();
-            console.error('Share error:', error);
-            showError('Could not share. Please try again.');
-            return { success: false, error: error.message };
-        }
-    }
-
-    // Show share options modal
-    function showShareOptions(scripture) {
-        // Remove existing modal if any
-        const existing = document.getElementById('share-options-modal');
-        if (existing) existing.remove();
-
-        const overlay = document.createElement('div');
-        overlay.id = 'share-options-modal';
-        overlay.className = 'share-modal-overlay';
-        overlay.innerHTML = `
-            <div class="share-modal-box">
-                <div class="share-modal-title">📖 Share Scripture</div>
-                <div class="share-modal-sub">Choose how you want to share</div>
-                
-                <div class="share-btn-group">
-                    <button class="share-btn share-btn-primary" onclick="window.COCScriptureShare.shareAsImage(${JSON.stringify(scripture)}, 'whatsapp')">
-                        <span class="share-btn-icon">💬</span>
-                        <span>Share to WhatsApp</span>
-                    </button>
-                    
-                    <button class="share-btn share-btn-secondary" onclick="window.COCScriptureShare.shareAsImage(${JSON.stringify(scripture)}, 'native')">
-                        <span class="share-btn-icon">📤</span>
-                        <span>Share via Native</span>
-                    </button>
-                    
-                    <button class="share-btn share-btn-secondary" onclick="window.COCScriptureShare.shareAsImage(${JSON.stringify(scripture)}, 'download')">
-                        <span class="share-btn-icon">⬇️</span>
-                        <span>Download as Image</span>
-                    </button>
-                    
-                    <button class="share-btn share-btn-text" onclick="window.COCScriptureShare.copyAsText(${JSON.stringify(scripture)})">
-                        <span class="share-btn-icon">📋</span>
-                        <span>Copy as Text</span>
-                    </button>
-                </div>
-                
-                <button class="share-cancel" onclick="this.closest('#share-options-modal').remove()">
-                    Cancel
-                </button>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-        
-        // Close on click outside
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) overlay.remove();
+        const canvas = await html2canvas(card, {
+            scale: 1,                              // 1× — already 1080px, no need to double
+            backgroundColor: '#0d0000',
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            width:  1080,
+            height: 1080,
+            x: 0,
+            y: 0,
+            scrollX: 0,
+            scrollY: 0,
         });
+
+        host.innerHTML = '';                       // clean up
+        return canvas.toDataURL('image/png');
     }
 
-    // Copy as text (fallback)
-    function copyAsText(scripture) {
-        const text = `${scripture.verse}\n— ${scripture.reference}\n\nRead more at joincoc.com 🔥`;
-        
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(text).then(() => {
-                showSuccess('Copied to clipboard!');
-            }).catch(() => {
-                fallbackCopy(text);
-            });
-        } else {
-            fallbackCopy(text);
+    // ── toast helpers ─────────────────────────────────────────────────────────
+    function toast(msg, color, ms) {
+        const t = document.createElement('div');
+        t.style.cssText = `
+            position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+            background:#111;border:1px solid ${color}44;color:${color};
+            border-radius:14px;padding:13px 22px;
+            font-family:Inter,Arial,sans-serif;font-size:14px;
+            z-index:2147483647;box-shadow:0 16px 48px rgba(0,0,0,0.6);
+            display:flex;align-items:center;gap:10px;white-space:nowrap;
+        `;
+        t.innerHTML = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), ms || 3500);
+        return t;
+    }
+    function toastLoading(msg) {
+        const t = document.createElement('div');
+        t.id = '_sotd_loading';
+        t.style.cssText = `
+            position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+            background:#111;border:1px solid rgba(200,16,46,0.35);color:#fff;
+            border-radius:14px;padding:13px 22px;
+            font-family:Inter,Arial,sans-serif;font-size:14px;
+            z-index:2147483647;box-shadow:0 16px 48px rgba(0,0,0,0.6);
+            display:flex;align-items:center;gap:12px;white-space:nowrap;
+        `;
+        t.innerHTML = `
+            <div style="width:18px;height:18px;border-radius:50%;
+                border:2px solid rgba(200,16,46,0.2);border-top-color:#c8102e;
+                animation:_sotdSpin 0.75s linear infinite;flex-shrink:0;"></div>
+            <span>${msg || 'Generating image…'}</span>
+            <style>@keyframes _sotdSpin{to{transform:rotate(360deg)}}</style>
+        `;
+        document.body.appendChild(t);
+        return t;
+    }
+    function hideLoading() {
+        const t = document.getElementById('_sotd_loading');
+        if (t) t.remove();
+    }
+
+    // ── dataURL → Blob → File ─────────────────────────────────────────────────
+    function dataUrlToFile(dataUrl, name) {
+        const [header, b64] = dataUrl.split(',');
+        const mime = header.match(/:(.*?);/)[1];
+        const bytes = atob(b64);
+        const arr   = new Uint8Array(bytes.length);
+        for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+        return new File([arr], name, { type: mime });
+    }
+
+    // ── download helper ───────────────────────────────────────────────────────
+    function triggerDownload(dataUrl, filename) {
+        const a  = document.createElement('a');
+        a.href   = dataUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // PUBLIC API
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Share button — plain text share via Web Share API or clipboard.
+     * Instant — no image generation.
+     */
+    async function shareAsText(scripture) {
+        const text = `${scripture.verse}\n— ${scripture.reference}\n\njoincoc.com 🔥`;
+        if (navigator.share) {
+            try {
+                await navigator.share({ title: 'Scripture of the Day – City of Champions', text });
+                return;
+            } catch (e) {
+                if (e.name === 'AbortError') return;
+            }
         }
-        
-        // Close modal
-        const modal = document.getElementById('share-options-modal');
-        if (modal) modal.remove();
-    }
-
-    function fallbackCopy(text) {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
+        // clipboard fallback
         try {
-            document.execCommand('copy');
-            showSuccess('Copied to clipboard!');
-        } catch (e) {
-            showError('Could not copy. Please try again.');
+            await navigator.clipboard.writeText(text);
+            toast('📋 Copied to clipboard!', '#4ade80');
+        } catch {
+            // last-resort prompt
+            prompt('Copy this scripture:', text);
         }
-        textarea.remove();
     }
 
-    // Public API
+    /**
+     * WhatsApp button — generate image, try native share (with file),
+     * fall back to download + instructions.
+     */
+    async function shareImageWhatsApp(scripture) {
+        const tl = toastLoading('Creating image…');
+        try {
+            const dataUrl  = await generateImage(scripture);
+            hideLoading();
+            const safeName = `coc-scripture-${(scripture.reference || 'today').replace(/[\s:]/g, '-')}.png`;
+            const file     = dataUrlToFile(dataUrl, safeName);
+
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        title: 'Scripture of the Day – City of Champions',
+                        text: `${scripture.verse} — ${scripture.reference}\n\njoincoc.com`,
+                        files: [file],
+                    });
+                    return;
+                } catch (e) {
+                    if (e.name === 'AbortError') return;
+                    // fall through to download
+                }
+            }
+
+            // No native file share — download + tip
+            triggerDownload(dataUrl, safeName);
+            toast('📥 Image saved! Open your gallery to share it on WhatsApp.', '#25D366', 5000);
+        } catch (err) {
+            hideLoading();
+            console.error('[COCShare] WhatsApp error:', err);
+            toast('⚠️ Could not create image. Please try again.', '#ef4444');
+        }
+    }
+
+    /**
+     * Download button — generate image and save as PNG.
+     */
+    async function downloadImage(scripture) {
+        const tl = toastLoading('Preparing download…');
+        try {
+            const dataUrl  = await generateImage(scripture);
+            hideLoading();
+            const safeName = `coc-scripture-${(scripture.reference || 'today').replace(/[\s:]/g, '-')}.png`;
+            triggerDownload(dataUrl, safeName);
+            toast('✅ Image downloaded!', '#4ade80');
+        } catch (err) {
+            hideLoading();
+            console.error('[COCShare] Download error:', err);
+            toast('⚠️ Could not download image. Please try again.', '#ef4444');
+        }
+    }
+
+    // Legacy alias kept so existing callers don't break
+    function shareAsImage(scripture, method) {
+        if (method === 'whatsapp') return shareImageWhatsApp(scripture);
+        if (method === 'download') return downloadImage(scripture);
+        return shareAsText(scripture);
+    }
+
+    // ── export ────────────────────────────────────────────────────────────────
     global.COCScriptureShare = {
+        shareAsText,
+        shareImageWhatsApp,
+        downloadImage,
         generateImage,
+        // legacy
         shareAsImage,
-        shareToWhatsApp,
-        showShareOptions,
-        copyAsText,
-        share: showShareOptions, // Alias for convenience
+        showShareOptions: (s) => shareAsText(s),
     };
 
 })(window);
