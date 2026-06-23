@@ -155,7 +155,8 @@
         .section-card {
             background: var(--card);
             border: 1px solid var(--card-border);
-            border-radius: 16px; padding: 28px 32px;
+            border-radius: 16px;
+            padding: 28px 32px;
             margin-bottom: 20px;
             transition: border-color 0.2s;
         }
@@ -342,6 +343,7 @@
 <script src="/scripts/coc-scripture.js"></script>
 
 <script type="module">
+    import { getScriptureOfDay, getAllScriptures } from '/scripts/coc-scripture-firebase.js';
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
         getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
@@ -349,48 +351,30 @@
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
-        apiKey:            "AIzaSyB2gU2QrpRnIevjhLqd1kTj-xsjiWBHGqQ",
-        authDomain:        "joincoc.firebaseapp.com",
-        projectId:         "joincoc",
-        storageBucket:     "joincoc.firebasestorage.app",
+        apiKey: "AIzaSyB2gU2QrpRnIevjhLqd1kTj-xsjiWBHGqQ",
+        authDomain: "joincoc.firebaseapp.com",
+        projectId: "joincoc",
+        storageBucket: "joincoc.firebasestorage.app",
         messagingSenderId: "322343274719",
-        appId:             "1:322343274719:web:689229a5dd1ca422c9c16a"
+        appId: "1:322343274719:web:689229a5dd1ca422c9c16a"
     };
 
     const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-    const db  = getFirestore(app);
-
-    const SCRIPTURE_DATA = [
-        { verse: '"Trust in the Lord with all your heart and lean not on your own understanding."', reference: 'Proverbs 3:5', reflection: 'God invites us to trust Him completely, even when you don\'t understand His ways. He is faithful and His plans are perfect.', prayer: 'Lord, help me to trust You more deeply today. Let Your Word guide my steps.' },
-        { verse: '"I can do all things through Christ who strengthens me."', reference: 'Philippians 4:13', reflection: 'Your strength comes from Christ, not your own abilities. When you feel weak, His power is made perfect in you.', prayer: 'Father, thank You for Your constant presence. Fill me with Your peace.' },
-        { verse: '"The Lord is my shepherd; I shall not want."', reference: 'Psalm 23:1', reflection: 'With God as your shepherd, you have everything you need. He leads, guides, and provides for you.', prayer: 'Lord, I surrender my fears to You. Give me courage and strength.' },
-        { verse: '"Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go."', reference: 'Joshua 1:9', reflection: 'God\'s presence is with you always — you don\'t need to fear. He goes before you and fights for you.', prayer: 'Heavenly Father, open my eyes to see Your goodness today.' },
-        { verse: '"And we know that in all things God works for the good of those who love him, who have been called according to his purpose."', reference: 'Romans 8:28', reflection: 'Even difficult circumstances are part of God\'s good plan for your life. He is working all things for your good.', prayer: 'Lord, guide my heart to love others as You have loved me.' },
-        { verse: '"The Lord is my light and my salvation — whom shall I fear?"', reference: 'Psalm 27:1', reflection: 'God\'s light dispels all darkness. You have nothing to fear when He is your protector.', prayer: 'Father, thank You for being my light and salvation. I trust in You.' },
-        { verse: '"For I know the plans I have for you," declares the Lord, "plans to prosper you and not to harm you, plans to give you hope and a future."', reference: 'Jeremiah 29:11', reflection: 'God holds your future in His hands. His plans for you are filled with hope and purpose.', prayer: 'Lord, I trust Your plans over my own. Lead me in Your perfect way.' },
-        { verse: '"Ask and it will be given to you; seek and you will find; knock and the door will be opened to you."', reference: 'Matthew 7:7', reflection: 'God is approachable and responds to those who seek Him. Come to Him boldly in prayer.', prayer: 'Father, I come to You boldly today. Hear my prayer and answer in Your perfect timing.' },
-        { verse: '"Come to me, all you who are weary and burdened, and I will give you rest."', reference: 'Matthew 11:28', reflection: 'Jesus offers rest to all who are tired and burdened. His yoke is easy and His burden is light.', prayer: 'Lord Jesus, I lay my burdens at Your feet today. Grant me Your perfect rest.' },
-        { verse: '"The name of the Lord is a fortified tower; the righteous run to it and are safe."', reference: 'Proverbs 18:10', reflection: 'In times of trouble, God\'s name is your refuge and strength. Run to Him in prayer.', prayer: 'Father, You are my strong tower. I run to You in times of trouble.' }
-    ];
-
-    function getTodayIndex() {
-        const start = new Date('2024-01-01');
-        const today = new Date();
-        const diff  = Math.floor((today - start) / 86400000);
-        return diff % SCRIPTURE_DATA.length;
-    }
-
-    const todayIdx    = getTodayIndex();
-    const todayData   = SCRIPTURE_DATA[todayIdx];
-    const todayKey    = new Date().toISOString().split('T')[0];
+    const db = getFirestore(app);
+    const todayKey = new Date().toISOString().split('T')[0];
     const scriptureRef = doc(db, 'scriptures', todayKey);
-    const commentsRef  = collection(db, 'scriptures', todayKey, 'comments');
+    const commentsRef = collection(db, 'scriptures', todayKey, 'comments');
 
-    function renderTodayScripture() {
-        document.getElementById('todayVerse').textContent     = todayData.verse;
+    // Store all scriptures for archive
+    let allScriptures = [];
+
+    async function renderTodayScripture() {
+        const todayData = await getScriptureOfDay();
+        
+        document.getElementById('todayVerse').textContent = todayData.verse;
         document.getElementById('todayReference').textContent = '— ' + todayData.reference;
-        document.getElementById('todayReflection').textContent = todayData.reflection;
-        document.getElementById('todayPrayer').textContent    = todayData.prayer;
+        document.getElementById('todayReflection').textContent = todayData.reflection || 'Reflect on God\'s Word today.';
+        document.getElementById('todayPrayer').textContent = todayData.prayer || 'Lord, speak to me through Your Word today.';
 
         const readKey = 'coc_scripture_read_' + todayKey;
         if (localStorage.getItem(readKey)) {
@@ -412,7 +396,9 @@
     };
 
     window.shareScripture = function() {
-        const text = `${todayData.verse}\n— ${todayData.reference}\n\nRead more at joincoc.com 🔥`;
+        const verse = document.getElementById('todayVerse').textContent;
+        const ref = document.getElementById('todayReference').textContent;
+        const text = `${verse}\n${ref}\n\nRead more at joincoc.com 🔥`;
         if (navigator.share) {
             navigator.share({ title: 'Scripture of the Day', text });
         } else {
@@ -500,16 +486,25 @@
 
     function renderArchive() {
         const container = document.getElementById('archiveContainer');
-        container.innerHTML = SCRIPTURE_DATA.map((s, idx) => {
-            const daysAgo = (idx - todayIdx + SCRIPTURE_DATA.length) % SCRIPTURE_DATA.length;
-            const isToday = daysAgo === 0;
-            const date    = new Date();
-            date.setDate(date.getDate() - daysAgo);
+        // Use the fallback scriptures for archive
+        // In production, this would come from Firebase
+        const tempVerses = [
+            { verse: '"Trust in the Lord with all your heart..."', reference: 'Proverbs 3:5' },
+            { verse: '"I can do all things through Christ..."', reference: 'Philippians 4:13' },
+            { verse: '"The Lord is my shepherd..."', reference: 'Psalm 23:1' },
+            { verse: '"Be strong and courageous..."', reference: 'Joshua 1:9' },
+            { verse: '"And we know that in all things..."', reference: 'Romans 8:28' },
+        ];
+        
+        container.innerHTML = tempVerses.map((s, idx) => {
+            const isToday = idx === 0;
+            const date = new Date();
+            date.setDate(date.getDate() - idx);
             const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             return `
                 <div class="archive-item ${isToday ? 'today' : ''}">
                     <div>
-                        <div class="archive-book">${s.verse.substring(0,65)}${s.verse.length>65?'…':''}</div>
+                        <div class="archive-book">${s.verse.substring(0,50)}${s.verse.length>50?'…':''}</div>
                         <div class="archive-ref">${s.reference} · ${dateStr}</div>
                     </div>
                     ${isToday ? '<span class="today-badge">Today</span>' : ''}

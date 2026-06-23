@@ -861,7 +861,7 @@
 <body>
 
     <!-- NAV -->
-    <nav >
+    <nav>
         <a href="index.html" class="nav-back">
             <i class="fa-solid fa-arrow-left"></i> 
         </a>
@@ -1025,7 +1025,9 @@
     <script src="/scripts/coc-points.js"></script>
     <script src="/scripts/coc-streak.js"></script>
 
-    <script>
+    <script type="module">
+    import { getScriptureOfDay } from '/scripts/coc-scripture-firebase.js';
+
     /* ======================================================
        CHALLENGE DATA
     ====================================================== */
@@ -1159,8 +1161,8 @@
             const listKey = challengeId.includes('scripture') || challengeId.includes('bible') ? 'completedDates' : 'countedIds';
 
             if (!entry[listKey]) entry[listKey] = [];
-            if (entry[listKey].includes(actionId)) return; // duplicate guard
-            if (entry.completed) return; // already done
+            if (entry[listKey].includes(actionId)) return;
+            if (entry.completed) return;
 
             entry[listKey].push(actionId);
             entry.progress = (entry.progress || 0) + 1;
@@ -1224,13 +1226,6 @@
             const completed = window.COCChallenges.isCompleted(c.id);
             const pct = Math.min(100, Math.round((progress / c.target) * 100));
             if (completed) completedCount++;
-
-            const progressText = c.id === 'daily_scripture_week' || c.id === 'bible_plan_90'
-                ? `${progress}/${c.target} days`
-                : c.id === 'quiz_master' ? `${progress}/${c.target} quizzes`
-                : c.id === 'prayer_warrior' ? `${progress}/${c.target} prayers`
-                : c.id === 'community_builder' ? `${progress}/${c.target} comments`
-                : `${progress}/${c.target}`;
 
             return `
             <div class="challenge-card ${completed ? 'completed' : ''}" style="animation-delay:${i*0.06}s">
@@ -1320,41 +1315,8 @@
     }
 
     /* ======================================================
-       BIBLE READER
+       BIBLE READER - Now using Firebase
     ====================================================== */
-    const DAILY_READINGS = [
-        {
-            id: 'psalm23',
-            title: 'Psalm 23',
-            book: 'Old Testament · Psalms · Chapter 23',
-            requiredSeconds: 90,
-            verses: [
-                { num: 1, text: 'The Lord is my shepherd; I shall not want.' },
-                { num: 2, text: 'He maketh me to lie down in green pastures: he leadeth me beside the still waters.' },
-                { num: 3, text: 'He restoreth my soul: he leadeth me in the paths of righteousness for his name\'s sake.' },
-                { num: 4, text: 'Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me; thy rod and thy staff they comfort me.' },
-                { num: 5, text: 'Thou preparest a table before me in the presence of mine enemies: thou anointest my head with oil; my cup runneth over.' },
-                { num: 6, text: 'Surely goodness and mercy shall follow me all the days of my life: and I will dwell in the house of the Lord for ever.' }
-            ]
-        },
-        {
-            id: 'john3',
-            title: 'John 3:14–21',
-            book: 'New Testament · Gospel of John · Chapter 3',
-            requiredSeconds: 120,
-            verses: [
-                { num: 14, text: 'And as Moses lifted up the serpent in the wilderness, even so must the Son of man be lifted up:' },
-                { num: 15, text: 'That whosoever believeth in him should not perish, but have eternal life.' },
-                { num: 16, text: 'For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.' },
-                { num: 17, text: 'For God sent not his Son into the world to condemn the world; but that the world through him might be saved.' },
-                { num: 18, text: 'He that believeth on him is not condemned: but he that believeth not is condemned already, because he hath not believed in the name of the only begotten Son of God.' },
-                { num: 19, text: 'And this is the condemnation, that light is come into the world, and men loved darkness rather than light, because their deeds were evil.' },
-                { num: 20, text: 'For every one that doeth evil hateth the light, neither cometh to the light, lest his deeds should be reproved.' },
-                { num: 21, text: 'But he that doeth truth cometh to the light, that his deeds may be made manifest, that they are wrought in God.' }
-            ]
-        }
-    ];
-
     let readerState = {
         active: false,
         chapterId: null,
@@ -1368,63 +1330,93 @@
         requiredSeconds: 90
     };
 
-    function openBibleModal(e) {
+    window.openBibleModal = async function(e) {
         if (e) e.preventDefault();
 
-        // Pick today's reading (cycle by day of year)
-        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-        const reading = DAILY_READINGS[dayOfYear % DAILY_READINGS.length];
+        try {
+            // Get today's scripture from Firebase
+            const reading = await getScriptureOfDay();
 
-        readerState = {
-            active: true,
-            chapterId: reading.id,
-            startedAt: Date.now(),
-            activeSeconds: 0,
-            scrollPercent: 0,
-            completed: false,
-            timerInterval: null,
-            lastActivityAt: Date.now(),
-            paused: false,
-            requiredSeconds: reading.requiredSeconds
-        };
+            // Format for the reader
+            const formattedReading = {
+                id: 'daily_' + Date.now(),
+                title: reading.reference || 'Scripture of the Day',
+                book: reading.reference || 'Daily Word',
+                requiredSeconds: 90,
+                verses: [
+                    { num: 1, text: reading.verse || 'Trust in the Lord with all your heart.' }
+                ]
+            };
 
-        // Populate
-        document.getElementById('bibleChapterTitle').textContent = reading.title;
-        document.getElementById('bibleBookLabel').innerHTML = `<i class="fa-solid fa-bible"></i> ${reading.book}`;
-        document.getElementById('bibleVerses').innerHTML = reading.verses.map(v => `
-            <div class="bible-verse">
-                <span class="verse-num">${v.num}</span>
-                <span class="verse-text">${v.text}</span>
-            </div>
-        `).join('');
+            // Add reflection as extra verse if available
+            if (reading.reflection) {
+                formattedReading.verses.push({ 
+                    num: 2, 
+                    text: '💭 ' + reading.reflection 
+                });
+            }
 
-        const mins = Math.floor(reading.requiredSeconds / 60);
-        const secs = reading.requiredSeconds % 60;
-        document.getElementById('timerTarget').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-        document.getElementById('timerVal').textContent = '0:00';
-        document.getElementById('scrollVal').textContent = '0%';
-        document.getElementById('scrollProgressBar').style.width = '0%';
-        document.getElementById('readStatusText').textContent = 'Keep reading...';
-        document.getElementById('reflectionSection').style.display = 'none';
-        document.getElementById('reflectionText').value = '';
-        document.getElementById('reflectionCharCount').textContent = '0 / 30 min';
-        document.getElementById('completeReadingBtn').disabled = true;
+            if (reading.prayer) {
+                formattedReading.verses.push({ 
+                    num: 3, 
+                    text: '🙏 ' + reading.prayer 
+                });
+            }
 
-        const progress = window.COCChallenges.getProgress('daily_scripture_week');
-        document.getElementById('streakChallVal').textContent = `${progress}/7`;
+            // Populate the modal with formatted reading
+            readerState = {
+                active: true,
+                chapterId: formattedReading.id,
+                startedAt: Date.now(),
+                activeSeconds: 0,
+                scrollPercent: 0,
+                completed: false,
+                timerInterval: null,
+                lastActivityAt: Date.now(),
+                paused: false,
+                requiredSeconds: formattedReading.requiredSeconds
+            };
 
-        document.getElementById('bibleModal').classList.add('show');
-        document.getElementById('bibleScrollArea').scrollTop = 0;
+            document.getElementById('bibleChapterTitle').textContent = formattedReading.title;
+            document.getElementById('bibleBookLabel').innerHTML = `<i class="fa-solid fa-bible"></i> ${formattedReading.book}`;
+            document.getElementById('bibleVerses').innerHTML = formattedReading.verses.map(v => `
+                <div class="bible-verse">
+                    <span class="verse-num">${v.num}</span>
+                    <span class="verse-text">${v.text}</span>
+                </div>
+            `).join('');
 
-        startReadingTimer();
-        setupReadingTrackers();
-    }
+            const mins = Math.floor(formattedReading.requiredSeconds / 60);
+            const secs = formattedReading.requiredSeconds % 60;
+            document.getElementById('timerTarget').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+            document.getElementById('timerVal').textContent = '0:00';
+            document.getElementById('scrollVal').textContent = '0%';
+            document.getElementById('scrollProgressBar').style.width = '0%';
+            document.getElementById('readStatusText').textContent = 'Keep reading...';
+            document.getElementById('reflectionSection').style.display = 'none';
+            document.getElementById('reflectionText').value = '';
+            document.getElementById('reflectionCharCount').textContent = '0 / 30 min';
+            document.getElementById('completeReadingBtn').disabled = true;
 
-    function closeBibleModal() {
+            const progress = window.COCChallenges.getProgress('daily_scripture_week');
+            document.getElementById('streakChallVal').textContent = `${progress}/7`;
+
+            document.getElementById('bibleModal').classList.add('show');
+            document.getElementById('bibleScrollArea').scrollTop = 0;
+
+            startReadingTimer();
+            setupReadingTrackers();
+        } catch (error) {
+            console.error('Error loading scripture:', error);
+            showToast('⚠️ Could not load scripture. Please try again.');
+        }
+    };
+
+    window.closeBibleModal = function() {
         document.getElementById('bibleModal').classList.remove('show');
         stopReadingTimer();
         readerState.active = false;
-    }
+    };
 
     function startReadingTimer() {
         if (readerState.timerInterval) clearInterval(readerState.timerInterval);
@@ -1524,7 +1516,7 @@
         document.getElementById('completeReadingBtn').disabled = len < 30;
     });
 
-    function finishReading() {
+    window.finishReading = function() {
         if (!readerState.completed) return;
         const reflection = document.getElementById('reflectionText').value.trim();
         if (reflection.length < 30) return;
@@ -1534,7 +1526,8 @@
         window.COCChallenges.increment('daily_scripture_week', today);
 
         closeBibleModal();
-    }
+        showToast('🔥 Day complete! Keep going!');
+    };
 
     /* ======================================================
        SCROLL REVEAL

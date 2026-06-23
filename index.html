@@ -727,6 +727,123 @@
         #userDashboard [class*="border-gray"], #scriptureWidget [class*="border-gray"], #notifPrompt [class*="border-gray"] {
             border-color: var(--border) !important;
         }
+
+        /* ── SHARE MODAL STYLES ── */
+        @keyframes shareFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes shareSlideUp {
+            from { transform: translateY(20px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .share-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: shareFadeIn 0.3s ease;
+        }
+        .share-modal-box {
+            background: #111;
+            border-radius: 24px;
+            border: 1px solid rgba(200,16,46,0.2);
+            padding: 40px 36px;
+            max-width: 420px;
+            width: 100%;
+            animation: shareSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .share-modal-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 28px;
+            color: #fff;
+            letter-spacing: 0.04em;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .share-modal-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.3);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .share-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .share-btn {
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+        .share-btn:hover { transform: scale(1.02); }
+        .share-btn-primary {
+            background: linear-gradient(135deg, #c8102e, #8b0000);
+            color: #fff;
+        }
+        .share-btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .share-btn-secondary:hover { background: rgba(255,255,255,0.1); }
+        .share-btn-text {
+            background: rgba(255,255,255,0.03);
+            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .share-btn-text:hover { background: rgba(255,255,255,0.06); }
+        .share-btn-icon { font-size: 20px; flex-shrink: 0; }
+        .share-cancel {
+            margin-top: 16px;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.2);
+            font-size: 13px;
+            cursor: pointer;
+            width: 100%;
+            padding: 8px;
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+        }
+        .share-cancel:hover { color: rgba(255,255,255,0.4); }
+
+        /* Toast notification */
+        .share-toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1e;
+            border: 1px solid rgba(74,222,128,0.3);
+            border-radius: 16px;
+            padding: 14px 24px;
+            color: #4ade80;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            z-index: 999999;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: shareSlideUp 0.3s ease;
+        }
     </style>
 </head>
 <body class="text-white" style="background: var(--bg);">
@@ -781,7 +898,6 @@
             </div>
         </div>
     </div>
-
 
     <nav class="glass-nav sticky top-0 z-50 transition-all duration-300">
         <div class="nav-inner px-6 py-3">
@@ -849,7 +965,7 @@
     <!-- ═══ NEW: NOTIFICATION PROMPT ═══ -->
     <div id="notifPrompt" class="container mx-auto px-6 pb-4"></div>
 
-    <!-- ═══ NEW: SCRIPTURE OF THE DAY WIDGET ═══ -->
+    <!-- ═══ NEW: SCRIPTURE OF THE DAY WIDGET (Firebase Powered with Share) ═══ -->
     <section id="scripture" class="container mx-auto px-6 py-8">
         <div id="scriptureWidget"></div>
     </section>
@@ -1359,7 +1475,8 @@
     <!-- ═══════════════════════════════════════════════
          ORIGINAL SCRIPTS — VERBATIM, UNTOUCHED
     ═══════════════════════════════════════════════ -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script>
         function toggleMenu() {
             document.getElementById('mobile-menu').classList.toggle('open');
         }
@@ -1720,29 +1837,7 @@ TONE: Warm, welcoming, faith-affirming. If unsure, direct to WhatsApp or email. 
 
     <script>
         /* ══ SCRIPTURE OF THE DAY ══ */
-        const SOTD_VERSES = [
-            { v: '"For I know the plans I have for you, declares the Lord, plans for welfare and not for evil, to give you a future and a hope."', r: 'Jeremiah 29:11' },
-            { v: '"I can do all things through Christ who strengthens me."', r: 'Philippians 4:13' },
-            { v: '"The Lord is my shepherd; I shall not want."', r: 'Psalm 23:1' },
-            { v: '"Trust in the Lord with all your heart, and do not lean on your own understanding."', r: 'Proverbs 3:5' },
-            { v: '"But they who wait for the Lord shall renew their strength; they shall mount up with wings like eagles."', r: 'Isaiah 40:31' },
-            { v: '"And we know that for those who love God all things work together for good."', r: 'Romans 8:28' },
-            { v: '"Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go."', r: 'Joshua 1:9' },
-            { v: '"Call to me and I will answer you, and will tell you great and hidden things that you have not known."', r: 'Jeremiah 33:3' },
-            { v: '"The Lord your God is in your midst, a mighty one who will save; he will rejoice over you with gladness."', r: 'Zephaniah 3:17' },
-            { v: '"No weapon that is fashioned against you shall succeed."', r: 'Isaiah 54:17' },
-            { v: '"Ask, and it will be given to you; seek, and you will find; knock, and it will be opened to you."', r: 'Matthew 7:7' },
-            { v: '"The name of the Lord is a strong tower; the righteous man runs into it and is safe."', r: 'Proverbs 18:10' },
-            { v: '"Delight yourself in the Lord, and he will give you the desires of your heart."', r: 'Psalm 37:4' },
-            { v: '"Cast all your anxiety on him because he cares for you."', r: '1 Peter 5:7' },
-            { v: '"If God is for us, who can be against us?"', r: 'Romans 8:31' },
-        ];
-        const dayIdx = Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % SOTD_VERSES.length;
-        const sotd = SOTD_VERSES[dayIdx];
-        const vEl = document.getElementById('sotd-verse-text');
-        const rEl = document.getElementById('sotd-verse-ref');
-        if (vEl) vEl.textContent = sotd.v;
-        if (rEl) rEl.textContent = sotd.r;
+        // This is now handled by coc-scripture-firebase.js via the widget below
 
         /* ══ COUNTDOWN TIMER ══ */
         function getNextOccurrence(dayOfWeek, hour, minute) {
@@ -1826,7 +1921,7 @@ TONE: Warm, welcoming, faith-affirming. If unsure, direct to WhatsApp or email. 
                 window.COCDashboard.renderUserDashboard('userDashboard');
             }
 
-            // Render scripture widget
+            // Render scripture widget using Firebase
             if (window.COCScripture) {
                 window.COCScripture.renderScriptureWidget('scriptureWidget');
             }
