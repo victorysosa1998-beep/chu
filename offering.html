@@ -5,55 +5,221 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offering | City of Champion Fire</title>
     <link rel="icon" type="image/png" href="media/logo1.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Inter:wght@300;400;500&display=swap');
-        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
-        .font-outfit { font-family: 'Outfit', sans-serif; }
-        .copy-card:active { transform: scale(0.98); }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --red: #c8102e; --red-dark: #9a0b22; --red-glow: rgba(200,16,46,0.25);
+            --gold: #f0c842; --gold-dim: rgba(240,200,66,0.12);
+            --bg: #0a0a0b; --bg-card: #111113; --bg-card2: #161618;
+            --border: rgba(255,255,255,0.07); --border-red: rgba(200,16,46,0.3);
+            --text: #f0f0f2; --text-muted: #6b6b75; --text-dim: #9999a8;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; overflow-x: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* NAV */
+        nav {
+            background: rgba(10,10,11,0.88); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+            padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-back { color: var(--red); font-weight: 700; font-size: 12px; letter-spacing: 0.08em;
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase; transition: color 0.2s; }
+        .nav-back:hover { color: #ff1a3d; }
+        .nav-brand { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.05em; color: var(--text); }
+        .nav-logo img { height: 36px; object-fit: contain; }
+
+        /* HERO */
+        .hero {
+            position: relative; overflow: hidden;
+            padding: 80px 24px 64px; text-align: center; flex-shrink: 0;
+        }
+        .hero-bg {
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% -10%, rgba(240,200,66,0.1) 0%, transparent 65%),
+                        radial-gradient(ellipse 50% 40% at 80% 100%, rgba(200,16,46,0.08) 0%, transparent 70%);
+        }
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.016) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.016) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 540px; margin: 0 auto; }
+        .hero-icon {
+            width: 72px; height: 72px; border-radius: 22px; margin: 0 auto 24px;
+            background: linear-gradient(135deg, var(--gold), #d4a010);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: #1a1000;
+            box-shadow: 0 0 40px rgba(240,200,66,0.3);
+        }
+        .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(44px, 9vw, 72px);
+            line-height: 0.95; letter-spacing: 0.02em; color: var(--text); margin-bottom: 14px; }
+        .hero-title .accent { color: var(--gold); }
+        .hero-sub { font-size: 15px; color: var(--text-dim); font-weight: 300; line-height: 1.6;
+            max-width: 400px; margin: 0 auto; }
+        .hero-quote {
+            margin-top: 20px; padding: 14px 20px;
+            background: var(--gold-dim); border: 1px solid rgba(240,200,66,0.2);
+            border-radius: 12px; display: inline-block;
+            font-style: italic; font-size: 13px; color: var(--gold); line-height: 1.5;
+        }
+
+        /* MAIN */
+        main { max-width: 540px; margin: 0 auto; padding: 40px 20px 80px; width: 100%; }
+
+        /* SECTION EYEBROW */
+        .section-eye {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+            color: var(--text-muted); text-align: center; margin-bottom: 24px;
+            display: flex; align-items: center; gap: 12px; justify-content: center;
+        }
+        .section-eye::before, .section-eye::after { content: ''; flex: 1; height: 1px; background: var(--border); max-width: 60px; }
+
+        /* ACCOUNT CARDS */
+        .acct-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 24px 26px; margin-bottom: 16px;
+            cursor: pointer; transition: all 0.22s ease; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; gap: 6px;
+            user-select: none;
+        }
+        .acct-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(240,200,66,0.3), transparent);
+        }
+        .acct-card::after {
+            content: '\f03a'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; bottom: -14px; right: -8px;
+            font-size: 80px; color: rgba(255,255,255,0.025); pointer-events: none;
+        }
+        .acct-card:hover { border-color: rgba(240,200,66,0.3); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        .acct-card:active { transform: scale(0.98); }
+        .acct-card.copied { border-color: var(--gold); box-shadow: 0 0 24px rgba(240,200,66,0.2); }
+
+        .acct-bank {
+            font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+            text-transform: uppercase; color: var(--gold);
+        }
+        .acct-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .acct-number {
+            font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 0.08em;
+            color: var(--text); transition: color 0.2s;
+        }
+        .acct-number.flash { color: var(--gold); }
+        .acct-copy-icon { color: var(--text-muted); font-size: 16px; transition: color 0.2s; flex-shrink: 0; }
+        .acct-card:hover .acct-copy-icon { color: var(--gold); }
+        .acct-name { font-size: 13px; color: var(--text-muted); }
+
+        /* COPY PILL */
+        .copy-pill {
+            position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: var(--gold); color: #1a1000;
+            padding: 12px 24px; border-radius: 100px;
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 13px;
+            z-index: 999; pointer-events: none; opacity: 0; transition: all 0.3s;
+            display: flex; align-items: center; gap: 8px; white-space: nowrap;
+        }
+        .copy-pill.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* TIPS BOX */
+        .tips-box {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 20px 22px; margin-top: 8px;
+        }
+        .tips-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--text-muted); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .tips-title i { color: var(--red); }
+        .tip-row { display: flex; align-items: flex-start; gap: 10px; font-size: 13px;
+            color: var(--text-dim); line-height: 1.5; margin-bottom: 10px; }
+        .tip-row:last-child { margin-bottom: 0; }
+        .tip-row i { color: var(--gold); margin-top: 1px; flex-shrink: 0; font-size: 11px; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        main > * { animation: fadeUp 0.4s ease both; }
+        main > *:nth-child(2) { animation-delay: 0.06s; }
+        main > *:nth-child(3) { animation-delay: 0.12s; }
+        main > *:nth-child(4) { animation-delay: 0.18s; }
     </style>
 </head>
-<body class="min-height-screen flex items-center justify-center py-12 px-6">
-    <div class="max-w-md w-full text-center">
-        <a href="give.html" class="inline-flex items-center text-gray-400 hover:text-red-700 mb-8 transition">
-            <i class="fas fa-arrow-left mr-2 text-sm"></i> Back
-        </a>
-        
-        <div class="mb-10">
-            <div class="w-20 h-20 bg-red-100 text-red-700 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-6">
-                <i class="fas fa-hand-holding-heart"></i>
-            </div>
-            <h1 class="font-outfit text-3xl font-extrabold text-gray-900">Tithe & Offering</h1>
-            <p class="text-gray-500 mt-2">Tap an account number to copy it</p>
+<body>
+
+<nav>
+    <a href="give.html" class="nav-back"><i class="fas fa-arrow-left"></i> </a>
+    <span class="nav-brand">Giving</span>
+    <div class="nav-logo"><img src="media/logo1.png" alt="COC" onerror="this.style.display='none'"></div>
+</nav>
+
+<div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+        <div class="hero-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        <h1 class="hero-title">TITHE &amp;<br><span class="accent">OFFERING</span></h1>
+        <p class="hero-sub">Tap any account number to copy it instantly and complete your giving.</p>
+        <div class="hero-quote"><i class="fas fa-quote-left" style="font-size:10px;margin-right:6px;"></i>God loves a cheerful giver — 2 Corinthians 9:7</div>
+    </div>
+</div>
+
+<main>
+    <div class="section-eye"><i class="fas fa-university"></i> Bank Accounts</div>
+
+    <div class="acct-card" onclick="copyAcct('0063495689', 'num1', this)">
+        <div class="acct-bank">Unity Bank PLC</div>
+        <div class="acct-row">
+            <span class="acct-number" id="num1">0063495689</span>
+            <i class="fas fa-copy acct-copy-icon"></i>
         </div>
-
-        <div onclick="copyToClipboard('0123456789', 'acct1')" class="copy-card bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 mb-4 cursor-pointer hover:border-red-200 transition-all text-left relative overflow-hidden">
-            <span class="text-xs font-bold text-red-600 uppercase tracking-widest">UNITY BANK PLC</span>
-            <div class="flex justify-between items-center mt-1">
-                <span id="acct1" class="text-2xl font-mono font-bold text-gray-800">0063495689</span>
-                <i class="far fa-copy text-gray-300"></i>
-            </div>
-            <p class="text-gray-400 text-sm mt-1">City of Champion Fire Int'l</p>
-        </div>
-
-        
-
-        <p class="text-xs text-gray-400 px-6 italic">"God loves a cheerful giver."</p>
+        <div class="acct-name">City of Champion Fire Int'l</div>
     </div>
 
-    <script>
-        function copyToClipboard(text, id) {
-            navigator.clipboard.writeText(text);
-            const el = document.getElementById(id);
-            const originalText = el.innerText;
-            el.innerText = "COPIED!";
-            el.style.color = "#b91c1c";
-            setTimeout(() => {
-                el.innerText = originalText;
-                el.style.color = "#1f2937";
-            }, 1000);
-        }
-    </script>
+    <!-- Add more accounts here following the same pattern -->
+
+    <div class="tips-box">
+        <div class="tips-title"><i class="fas fa-info-circle"></i> Giving Guide</div>
+        <div class="tip-row"><i class="fas fa-check-circle"></i> Tap the account number — it copies to your clipboard automatically.</div>
+        <div class="tip-row"><i class="fas fa-check-circle"></i> Use your bank's transfer app and paste the number.</div>
+        <div class="tip-row"><i class="fas fa-check-circle"></i> Include your name and "Tithe" or "Offering" as the narration.</div>
+        <div class="tip-row"><i class="fas fa-check-circle"></i> Screenshot your receipt for records.</div>
+    </div>
+</main>
+
+<div class="copy-pill" id="copyPill"><i class="fas fa-check"></i> <span id="copyPillText">Copied!</span></div>
+
+<script>
+    function copyAcct(number, elId, card) {
+        navigator.clipboard.writeText(number).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = number; document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+        });
+
+        // Flash number
+        const el = document.getElementById(elId);
+        const orig = el.textContent;
+        el.textContent = 'COPIED!';
+        el.classList.add('flash');
+        card.classList.add('copied');
+        setTimeout(() => {
+            el.textContent = orig;
+            el.classList.remove('flash');
+            card.classList.remove('copied');
+        }, 1400);
+
+        // Show pill
+        const pill = document.getElementById('copyPill');
+        document.getElementById('copyPillText').textContent = `${number} copied!`;
+        pill.classList.add('show');
+        setTimeout(() => pill.classList.remove('show'), 2800);
+    }
+</script>
 </body>
 </html>

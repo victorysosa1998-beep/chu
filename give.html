@@ -3,127 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Give | City of Champion Fire</title>
     <link rel="icon" type="image/png" href="media/logo1.png">
-    <title>Give | City of Champion Fire International Assembly</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap');
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --red: #c8102e; --red-dark: #9a0b22; --red-glow: rgba(200,16,46,0.25);
+            --gold: #f0c842; --gold-dim: rgba(240,200,66,0.12);
+            --bg: #0a0a0b; --bg-card: #111113; --bg-card2: #161618;
+            --border: rgba(255,255,255,0.07); --border-red: rgba(200,16,46,0.3);
+            --text: #f0f0f2; --text-muted: #6b6b75; --text-dim: #9999a8;
         }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-        h1, h2, h3, .font-outfit { font-family: 'Outfit', sans-serif; }
-
-        .give-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
+        /* NAV */
+        nav {
+            background: rgba(10,10,11,0.88); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+            padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between;
         }
+        .nav-back { color: var(--red); font-weight: 700; font-size: 12px; letter-spacing: 0.08em;
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase; transition: color 0.2s; }
+        .nav-back:hover { color: #ff1a3d; }
+        .nav-brand { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.05em;
+            color: var(--text); display: flex; align-items: center; gap: 10px; }
+        .nav-brand .icon { color: var(--gold); }
+        .nav-logo img { height: 36px; object-fit: contain; }
 
-        .give-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15);
-            background: white;
-            border-color: #b91c1c;
-        }
-
-        .give-card::after {
+        /* HERO */
+        .hero { position: relative; overflow: hidden; padding: 84px 24px 36px; text-align: center; }
+        .hero::before {
             content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: #b91c1c;
-            transform: scaleX(0);
-            transition: transform 0.4s ease;
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% -10%, rgba(200,16,46,0.14) 0%, transparent 65%),
+                        radial-gradient(ellipse 50% 40% at 80% 100%, rgba(240,200,66,0.07) 0%, transparent 70%);
         }
-
-        .give-card:hover::after {
-            transform: scaleX(1);
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+            background-size: 48px 48px;
         }
-
-        .icon-box {
-            transition: all 0.4s ease;
+        .hero-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--gold-dim); border: 1px solid rgba(240,200,66,0.25);
+            color: var(--gold); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+            padding: 6px 16px; border-radius: 100px; margin-bottom: 22px;
         }
+        .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(44px, 9vw, 76px);
+            line-height: 0.95; letter-spacing: 0.03em; color: var(--text); margin-bottom: 20px; }
+        .hero-title span { color: var(--red); display: block; }
+        .hero-quote { color: var(--text-dim); font-size: 15px; font-weight: 300; font-style: italic;
+            max-width: 480px; margin: 0 auto; line-height: 1.7; }
+        .hero-quote .ref { display: block; margin-top: 10px; font-weight: 700; font-style: normal;
+            font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
 
-        .give-card:hover .icon-box {
-            transform: scale(1.1) rotate(-5deg);
-            background: #b91c1c;
-            color: white;
+        /* MAIN */
+        main { max-width: 920px; margin: 0 auto; padding: 56px 24px 80px; }
+        .give-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
+
+        /* GIVE CARD */
+        .give-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+            padding: 40px 36px; text-decoration: none; display: block;
+            transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative; overflow: hidden;
         }
-
-        .reveal {
-            animation: fadeInUp 0.8s ease forwards;
+        .give-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200,16,46,0.5), transparent);
+            opacity: 0; transition: opacity 0.3s;
         }
+        .give-card:hover {
+            transform: translateY(-8px); border-color: rgba(200,16,46,0.3);
+            box-shadow: 0 24px 56px rgba(0,0,0,0.5);
+        }
+        .give-card:hover::before { opacity: 1; }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .give-icon {
+            width: 60px; height: 60px; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; margin-bottom: 28px;
+            background: rgba(200,16,46,0.1); border: 1px solid rgba(200,16,46,0.25); color: var(--red);
+            transition: all 0.35s ease;
+        }
+        .give-card.gold .give-icon { background: var(--gold-dim); border-color: rgba(240,200,66,0.3); color: var(--gold); }
+        .give-card:hover .give-icon { background: var(--red); color: #fff; transform: scale(1.08) rotate(-4deg); }
+        .give-card.gold:hover .give-icon { background: var(--gold); color: #1a1400; }
+
+        .give-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; letter-spacing: 0.03em;
+            color: var(--text); margin-bottom: 12px; }
+        .give-card p { color: var(--text-dim); font-size: 14px; line-height: 1.7; margin-bottom: 26px; }
+        .give-cta { display: inline-flex; align-items: center; gap: 8px; color: var(--red);
+            font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 12px;
+            letter-spacing: 0.14em; text-transform: uppercase; transition: gap 0.2s; }
+        .give-card.gold .give-cta { color: var(--gold); }
+        .give-card:hover .give-cta { gap: 14px; }
+
+        /* FOOTER */
+        footer { padding: 32px 24px 48px; text-align: center; }
+        .footer-back { color: var(--text-muted); text-decoration: none; font-size: 12px; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 8px; transition: color 0.2s; }
+        .footer-back:hover { color: var(--red); }
+
+        /* SCROLL ANIMATION */
+        .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.55s ease, transform 0.55s ease; }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 600px) {
+            .hero { padding: 60px 20px 28px; }
+            .give-card { padding: 32px 26px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container mx-auto px-6 py-12">
-        <div class="text-center mb-16 reveal">
-            <a href="index.html" class="inline-block mb-8">
-                <img src="media/logo1.png" alt="Logo" class="h-20 w-auto">
-            </a>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tighter">Support the Mission</h1>
-            <p class="text-gray-600 max-w-lg mx-auto text-lg font-light italic">
-                "Every man according as he purposeth in his heart, so let him give; not grudgingly, or of necessity: for God loveth a cheerful giver."
-                <span class="block mt-2 font-bold not-italic text-sm text-gray-400">— 2 Corinthians 9:7</span>
-            </p>
-        </div>
+<nav>
+    <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> </a>
+    <div class="nav-brand"><span class="icon"><i class="fas fa-hand-holding-heart"></i></span> Give</div>
+    <div class="nav-logo"><img src="media/logo1.png" alt="COC" onerror="this.style.display='none'"></div>
+</nav>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            
-            <a href="offering.html" class="give-card p-10 rounded-[2.5rem] shadow-xl reveal" style="animation-delay: 0.1s;">
-                <div class="icon-box w-16 h-16 bg-red-50 text-red-700 rounded-2xl flex items-center justify-center text-3xl mb-8">
-                    <i class="fas fa-hand-holding-heart"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-3">Tithe / Offering</h3>
-                <p class="text-gray-500 leading-relaxed mb-6">
-                    Honor the Lord with your substance and with the firstfruits of all your increase.
-                </p>
-                <div class="flex items-center text-red-700 font-bold gap-2">
-                    GIVE NOW <i class="fas fa-arrow-right text-sm"></i>
-                </div>
-            </a>
-
-            <a href="building.html" class="give-card p-10 rounded-[2.5rem] shadow-xl reveal" style="animation-delay: 0.2s;">
-                <div class="icon-box w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-3xl mb-8">
-                    <i class="fas fa-trowel-bricks"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-3">Build With Us</h3>
-                <p class="text-gray-500 leading-relaxed mb-6">
-                    Partner with us in expanding the kingdom of God through our building projects.
-                </p>
-                <div class="flex items-center text-red-700 font-bold gap-2">
-                    PARTNER NOW <i class="fas fa-arrow-right text-sm"></i>
-                </div>
-            </a>
-
-        </div>
-
-        <div class="text-center mt-16 reveal" style="animation-delay: 0.4s;">
-            <a href="index.html" class="text-gray-500 hover:text-red-700 transition text-sm font-medium flex items-center justify-center gap-2">
-                <i class="fas fa-chevron-left text-xs"></i> BACK TO HOME
-            </a>
-        </div>
+<section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+        <div class="hero-eyebrow"><i class="fas fa-seedling"></i> Sow into the Kingdom</div>
+        <h1 class="hero-title">Support<span>the Mission</span></h1>
+        <p class="hero-quote">
+            "Every man according as he purposeth in his heart, so let him give; not grudgingly, or of necessity: for God loveth a cheerful giver."
+            <span class="ref">— 2 Corinthians 9:7</span>
+        </p>
     </div>
+</section>
 
+<main>
+    <div class="give-grid">
+
+        <a href="offering.html" class="give-card fade-up">
+            <div class="give-icon"><i class="fas fa-hand-holding-heart"></i></div>
+            <h3>Tithe / Offering</h3>
+            <p>Honor the Lord with your substance and with the firstfruits of all your increase.</p>
+            <div class="give-cta">Give Now <i class="fas fa-arrow-right"></i></div>
+        </a>
+
+        <a href="building.html" class="give-card gold fade-up">
+            <div class="give-icon"><i class="fas fa-trowel-bricks"></i></div>
+            <h3>Build With Us</h3>
+            <p>Partner with us in expanding the kingdom of God through our building projects.</p>
+            <div class="give-cta">Partner Now <i class="fas fa-arrow-right"></i></div>
+        </a>
+
+    </div>
+</main>
+
+<footer>
+    <a href="index.html" class="footer-back"><i class="fas fa-chevron-left"></i> BACK TO HOME</a>
+</footer>
+
+<script>
+    const cards = document.querySelectorAll('.fade-up');
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => entry.target.classList.add('visible'), i * 100);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    cards.forEach(c => observer.observe(c));
+</script>
 </body>
 </html>

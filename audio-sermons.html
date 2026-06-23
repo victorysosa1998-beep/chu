@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Sermons | City of Champion Fire</title>
+    <link rel="icon" type="image/png" href="media/logo1.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --red: #c8102e; --red-dark: #9a0b22; --red-glow: rgba(200,16,46,0.25);
+            --gold: #f0c842; --gold-dim: rgba(240,200,66,0.12);
+            --bg: #0a0a0b; --bg-card: #111113; --bg-card2: #161618;
+            --border: rgba(255,255,255,0.07); --border-red: rgba(200,16,46,0.3);
+            --text: #f0f0f2; --text-muted: #6b6b75; --text-dim: #9999a8;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+        /* NAV */
+        nav {
+            background: rgba(10,10,11,0.88); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+            padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-back { color: var(--red); font-weight: 700; font-size: 12px; letter-spacing: 0.08em;
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase; transition: color 0.2s; }
+        .nav-back:hover { color: #ff1a3d; }
+        .nav-brand { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.05em;
+            color: var(--text); display: flex; align-items: center; gap: 10px; }
+        .nav-brand .icon { color: var(--gold); }
+        .nav-logo img { height: 36px; object-fit: contain; }
+
+        /* HERO */
+        .hero { position: relative; overflow: hidden; padding: 80px 24px 64px; }
+        .hero-bg {
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 80% 50%, rgba(200,16,46,0.12) 0%, transparent 65%),
+                        radial-gradient(ellipse 40% 50% at 0% 100%, rgba(240,200,66,0.05) 0%, transparent 60%);
+        }
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.016) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.016) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+        .hero-watermark {
+            position: absolute; right: -10px; bottom: -20px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(7rem, 20vw, 17rem);
+            color: rgba(255,255,255,0.025); line-height: 1; pointer-events: none; letter-spacing: 0.04em;
+        }
+        .hero-inner { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; }
+        .hero-eyebrow {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--red); display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+        }
+        .hero-eyebrow::before { content: ''; display: block; width: 28px; height: 1.5px; background: var(--red); }
+        .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.5rem, 10vw, 8rem);
+            color: var(--text); line-height: 0.9; letter-spacing: 0.03em; }
+        .hero-title span { color: var(--gold); }
+        .hero-sub { margin-top: 20px; font-size: 15px; color: var(--text-dim); font-weight: 300;
+            max-width: 520px; line-height: 1.7; }
+
+        /* FILTER BAR */
+        .filter-bar {
+            background: rgba(17,17,19,0.95); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border); padding: 0 24px;
+            display: flex; gap: 0; overflow-x: auto; position: sticky; top: 64px; z-index: 90;
+        }
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-btn {
+            background: none; border: none; padding: 18px 20px;
+            font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+            letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
+            cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;
+        }
+        .filter-btn:hover { color: var(--text); }
+        .filter-btn.active { color: var(--red); border-bottom-color: var(--red); }
+
+        /* SEARCH */
+        .search-wrap { max-width: 1280px; margin: 0 auto; padding: 28px 24px 0; }
+        .search-box { position: relative; max-width: 420px; }
+        .search-box input {
+            width: 100%; padding: 13px 16px 13px 44px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 100px; font-family: 'Inter', sans-serif; font-size: 13px;
+            color: var(--text); outline: none; transition: border-color 0.2s;
+        }
+        .search-box input::placeholder { color: var(--text-muted); }
+        .search-box input:focus { border-color: var(--red); }
+        .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 13px; }
+
+        /* MAIN */
+        main { max-width: 1280px; margin: 0 auto; padding: 36px 24px 80px; }
+
+        .section-header { display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+        .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+            letter-spacing: 0.04em; color: var(--text); }
+        .audio-count { font-size: 12px; color: var(--text-muted); font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            background: var(--bg-card); border: 1px solid var(--border);
+            padding: 6px 14px; border-radius: 100px; }
+
+        /* AUDIO GRID */
+        .audio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+        .audio-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px;
+            overflow: hidden; transition: all 0.25s ease; position: relative; display: flex; flex-direction: column;
+        }
+        .audio-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--red), var(--gold), var(--red));
+            opacity: 0; transition: opacity 0.25s; }
+        .audio-card:hover { transform: translateY(-4px); border-color: rgba(200,16,46,0.25);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.4); }
+        .audio-card:hover::before { opacity: 1; }
+
+        .audio-card-top { padding: 22px 22px 0; display: flex; align-items: center; gap: 16px; }
+        .audio-icon {
+            width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 18px;
+            box-shadow: 0 6px 20px var(--red-glow); transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .audio-card:hover .audio-icon { transform: scale(1.07); box-shadow: 0 8px 28px var(--red-glow); }
+        .audio-meta-top { min-width: 0; flex: 1; }
+        .audio-series { font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+            text-transform: uppercase; color: var(--red); margin-bottom: 6px; }
+        .audio-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 15px;
+            color: var(--text); line-height: 1.3;
+            overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+            -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+        .audio-body { padding: 16px 22px 22px; display: flex; flex-direction: column; gap: 0; flex: 1; }
+        .audio-meta { display: flex; align-items: center; justify-content: space-between;
+            font-size: 11px; color: var(--text-muted); margin-bottom: 14px; flex-wrap: wrap; gap: 6px; }
+        .audio-pastor { display: flex; align-items: center; gap: 5px; }
+        .audio-pastor i { color: var(--red); font-size: 9px; }
+        .audio-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; }
+
+        .audio-player-wrap {
+            background: var(--bg-card2); border: 1px solid var(--border);
+            border-radius: 10px; padding: 8px 10px; margin-bottom: 14px;
+        }
+        .audio-player { width: 100%; height: 36px; display: block; filter: invert(1) hue-rotate(160deg); }
+        .audio-actions { display: flex; gap: 10px; margin-top: auto; }
+        .audio-download {
+            flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: var(--bg-card2); color: var(--text); border: 1px solid var(--border);
+            cursor: pointer; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700;
+            letter-spacing: 0.12em; text-transform: uppercase; padding: 11px 16px;
+            border-radius: 100px; transition: all 0.22s; text-decoration: none;
+        }
+        .audio-download:hover { background: var(--red); border-color: var(--red); color: #fff; transform: translateY(-1px); }
+
+        /* EMPTY */
+        .empty-state { text-align: center; padding: 80px 20px; grid-column: 1 / -1; }
+        .empty-icon { font-size: 3rem; color: rgba(200,16,46,0.2); margin-bottom: 16px; }
+        .empty-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--text); margin-bottom: 8px; }
+        .empty-sub { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+        /* FOOTER */
+        footer { background: var(--bg-card); border-top: 1px solid var(--border);
+            padding: 28px 24px; text-align: center; font-size: 12px; color: var(--text-muted); }
+        footer a { color: var(--text-muted); text-decoration: none; }
+        footer a:hover { color: var(--red); }
+
+        @media (max-width: 900px) {
+            nav { padding: 0 16px; }
+            .hero { padding: 56px 16px 48px; }
+            .filter-bar { padding: 0 16px; }
+            .search-wrap, main { padding-left: 16px; padding-right: 16px; }
+            .audio-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i></a>
+    <div class="nav-brand"><span class="icon"><i class="fas fa-headphones"></i></span> Sermons</div>
+    <div class="nav-logo"><img src="media/logos.png" alt="COC" onerror="this.style.display='none'"></div>
+</nav>
+
+<div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-watermark">AUDIO</div>
+    <div class="hero-inner">
+        <div class="hero-eyebrow">Listen Anywhere</div>
+        <h1 class="hero-title">Audio<br><span>Sermons</span></h1>
+        <p class="hero-sub">Listen online or download messages from City of Champions International Assembly straight to your device — no app required.</p>
+    </div>
+</div>
+
+<div class="filter-bar">
+    <button class="filter-btn active" onclick="filterAudio('all', this)">All Messages</button>
+    <button class="filter-btn" onclick="filterAudio('sunday', this)">Sunday Service</button>
+    <button class="filter-btn" onclick="filterAudio('healing', this)">Healing & Deliverance</button>
+    <button class="filter-btn" onclick="filterAudio('communion', this)">Power Communion</button>
+    <button class="filter-btn" onclick="filterAudio('convention', this)">Convention</button>
+    <button class="filter-btn" onclick="filterAudio('Thursday', this)">Conference</button>
+</div>
+
+<div class="search-wrap">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by title or preacher…" oninput="renderAudioSermons()">
+    </div>
+</div>
+
+<main>
+    <div class="section-header">
+        <h2 class="section-title">All Audio Messages</h2>
+        <span class="audio-count" id="audioCount"></span>
+    </div>
+    <div class="audio-grid" id="audioGrid">
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-podcast"></i></div>
+            <div class="empty-title">Audio Messages Coming Soon</div>
+            <div class="empty-sub">Sermons will appear here once they are uploaded.<br>Check back after Sunday service!</div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    © 2026 COC. All Rights Reserved. ·
+    <a href="index.html">City of Champions International Assembly</a>
+</footer>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   AUDIO SERMONS LIST — add entries here
+   "file" maps directly to: media/<file>
+   ════════════════════════════════════════════════════════════ */
+const audioSermons = [
+    {
+        title: "Day 1 Prayer Conference",
+        pastor: "Apostle Abraham Wealth & Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "2ay1prayerconference-Morning.mp3.mp3",
+        description: "A powerful message on Anger."
+    },
+    {
+        title: "Don't let your Situation define your Answers",
+        pastor: "Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "Don'tletyourSituationdefineyourAnswers.mp3",
+        description: "A powerful message."
+    },
+    {
+        title: "Easter Message Retreat",
+        pastor: "Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "EASTERMESSAGERETREAT.mp3",
+        description: "A powerful message."
+    },
+    {
+        title: "Generating Signs and Wonders Through the Presence of God",
+        pastor: "Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "GENERATINGSIGNSANDWONDERSTHROUGHTHEPRESENCEOFGOD.mp3",
+        description: "A powerful message."
+    },
+    {
+        title: "Grace & Glory part 1",
+        pastor: "Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "Grace&Glory.mp3",
+        description: "A powerful message."
+    },
+    {
+        title: "Grace & Glory part 2",
+        pastor: "Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "Grace&Glorypart2.mp3",
+        description: "A powerful message."
+    },
+    {
+        title: "Moving from Mortality to Immortality",
+        pastor: "Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "MOVINGFROMMORTALITYTOIMORTALITY.mp3",
+        description: "A powerful message."
+    },
+    {
+        title: "PAPA SPEAKING IN TONGUES",
+        pastor: "Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "papaspeakingintongues.mp3",
+        description: "A powerful message."
+    },
+    {
+        title: "Season of Jubilee",
+        pastor: "Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "SeasonOfJubilee.mp3",
+        description: "A powerful message."
+    },
+    {
+        title: "Service of God",
+        pastor: "Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "ServiceofGod.mp3",
+        description: "A powerful message."
+    },
+    {
+        title: "The Five Mandates of Blessings",
+        pastor: "Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "TheFiveMandateofBlessings.mp3",
+        description: "A powerful message."
+    },
+    {
+        title: "The Power of a River",
+        pastor: "Apostle Osaro Magnus",
+        date: "2026-06-11",
+        category: "Thursday",
+        file: "THEPOWEROFARIVER.mp3",
+        description: "A powerful message."
+    },
+];
+
+const CATEGORY_LABELS = {
+    sunday: 'Sunday Service',
+    healing: 'Healing & Deliverance',
+    communion: 'Power Communion',
+    convention: 'Convention',
+    Thursday: 'Conference'
+};
+
+let currentFilter = 'all';
+
+function filterAudio(cat, btn) {
+    currentFilter = cat;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderAudioSermons();
+}
+
+function escapeHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function renderAudioSermons() {
+    const grid = document.getElementById('audioGrid');
+    const searchTerm = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+
+    let list = audioSermons.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    if (currentFilter !== 'all') list = list.filter(a => a.category === currentFilter);
+    if (searchTerm) list = list.filter(a =>
+        (a.title || '').toLowerCase().includes(searchTerm) ||
+        (a.pastor || '').toLowerCase().includes(searchTerm)
+    );
+
+    const countEl = document.getElementById('audioCount');
+    countEl.textContent = list.length ? `${list.length} Message${list.length === 1 ? '' : 's'}` : '';
+
+    if (!list.length) {
+        grid.innerHTML = `<div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-podcast"></i></div>
+            <div class="empty-title">No Audio Messages Found</div>
+            <div class="empty-sub">${audioSermons.length ? 'Try a different search or filter.' : 'Sermons will appear here once uploaded.'}</div>
+        </div>`;
+        return;
+    }
+
+    grid.innerHTML = list.map(a => {
+        const src = `media/${encodeURIComponent(a.file || '')}`;
+        const catLabel = CATEGORY_LABELS[a.category] || 'Message';
+        return `
+        <div class="audio-card">
+            <div class="audio-card-top">
+                <div class="audio-icon"><i class="fas fa-headphones"></i></div>
+                <div class="audio-meta-top">
+                    <div class="audio-series">${escapeHtml(catLabel)}</div>
+                    <div class="audio-title">${escapeHtml(a.title)}</div>
+                </div>
+            </div>
+            <div class="audio-body">
+                <div class="audio-meta">
+                    <span class="audio-pastor"><i class="fas fa-user"></i> ${escapeHtml(a.pastor)}</span>
+                    <span>${escapeHtml(formatDate(a.date))}</span>
+                </div>
+                ${a.description ? `<div class="audio-desc">${escapeHtml(a.description)}</div>` : ''}
+                <div class="audio-player-wrap">
+                    <audio class="audio-player" controls preload="none" src="${src}"></audio>
+                </div>
+                <div class="audio-actions">
+                    <a class="audio-download" href="${src}" download>
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+renderAudioSermons();
+</script>
+</body>
+</html>

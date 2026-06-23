@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Challenges | City of Champion Fire</title>
+    <link rel="icon" type="image/png" href="media/logo1.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --red: #c8102e;
+            --red-dark: #9a0b22;
+            --red-glow: rgba(200,16,46,0.25);
+            --gold: #f0c842;
+            --gold-dim: rgba(240,200,66,0.15);
+            --bg: #0a0a0b;
+            --bg-card: #111113;
+            --bg-card2: #161618;
+            --border: rgba(255,255,255,0.07);
+            --border-red: rgba(200,16,46,0.3);
+            --text: #f0f0f2;
+            --text-muted: #6b6b75;
+            --text-dim: #9999a8;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── NAV ── */
+        nav {
+            background: rgba(10,10,11,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-back {
+            color: var(--red);
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+        .nav-back:hover { color: #ff1a3d; }
+        .nav-brand {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            letter-spacing: 0.05em;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-brand .flame-icon { color: var(--red); }
+        .nav-logo img { height: 36px; object-fit: contain; }
+
+        /* ── HERO ── */
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 100px 24px 80px;
+            text-align: center;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% -10%, rgba(200,16,46,0.22) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 20% 100%, rgba(200,16,46,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 80% 80%, rgba(240,200,66,0.05) 0%, transparent 70%);
+            z-index: 0;
+        }
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 48px 48px;
+            z-index: 0;
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(200,16,46,0.12);
+            border: 1px solid var(--border-red);
+            color: #ff6680;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 100px;
+            margin-bottom: 24px;
+        }
+        .hero-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(52px, 10vw, 88px);
+            line-height: 0.95;
+            letter-spacing: 0.02em;
+            color: var(--text);
+            margin-bottom: 20px;
+        }
+        .hero-title .accent { color: var(--red); }
+        .hero-subtitle {
+            font-size: 16px;
+            color: var(--text-dim);
+            font-weight: 300;
+            line-height: 1.6;
+            max-width: 480px;
+            margin: 0 auto 40px;
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .hero-stat { text-align: center; }
+        .hero-stat-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            color: var(--text);
+            letter-spacing: 0.03em;
+            display: block;
+        }
+        .hero-stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .hero-divider {
+            width: 1px;
+            height: 36px;
+            background: var(--border);
+            align-self: center;
+        }
+
+        /* ── SECTION HEADER ── */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .section-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(200,16,46,0.12);
+            border: 1px solid var(--border-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--red);
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+        .section-count {
+            margin-left: auto;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            border-radius: 100px;
+            letter-spacing: 0.04em;
+        }
+
+        /* ── MAIN ── */
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 24px 80px;
+        }
+        .challenges-section { margin-bottom: 72px; }
+
+        /* ── CHALLENGE GRID ── */
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* ── CHALLENGE CARD ── */
+        .challenge-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.25s, transform 0.25s;
+            cursor: default;
+        }
+        .challenge-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200,16,46,0.5), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .challenge-card:hover {
+            border-color: var(--border-red);
+            transform: translateY(-3px);
+        }
+        .challenge-card:hover::before { opacity: 1; }
+
+        .challenge-card.completed {
+            background: linear-gradient(135deg, rgba(0,180,80,0.07) 0%, var(--bg-card) 60%);
+            border-color: rgba(0,200,90,0.2);
+        }
+        .challenge-card.completed::before {
+            background: linear-gradient(90deg, transparent, rgba(0,200,90,0.4), transparent);
+            opacity: 1;
+        }
+
+        /* glow blob */
+        .card-glow {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--red-glow);
+            filter: blur(50px);
+            top: -30px;
+            right: -30px;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .challenge-card.completed .card-glow {
+            background: rgba(0,200,90,0.15);
+        }
+
+        /* card header */
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            gap: 10px;
+        }
+        .card-icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .card-icon-wrap.red { background: rgba(200,16,46,0.15); border: 1px solid rgba(200,16,46,0.25); }
+        .card-icon-wrap.gold { background: rgba(240,200,66,0.12); border: 1px solid rgba(240,200,66,0.2); }
+        .card-icon-wrap.blue { background: rgba(50,130,255,0.12); border: 1px solid rgba(50,130,255,0.2); }
+        .card-icon-wrap.purple { background: rgba(140,60,255,0.12); border: 1px solid rgba(140,60,255,0.2); }
+        .card-icon-wrap.green { background: rgba(0,190,80,0.12); border: 1px solid rgba(0,190,80,0.2); }
+        .card-icon-wrap.teal { background: rgba(0,200,180,0.12); border: 1px solid rgba(0,200,180,0.2); }
+
+        .card-icon-wrap .fa { font-size: 22px; }
+        .red .fa { color: #ff4060; }
+        .gold .fa { color: #f0c842; }
+        .blue .fa { color: #5b9cff; }
+        .purple .fa { color: #b06aff; }
+        .green .fa { color: #36e880; }
+        .teal .fa { color: #28e8d0; }
+
+        .card-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+        .type-badge {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 100px;
+            border: 1px solid;
+        }
+        .type-badge.weekly {
+            color: #f0c842;
+            background: rgba(240,200,66,0.1);
+            border-color: rgba(240,200,66,0.25);
+        }
+        .type-badge.monthly {
+            color: #5b9cff;
+            background: rgba(91,156,255,0.1);
+            border-color: rgba(91,156,255,0.25);
+        }
+        .completed-badge {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 100px;
+            color: #36e880;
+            background: rgba(54,232,128,0.1);
+            border: 1px solid rgba(54,232,128,0.25);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+        }
+        .card-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin-bottom: 20px;
+        }
+
+        /* progress */
+        .progress-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .progress-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+        .progress-fraction {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .progress-fraction .denom { color: var(--text-muted); font-weight: 400; }
+        .progress-bar-track {
+            width: 100%;
+            height: 5px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 100px;
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 100px;
+            background: linear-gradient(90deg, var(--red), var(--gold));
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .challenge-card.completed .progress-bar-fill {
+            background: linear-gradient(90deg, #16a34a, #36e880);
+        }
+
+        /* card footer */
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .points-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gold);
+            background: var(--gold-dim);
+            border: 1px solid rgba(240,200,66,0.2);
+            padding: 6px 12px;
+            border-radius: 100px;
+        }
+        .badge-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .auto-tag {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 14px;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+        .auto-tag .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #36e880;
+            box-shadow: 0 0 6px #36e880;
+            flex-shrink: 0;
+        }
+
+        /* read scripture CTA */
+        .scripture-cta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(200,16,46,0.08);
+            border: 1px solid var(--border-red);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 16px;
+            color: #ff8090;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        .scripture-cta:hover { background: rgba(200,16,46,0.14); }
+        .scripture-cta .fa { color: var(--red); }
+
+        /* ── PAST CHALLENGES ── */
+        .past-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .past-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            opacity: 0.65;
+            transition: opacity 0.2s;
+        }
+        .past-card:hover { opacity: 0.9; }
+        .past-card-left { display: flex; align-items: center; gap: 14px; }
+        .past-check {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(54,232,128,0.1);
+            border: 1px solid rgba(54,232,128,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #36e880;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+        .past-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+        .past-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+        .past-pts {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        /* ── TOAST ── */
+        #toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--bg-card2);
+            border: 1px solid var(--border-red);
+            border-radius: 14px;
+            padding: 14px 22px;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
+            opacity: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            max-width: 90vw;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        #toast .fa { color: var(--gold); }
+
+        /* ── CELEBRATION MODAL ── */
+        #celebModal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            padding: 24px;
+        }
+        #celebModal.show { opacity: 1; pointer-events: all; }
+        .celeb-box {
+            background: var(--bg-card);
+            border: 1px solid rgba(240,200,66,0.3);
+            border-radius: 28px;
+            padding: 48px 40px;
+            text-align: center;
+            max-width: 440px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .celeb-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .celeb-icon {
+            font-size: 64px;
+            display: block;
+            margin-bottom: 20px;
+            animation: pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        @keyframes pop {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .celeb-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 42px;
+            letter-spacing: 0.04em;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        .celeb-subtitle { font-size: 16px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
+        .celeb-badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(240,200,66,0.1);
+            border: 1px solid rgba(240,200,66,0.3);
+            color: var(--gold);
+            padding: 10px 22px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 28px;
+        }
+        .celeb-close {
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 36px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            letter-spacing: 0.03em;
+            transition: background 0.2s;
+        }
+        .celeb-close:hover { background: var(--red-dark); }
+
+        /* ── BIBLE READER MODAL ── */
+        #bibleModal {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        #bibleModal.show { opacity: 1; pointer-events: all; }
+        .bible-sheet {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 28px 28px 0 0;
+            width: 100%;
+            max-width: 700px;
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #bibleModal.show .bible-sheet { transform: translateY(0); }
+
+        .bible-handle {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 100px;
+            margin: 14px auto 0;
+        }
+        .bible-header {
+            padding: 20px 28px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .bible-header-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .bible-header-title .fa { color: var(--red); font-size: 16px; }
+        .bible-close-btn {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .bible-close-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+        /* reading stats bar */
+        .reading-stats {
+            padding: 14px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        .reading-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .reading-stat .fa { font-size: 12px; }
+        .reading-stat.active { color: #36e880; }
+        .reading-stat.timer { color: var(--gold); }
+        .reading-stat .val { font-weight: 700; color: var(--text); }
+
+        .bible-scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px 28px;
+        }
+        .bible-scroll-area::-webkit-scrollbar { width: 4px; }
+        .bible-scroll-area::-webkit-scrollbar-track { background: transparent; }
+        .bible-scroll-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 100px; }
+
+        .bible-chapter-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            letter-spacing: 0.04em;
+            color: var(--text);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .bible-chapter-title .fa { color: var(--red); font-size: 24px; }
+        .bible-book-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bible-verse {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 18px;
+            line-height: 1.7;
+        }
+        .verse-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--red);
+            padding-top: 6px;
+            min-width: 18px;
+            letter-spacing: 0.04em;
+        }
+        .verse-text {
+            font-size: 15px;
+            color: #d0d0da;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        /* reflection */
+        .reflection-section {
+            border-top: 1px solid var(--border);
+            padding: 20px 28px 28px;
+            flex-shrink: 0;
+        }
+        .reflection-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .reflection-label .fa { color: var(--gold); }
+        .reflection-input {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 1.5;
+            resize: none;
+            height: 80px;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .reflection-input::placeholder { color: var(--text-muted); }
+        .reflection-input:focus { border-color: rgba(200,16,46,0.4); }
+        .reflection-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 12px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .reflection-chars { font-size: 11px; color: var(--text-muted); }
+        .reflection-chars.good { color: #36e880; }
+        .complete-btn {
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 11px 24px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s, opacity 0.2s;
+            letter-spacing: 0.02em;
+        }
+        .complete-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .complete-btn:not(:disabled):hover { background: var(--red-dark); }
+
+        /* scroll progress bar at top of reading area */
+        .scroll-progress-bar {
+            height: 2px;
+            background: linear-gradient(90deg, var(--red), var(--gold));
+            width: 0%;
+            transition: width 0.2s;
+            flex-shrink: 0;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 600px) {
+            .hero { padding: 70px 20px 60px; }
+            .challenges-grid { grid-template-columns: 1fr; }
+            .past-grid { grid-template-columns: 1fr; }
+            .hero-stats { gap: 20px; }
+            .reading-stats { gap: 16px; }
+            main { padding: 40px 16px 60px; }
+        }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .challenge-card { animation: fadeUp 0.5s ease both; }
+        .challenge-card:nth-child(2) { animation-delay: 0.05s; }
+        .challenge-card:nth-child(3) { animation-delay: 0.1s; }
+        .challenge-card:nth-child(4) { animation-delay: 0.15s; }
+        .challenge-card:nth-child(5) { animation-delay: 0.2s; }
+        .challenge-card:nth-child(6) { animation-delay: 0.25s; }
+
+        /* scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav >
+        <a href="index.html" class="nav-back">
+            <i class="fa-solid fa-arrow-left"></i> 
+        </a>
+        <div class="nav-brand">
+            <i class="fa-solid fa-fire flame-icon"></i>
+            Challenges
+        </div>
+        <div class="nav-logo">
+            <img src="media/logos.png" alt="COC" onerror="this.style.display='none'">
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-content">
+            <div class="hero-eyebrow">
+                <i class="fa-solid fa-bolt"></i>
+                City of Champions International Assembly
+            </div>
+            <h1 class="hero-title">
+                RISE TO<br>THE <span class="accent">CHALLENGE</span>
+            </h1>
+            <p class="hero-subtitle">
+                Grow in faith, sharpen your spirit, and earn rewards as you walk daily with God.
+            </p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="hero-stat-num" id="statActive">6</span>
+                    <span class="hero-stat-label">Active Challenges</span>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-stat">
+                    <span class="hero-stat-num" id="statTotal">865</span>
+                    <span class="hero-stat-label">Total Points Available</span>
+                </div>
+                <div class="hero-divider"></div>
+                <div class="hero-stat">
+                    <span class="hero-stat-num" id="statCompleted">0</span>
+                    <span class="hero-stat-label">Completed</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN -->
+    <main>
+        <!-- Active Challenges -->
+        <section class="challenges-section">
+            <div class="section-header reveal">
+                <div class="section-icon"><i class="fa-solid fa-fire"></i></div>
+                <h2 class="section-title">Active Challenges</h2>
+                <span class="section-count" id="activeCount">6 running</span>
+            </div>
+            <div id="activeChallenges" class="challenges-grid"></div>
+        </section>
+
+        <!-- Past Challenges -->
+        <section class="challenges-section">
+            <div class="section-header reveal">
+                <div class="section-icon" style="background:rgba(255,255,255,0.04);border-color:var(--border);color:var(--text-muted);">
+                    <i class="fa-solid fa-scroll"></i>
+                </div>
+                <h2 class="section-title" style="color:var(--text-dim);">Completed History</h2>
+                <span class="section-count" id="pastCount">2 done</span>
+            </div>
+            <div id="pastChallenges" class="past-grid"></div>
+        </section>
+    </main>
+
+    <!-- TOAST -->
+    <div id="toast">
+        <i class="fa-solid fa-bolt"></i>
+        <span id="toastMsg"></span>
+    </div>
+
+    <!-- CELEBRATION MODAL -->
+    <div id="celebModal">
+        <div class="celeb-box">
+            <span class="celeb-icon" id="celebEmoji">🎉</span>
+            <div class="celeb-title">CHALLENGE COMPLETE!</div>
+            <p class="celeb-subtitle" id="celebText">You've completed a challenge and earned rewards.</p>
+            <div class="celeb-badge-pill" id="celebBadge">
+                <i class="fa-solid fa-trophy"></i>
+                <span id="celebBadgeText">Badge Unlocked</span>
+            </div>
+            <br>
+            <button class="celeb-close" onclick="closeModal('celebModal')">
+                <i class="fa-solid fa-check" style="margin-right:8px;"></i> Awesome, Thanks!
+            </button>
+        </div>
+    </div>
+
+    <!-- BIBLE READER MODAL -->
+    <div id="bibleModal">
+        <div class="bible-sheet">
+            <div class="bible-handle"></div>
+            <div class="bible-header">
+                <div class="bible-header-title">
+                    <i class="fa-solid fa-book-open"></i>
+                    Today's Scripture
+                </div>
+                <button class="bible-close-btn" onclick="closeBibleModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+            <div class="reading-stats">
+                <div class="reading-stat timer" id="statTimer">
+                    <i class="fa-solid fa-stopwatch"></i>
+                    <span>Reading:</span>
+                    <span class="val" id="timerVal">0:00</span>
+                    <span>/ <span id="timerTarget">2:00</span></span>
+                </div>
+                <div class="reading-stat" id="statScroll">
+                    <i class="fa-solid fa-scroll"></i>
+                    <span>Scroll:</span>
+                    <span class="val" id="scrollVal">0%</span>
+                </div>
+                <div class="reading-stat" id="statReadStatus">
+                    <i class="fa-solid fa-circle-dot"></i>
+                    <span id="readStatusText">Keep reading...</span>
+                </div>
+                <div class="reading-stat" id="streakStat" style="margin-left:auto;">
+                    <i class="fa-solid fa-fire" style="color:var(--red);"></i>
+                    <span>Challenge:</span>
+                    <span class="val" id="streakChallVal">0/7</span>
+                </div>
+            </div>
+            <div class="bible-scroll-area" id="bibleScrollArea">
+                <div class="bible-chapter-title">
+                    <i class="fa-solid fa-cross"></i>
+                    <span id="bibleChapterTitle">Psalm 23</span>
+                </div>
+                <div class="bible-book-label">
+                    <i class="fa-solid fa-bible"></i>
+                    <span id="bibleBookLabel">Old Testament · Psalms · Chapter 23</span>
+                </div>
+                <div id="bibleVerses"></div>
+                <div style="height: 60px;"></div>
+            </div>
+            <div class="reflection-section" id="reflectionSection" style="display:none;">
+                <div class="reflection-label">
+                    <i class="fa-solid fa-feather"></i>
+                    What did God speak to you through this passage?
+                </div>
+                <textarea class="reflection-input" id="reflectionText" placeholder="Write your reflection here... (at least 30 characters)"></textarea>
+                <div class="reflection-footer">
+                    <span class="reflection-chars" id="reflectionCharCount">0 / 30 min</span>
+                    <button class="complete-btn" id="completeReadingBtn" disabled onclick="finishReading()">
+                        <i class="fa-solid fa-check-double"></i>
+                        Mark Day Complete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/scripts/coc-user.js"></script>
+    <script src="/scripts/coc-points.js"></script>
+    <script src="/scripts/coc-streak.js"></script>
+
+    <script>
+    /* ======================================================
+       CHALLENGE DATA
+    ====================================================== */
+    const CHALLENGE_META = [
+        {
+            id: 'daily_scripture_week',
+            title: 'Daily Scripture',
+            description: 'Read scripture every day for 7 days straight. Opens a guided Bible reader.',
+            type: 'weekly',
+            points: 50,
+            badge: 'Scripture Warrior',
+            target: 7,
+            active: true,
+            icon: 'fa-book-open-reader',
+            colorClass: 'red',
+            hasCTA: true,
+            ctaLabel: 'Read Today\'s Scripture',
+            ctaIcon: 'fa-book-open'
+        },
+        {
+            id: 'quiz_master',
+            title: 'Quiz Master',
+            description: 'Complete 5 Bible quizzes with a score of 80% or higher.',
+            type: 'weekly',
+            points: 75,
+            badge: 'Quiz Champion',
+            target: 5,
+            active: true,
+            icon: 'fa-brain',
+            colorClass: 'purple'
+        },
+        {
+            id: 'prayer_warrior',
+            title: 'Prayer Warrior',
+            description: 'Pray for 10 different prayer requests on the prayer wall.',
+            type: 'weekly',
+            points: 60,
+            badge: 'Prayer Warrior',
+            target: 10,
+            active: true,
+            icon: 'fa-hands-praying',
+            colorClass: 'blue'
+        },
+        {
+            id: 'testimony_challenge',
+            title: 'Testimony',
+            description: 'Share your personal testimony with the community.',
+            type: 'monthly',
+            points: 100,
+            badge: 'Storyteller',
+            target: 1,
+            active: true,
+            icon: 'fa-microphone-lines',
+            colorClass: 'gold'
+        },
+        {
+            id: 'bible_plan_90',
+            title: '90-Day Bible Plan',
+            description: 'Complete the Read the Bible in 90 Days plan — one day at a time.',
+            type: 'monthly',
+            points: 500,
+            badge: 'Bible Scholar',
+            target: 90,
+            active: true,
+            icon: 'fa-book-bible',
+            colorClass: 'teal'
+        },
+        {
+            id: 'community_builder',
+            title: 'Community Builder',
+            description: 'Comment on 15 community posts and spark meaningful conversations.',
+            type: 'monthly',
+            points: 80,
+            badge: 'Community Builder',
+            target: 15,
+            active: true,
+            icon: 'fa-people-group',
+            colorClass: 'green'
+        }
+    ];
+
+    const PAST_CHALLENGES = [
+        { id: 'past_1', title: 'January Fire Challenge', description: 'Attended all Sunday services in January.', points_earned: 150, icon: 'fa-church' },
+        { id: 'past_2', title: 'Advent Reading Plan', description: 'Completed the full Advent reading plan.', points_earned: 100, icon: 'fa-star' }
+    ];
+
+    /* ======================================================
+       CHALLENGE SYSTEM (window.COCChallenges)
+    ====================================================== */
+    window.COCChallenges = (function() {
+        const KEY = 'coc_challenge_progress';
+
+        function load() {
+            try {
+                const raw = localStorage.getItem(KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch { return {}; }
+        }
+
+        function save(data) {
+            try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {}
+        }
+
+        function getProgress(id) {
+            const data = load();
+            return (data[id] && data[id].progress) ? data[id].progress : 0;
+        }
+
+        function isCompleted(id) {
+            const data = load();
+            return !!(data[id] && data[id].completed);
+        }
+
+        function isDuplicate(id, actionId) {
+            const data = load();
+            const entry = data[id] || {};
+            const arr = entry.countedIds || entry.completedDates || [];
+            return arr.includes(actionId);
+        }
+
+        function increment(challengeId, actionId) {
+            const data = load();
+            const challenge = CHALLENGE_META.find(c => c.id === challengeId);
+            if (!challenge) return;
+
+            if (!data[challengeId]) {
+                data[challengeId] = { progress: 0, completed: false, countedIds: [], completedDates: [] };
+            }
+
+            const entry = data[challengeId];
+            const listKey = challengeId.includes('scripture') || challengeId.includes('bible') ? 'completedDates' : 'countedIds';
+
+            if (!entry[listKey]) entry[listKey] = [];
+            if (entry[listKey].includes(actionId)) return; // duplicate guard
+            if (entry.completed) return; // already done
+
+            entry[listKey].push(actionId);
+            entry.progress = (entry.progress || 0) + 1;
+            entry.lastUpdated = new Date().toISOString();
+
+            if (entry.progress >= challenge.target) {
+                entry.completed = true;
+                save(data);
+                awardChallenge(challengeId);
+            } else {
+                save(data);
+                showProgressToast(challengeId);
+            }
+            renderChallenges();
+        }
+
+        function awardChallenge(id) {
+            const challenge = CHALLENGE_META.find(c => c.id === id);
+            if (!challenge) return;
+
+            if (window.COCPoints) {
+                window.COCPoints.earnPoints('challenge_complete', { challenge: challenge.title });
+            }
+            if (window.COCUser && challenge.badge) {
+                const user = window.COCUser.getUser();
+                if (user && !user.badges.includes('🏆 ' + challenge.badge)) {
+                    user.badges.push('🏆 ' + challenge.badge);
+                    window.COCUser.saveUser(user);
+                }
+            }
+
+            document.getElementById('celebEmoji').textContent = '🎉';
+            document.getElementById('celebText').textContent = `You completed "${challenge.title}" and earned ${challenge.points} points!`;
+            document.getElementById('celebBadgeText').textContent = '🏆 ' + challenge.badge;
+            document.getElementById('celebModal').classList.add('show');
+        }
+
+        function showProgressToast(id) {
+            const progress = getProgress(id);
+            const challenge = CHALLENGE_META.find(c => c.id === id);
+            if (!challenge) return;
+            showToast(`${challenge.title}: ${progress}/${challenge.target} complete`);
+        }
+
+        function loadUserChallenges() { return load(); }
+
+        return { increment, getProgress, isCompleted, isDuplicate, loadUserChallenges, awardChallenge, showProgressToast };
+    })();
+
+    /* ======================================================
+       RENDER CHALLENGES
+    ====================================================== */
+    function renderChallenges() {
+        const activeEl = document.getElementById('activeChallenges');
+        const pastEl = document.getElementById('pastChallenges');
+
+        let completedCount = 0;
+
+        activeEl.innerHTML = CHALLENGE_META.filter(c => c.active).map((c, i) => {
+            const progress = window.COCChallenges.getProgress(c.id);
+            const completed = window.COCChallenges.isCompleted(c.id);
+            const pct = Math.min(100, Math.round((progress / c.target) * 100));
+            if (completed) completedCount++;
+
+            const progressText = c.id === 'daily_scripture_week' || c.id === 'bible_plan_90'
+                ? `${progress}/${c.target} days`
+                : c.id === 'quiz_master' ? `${progress}/${c.target} quizzes`
+                : c.id === 'prayer_warrior' ? `${progress}/${c.target} prayers`
+                : c.id === 'community_builder' ? `${progress}/${c.target} comments`
+                : `${progress}/${c.target}`;
+
+            return `
+            <div class="challenge-card ${completed ? 'completed' : ''}" style="animation-delay:${i*0.06}s">
+                <div class="card-glow"></div>
+                <div class="card-header">
+                    <div class="card-icon-wrap ${c.colorClass}">
+                        <i class="fa-solid ${c.icon} fa"></i>
+                    </div>
+                    <div class="card-badges">
+                        <span class="type-badge ${c.type}">${c.type}</span>
+                        ${completed ? '<span class="completed-badge"><i class="fa-solid fa-check-circle"></i> Done</span>' : ''}
+                    </div>
+                </div>
+                <div class="card-title">${c.title}</div>
+                <div class="card-desc">${c.description}</div>
+                ${completed ? '' : `
+                <div class="progress-row">
+                    <span class="progress-label">Progress</span>
+                    <span class="progress-fraction">${progress}<span class="denom">/${c.target}</span></span>
+                </div>`}
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" style="width:${pct}%"></div>
+                </div>
+                ${completed ? `
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#36e880;font-weight:600;margin-bottom:12px;">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Badge earned: ${c.badge}</span>
+                </div>` : ''}
+                <div class="card-footer">
+                    <div class="points-chip">
+                        <i class="fa-solid fa-star" style="font-size:11px;"></i>
+                        +${c.points} pts
+                    </div>
+                    ${!completed ? `<div class="badge-chip">
+                        <i class="fa-solid fa-shield-halved" style="color:var(--text-muted);font-size:12px;"></i>
+                        ${c.badge}
+                    </div>` : ''}
+                </div>
+                ${c.hasCTA && !completed ? `
+                <a href="#" class="scripture-cta" onclick="openBibleModal(event)">
+                    <i class="fa-solid ${c.ctaIcon} fa"></i>
+                    ${c.ctaLabel}
+                    <i class="fa-solid fa-arrow-right" style="margin-left:auto;font-size:11px;opacity:0.6;"></i>
+                </a>` : ''}
+                <div class="auto-tag">
+                    <span class="dot"></span>
+                    ${completed
+                        ? `<span style="color:#36e880;">Challenge complete — well done!</span>`
+                        : `<span>Progress updates automatically</span>`}
+                </div>
+            </div>`;
+        }).join('');
+
+        document.getElementById('statCompleted').textContent = completedCount;
+
+        // past challenges
+        pastEl.innerHTML = PAST_CHALLENGES.map(c => `
+            <div class="past-card reveal">
+                <div class="past-card-left">
+                    <div class="past-check"><i class="fa-solid fa-check"></i></div>
+                    <div>
+                        <div class="past-title">${c.title}</div>
+                        <div class="past-desc">${c.description}</div>
+                    </div>
+                </div>
+                <div class="past-pts">+${c.points_earned}</div>
+            </div>
+        `).join('');
+
+        observeReveal();
+    }
+
+    /* ======================================================
+       TOAST
+    ====================================================== */
+    let toastTimer;
+    function showToast(msg) {
+        const el = document.getElementById('toast');
+        document.getElementById('toastMsg').textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('show');
+    }
+
+    /* ======================================================
+       BIBLE READER
+    ====================================================== */
+    const DAILY_READINGS = [
+        {
+            id: 'psalm23',
+            title: 'Psalm 23',
+            book: 'Old Testament · Psalms · Chapter 23',
+            requiredSeconds: 90,
+            verses: [
+                { num: 1, text: 'The Lord is my shepherd; I shall not want.' },
+                { num: 2, text: 'He maketh me to lie down in green pastures: he leadeth me beside the still waters.' },
+                { num: 3, text: 'He restoreth my soul: he leadeth me in the paths of righteousness for his name\'s sake.' },
+                { num: 4, text: 'Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me; thy rod and thy staff they comfort me.' },
+                { num: 5, text: 'Thou preparest a table before me in the presence of mine enemies: thou anointest my head with oil; my cup runneth over.' },
+                { num: 6, text: 'Surely goodness and mercy shall follow me all the days of my life: and I will dwell in the house of the Lord for ever.' }
+            ]
+        },
+        {
+            id: 'john3',
+            title: 'John 3:14–21',
+            book: 'New Testament · Gospel of John · Chapter 3',
+            requiredSeconds: 120,
+            verses: [
+                { num: 14, text: 'And as Moses lifted up the serpent in the wilderness, even so must the Son of man be lifted up:' },
+                { num: 15, text: 'That whosoever believeth in him should not perish, but have eternal life.' },
+                { num: 16, text: 'For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.' },
+                { num: 17, text: 'For God sent not his Son into the world to condemn the world; but that the world through him might be saved.' },
+                { num: 18, text: 'He that believeth on him is not condemned: but he that believeth not is condemned already, because he hath not believed in the name of the only begotten Son of God.' },
+                { num: 19, text: 'And this is the condemnation, that light is come into the world, and men loved darkness rather than light, because their deeds were evil.' },
+                { num: 20, text: 'For every one that doeth evil hateth the light, neither cometh to the light, lest his deeds should be reproved.' },
+                { num: 21, text: 'But he that doeth truth cometh to the light, that his deeds may be made manifest, that they are wrought in God.' }
+            ]
+        }
+    ];
+
+    let readerState = {
+        active: false,
+        chapterId: null,
+        startedAt: null,
+        activeSeconds: 0,
+        scrollPercent: 0,
+        completed: false,
+        timerInterval: null,
+        lastActivityAt: null,
+        paused: false,
+        requiredSeconds: 90
+    };
+
+    function openBibleModal(e) {
+        if (e) e.preventDefault();
+
+        // Pick today's reading (cycle by day of year)
+        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+        const reading = DAILY_READINGS[dayOfYear % DAILY_READINGS.length];
+
+        readerState = {
+            active: true,
+            chapterId: reading.id,
+            startedAt: Date.now(),
+            activeSeconds: 0,
+            scrollPercent: 0,
+            completed: false,
+            timerInterval: null,
+            lastActivityAt: Date.now(),
+            paused: false,
+            requiredSeconds: reading.requiredSeconds
+        };
+
+        // Populate
+        document.getElementById('bibleChapterTitle').textContent = reading.title;
+        document.getElementById('bibleBookLabel').innerHTML = `<i class="fa-solid fa-bible"></i> ${reading.book}`;
+        document.getElementById('bibleVerses').innerHTML = reading.verses.map(v => `
+            <div class="bible-verse">
+                <span class="verse-num">${v.num}</span>
+                <span class="verse-text">${v.text}</span>
+            </div>
+        `).join('');
+
+        const mins = Math.floor(reading.requiredSeconds / 60);
+        const secs = reading.requiredSeconds % 60;
+        document.getElementById('timerTarget').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+        document.getElementById('timerVal').textContent = '0:00';
+        document.getElementById('scrollVal').textContent = '0%';
+        document.getElementById('scrollProgressBar').style.width = '0%';
+        document.getElementById('readStatusText').textContent = 'Keep reading...';
+        document.getElementById('reflectionSection').style.display = 'none';
+        document.getElementById('reflectionText').value = '';
+        document.getElementById('reflectionCharCount').textContent = '0 / 30 min';
+        document.getElementById('completeReadingBtn').disabled = true;
+
+        const progress = window.COCChallenges.getProgress('daily_scripture_week');
+        document.getElementById('streakChallVal').textContent = `${progress}/7`;
+
+        document.getElementById('bibleModal').classList.add('show');
+        document.getElementById('bibleScrollArea').scrollTop = 0;
+
+        startReadingTimer();
+        setupReadingTrackers();
+    }
+
+    function closeBibleModal() {
+        document.getElementById('bibleModal').classList.remove('show');
+        stopReadingTimer();
+        readerState.active = false;
+    }
+
+    function startReadingTimer() {
+        if (readerState.timerInterval) clearInterval(readerState.timerInterval);
+        readerState.timerInterval = setInterval(() => {
+            if (!readerState.active || readerState.completed) return;
+
+            const now = Date.now();
+            const sinceActivity = (now - readerState.lastActivityAt) / 1000;
+            const isHidden = document.visibilityState === 'hidden';
+            const isIdle = sinceActivity > 30;
+
+            if (isHidden || isIdle) {
+                if (!readerState.paused) {
+                    readerState.paused = true;
+                    document.getElementById('readStatusText').textContent = isHidden ? 'Tab hidden — paused' : 'Idle — resume to continue';
+                    const statEl = document.getElementById('statReadStatus');
+                    statEl.className = 'reading-stat';
+                }
+                return;
+            }
+
+            if (readerState.paused) {
+                readerState.paused = false;
+                document.getElementById('readStatusText').textContent = 'Keep reading...';
+            }
+
+            readerState.activeSeconds++;
+            const m = Math.floor(readerState.activeSeconds / 60);
+            const s = readerState.activeSeconds % 60;
+            document.getElementById('timerVal').textContent = `${m}:${s.toString().padStart(2, '0')}`;
+
+            checkReadingComplete();
+        }, 1000);
+    }
+
+    function stopReadingTimer() {
+        if (readerState.timerInterval) clearInterval(readerState.timerInterval);
+    }
+
+    function setupReadingTrackers() {
+        const area = document.getElementById('bibleScrollArea');
+
+        function onActivity() {
+            readerState.lastActivityAt = Date.now();
+        }
+
+        function onScroll() {
+            onActivity();
+            const el = document.getElementById('bibleScrollArea');
+            const scrolled = el.scrollTop;
+            const total = el.scrollHeight - el.clientHeight;
+            if (total <= 0) return;
+            const pct = Math.min(100, Math.round((scrolled / total) * 100));
+            readerState.scrollPercent = pct;
+            document.getElementById('scrollVal').textContent = pct + '%';
+            document.getElementById('scrollProgressBar').style.width = pct + '%';
+            checkReadingComplete();
+        }
+
+        area.addEventListener('scroll', onScroll, { passive: true });
+        area.addEventListener('click', onActivity);
+        area.addEventListener('keydown', onActivity);
+        area.addEventListener('touchstart', onActivity, { passive: true });
+        document.addEventListener('visibilitychange', onActivity);
+    }
+
+    function checkReadingComplete() {
+        if (readerState.completed) return;
+        const timeOk = readerState.activeSeconds >= readerState.requiredSeconds;
+        const scrollOk = readerState.scrollPercent >= 80;
+        const visibleOk = document.visibilityState !== 'hidden';
+
+        const statusEl = document.getElementById('statReadStatus');
+
+        if (timeOk && scrollOk && visibleOk) {
+            readerState.completed = true;
+            stopReadingTimer();
+            document.getElementById('readStatusText').textContent = 'Reading complete!';
+            statusEl.className = 'reading-stat active';
+            document.getElementById('reflectionSection').style.display = 'block';
+            showToast('✅ Reading verified! Write your reflection to complete the day.');
+        } else {
+            const missing = [];
+            if (!timeOk) missing.push(`${readerState.requiredSeconds - readerState.activeSeconds}s left`);
+            if (!scrollOk) missing.push(`scroll ${80 - readerState.scrollPercent}% more`);
+            if (missing.length > 0) {
+                document.getElementById('readStatusText').textContent = missing.join(' · ');
+            }
+        }
+    }
+
+    document.getElementById('reflectionText').addEventListener('input', function() {
+        const len = this.value.trim().length;
+        const countEl = document.getElementById('reflectionCharCount');
+        countEl.textContent = `${len} / 30 min`;
+        countEl.className = 'reflection-chars' + (len >= 30 ? ' good' : '');
+        document.getElementById('completeReadingBtn').disabled = len < 30;
+    });
+
+    function finishReading() {
+        if (!readerState.completed) return;
+        const reflection = document.getElementById('reflectionText').value.trim();
+        if (reflection.length < 30) return;
+
+        // Use today's date as the unique action ID
+        const today = new Date().toISOString().split('T')[0];
+        window.COCChallenges.increment('daily_scripture_week', today);
+
+        closeBibleModal();
+    }
+
+    /* ======================================================
+       SCROLL REVEAL
+    ====================================================== */
+    function observeReveal() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }
+
+    /* ======================================================
+       INIT
+    ====================================================== */
+    document.addEventListener('DOMContentLoaded', function() {
+        renderChallenges();
+        if (window.COCUser) {
+            const user = window.COCUser.getUser();
+            if (user && user.displayName) window.COCUser.recordVisit();
+        }
+        observeReveal();
+    });
+    </script>
+</body>
+</html>

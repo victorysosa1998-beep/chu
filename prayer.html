@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prayer Wall | City of Champion Fire</title>
+    <link rel="icon" type="image/png" href="media/logo1.png">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #f9fafb; color: #1a1a1a; overflow-x: hidden; }
+
+        /* NAV */
+        .pw-nav {
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .pw-nav-logo { height: 44px; }
+        .pw-back { display: inline-flex; align-items: center; gap: 8px; color: #c8102e; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; transition: gap 0.2s; }
+        .pw-back:hover { gap: 12px; }
+
+        /* HERO BANNER */
+        .pw-hero {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 60%, #0a0a0a 100%);
+            padding: 72px 40px 56px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .pw-hero::before {
+            content: '🙏';
+            position: absolute;
+            font-size: 22rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.04;
+            pointer-events: none;
+            line-height: 1;
+        }
+        .pw-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 50% at 50% 100%, rgba(200,16,46,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .pw-hero-inner { position: relative; z-index: 1; }
+        .pw-hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #c8102e;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 20px;
+        }
+        .pw-hero-eyebrow::before, .pw-hero-eyebrow::after { content: ''; display: block; width: 30px; height: 1px; background: #c8102e; }
+        .pw-hero h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(3rem, 9vw, 6rem);
+            color: #fff;
+            letter-spacing: 0.04em;
+            line-height: 0.95;
+            margin-bottom: 18px;
+        }
+        .pw-hero h1 span { color: #f0c842; }
+        .pw-hero p {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.15rem;
+            color: rgba(255,255,255,0.55);
+            font-style: italic;
+            font-weight: 300;
+            max-width: 520px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        .pw-stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 36px;
+            flex-wrap: wrap;
+        }
+        .pw-stat { text-align: center; }
+        .pw-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; color: #f0c842; letter-spacing: 0.04em; display: block; line-height: 1; }
+        .pw-stat-lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 4px; font-family: 'Inter', sans-serif; }
+
+        /* TOAST */
+        #pw-toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            z-index: 9999;
+            background: linear-gradient(135deg, #0a0a0a, #1a0505);
+            border: 1px solid rgba(185,28,28,0.4);
+            border-radius: 18px;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+            opacity: 0;
+            transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            min-width: 300px;
+            max-width: calc(100vw - 48px);
+        }
+        #pw-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .pw-toast-icon { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #b91c1c, #7f1d1d); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; color: #fcd34d; box-shadow: 0 4px 14px rgba(185,28,28,0.4); }
+        .pw-toast-title { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 13px; color: #fff; margin-bottom: 2px; }
+        .pw-toast-sub { font-size: 12px; color: rgba(255,255,255,0.5); font-style: italic; line-height: 1.4; }
+        .pw-toast-close { margin-left: auto; background: none; border: none; color: rgba(255,255,255,0.3); font-size: 14px; cursor: pointer; flex-shrink: 0; padding: 4px; transition: color 0.2s; }
+        .pw-toast-close:hover { color: rgba(255,255,255,0.7); }
+
+        /* MAIN LAYOUT */
+        .pw-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 56px 40px;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* SUBMIT FORM */
+        .pw-form-wrap {
+            background: #fff;
+            border-radius: 28px;
+            padding: 36px;
+            border: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 88px;
+        }
+        .pw-form-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #fee2e2, #fca5a5);
+            color: #c8102e;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+        .pw-form-wrap h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .pw-form-wrap p {
+            font-size: 0.88rem;
+            color: #9ca3af;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .pw-field { margin-bottom: 16px; }
+        .pw-label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+        .pw-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #1a1a1a;
+            outline: none;
+            background: #f9fafb;
+            transition: border-color 0.2s;
+        }
+        .pw-input:focus { border-color: #c8102e; background: #fff; }
+        .pw-input::placeholder { color: #d1d5db; }
+        textarea.pw-input { resize: none; }
+
+        /* Category tags */
+        .pw-cats {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .pw-cat-btn {
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            border: 1.5px solid #e5e7eb;
+            background: #fff;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pw-cat-btn.active { background: #fee2e2; border-color: #c8102e; color: #c8102e; }
+        .pw-cat-btn:hover { border-color: #c8102e; color: #c8102e; }
+
+        .pw-anon-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .pw-anon-row input[type=checkbox] { width: 16px; height: 16px; accent-color: #c8102e; }
+        .pw-anon-row label { font-size: 13px; color: #6b7280; cursor: pointer; }
+
+        .pw-submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #c8102e, #8b0000);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 15px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .pw-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,16,46,0.4); }
+        .pw-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* FILTERS */
+        .pw-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+        .pw-filter-chip {
+            padding: 7px 16px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            border: 1.5px solid #e5e7eb;
+            background: #fff;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .pw-filter-chip.active { background: #c8102e; border-color: #c8102e; color: #fff; }
+        .pw-filter-chip:hover:not(.active) { border-color: #c8102e; color: #c8102e; }
+
+        .pw-wall-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .pw-wall-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1a1a1a;
+        }
+        .pw-count-badge {
+            background: #fee2e2;
+            color: #c8102e;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 5px 14px;
+            border-radius: 100px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* PRAYER CARDS */
+        .pw-list { display: flex; flex-direction: column; gap: 16px; }
+        .pw-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px 28px;
+            border: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+            transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .pw-card:hover { border-color: rgba(200,16,46,0.25); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.09); }
+        .pw-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; gap: 12px; }
+        .pw-card-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #fee2e2, #fca5a5);
+            color: #c8102e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .pw-card-meta { flex: 1; min-width: 0; }
+        .pw-card-name { font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 800; color: #1a1a1a; display: block; margin-bottom: 2px; }
+        .pw-card-date { font-size: 0.75rem; color: #9ca3af; font-weight: 600; }
+        .pw-card-cat {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-family: 'Inter', sans-serif;
+            flex-shrink: 0;
+        }
+        .cat-healing { background: #fef3c7; color: #92400e; }
+        .cat-provision { background: #d1fae5; color: #065f46; }
+        .cat-family { background: #ede9fe; color: #5b21b6; }
+        .cat-guidance { background: #dbeafe; color: #1e40af; }
+        .cat-deliverance { background: #fee2e2; color: #b91c1c; }
+        .cat-thanksgiving { background: #fef9c3; color: #713f12; }
+        .cat-other { background: #f3f4f6; color: #4b5563; }
+
+        .pw-card-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.05rem;
+            color: #374151;
+            font-style: italic;
+            font-weight: 300;
+            line-height: 1.7;
+            margin-bottom: 18px;
+        }
+        .pw-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .pw-pray-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: #fee2e2;
+            color: #c8102e;
+            border: none;
+            border-radius: 100px;
+            padding: 8px 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .pw-pray-btn:hover, .pw-pray-btn.prayed { background: #c8102e; color: #fff; }
+        .pw-pray-btn.prayed { cursor: default; }
+        .pw-pray-count { font-size: 11px; color: #9ca3af; font-weight: 600; }
+        .pw-admin-del {
+            background: none;
+            border: 1px solid #fca5a5;
+            color: #b91c1c;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+        .pw-admin-del:hover { background: #b91c1c; color: #fff; border-color: #b91c1c; }
+        body.is-admin .pw-admin-del { display: inline-flex; }
+
+        /* Loading + empty states */
+        .pw-loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+        .pw-spinner {
+            width: 36px; height: 36px;
+            border: 3px solid #fee2e2;
+            border-top-color: #c8102e;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .pw-empty { text-align: center; padding: 60px 20px; }
+        .pw-empty-icon { font-size: 3rem; margin-bottom: 16px; display: block; }
+        .pw-empty p { color: #9ca3af; font-size: 0.95rem; }
+
+        @media (max-width: 1024px) { .pw-main { grid-template-columns: 1fr; } .pw-form-wrap { position: static; } }
+        @media (max-width: 640px) { .pw-nav, .pw-hero, .pw-main { padding-left: 20px; padding-right: 20px; } }
+    </style>
+</head>
+<body>
+
+    <nav class="pw-nav">
+        <img src="media/logos.png" alt="COC" class="pw-nav-logo" onerror="this.style.display='none'">
+        <a href="index.html" class="pw-back"><i class="fas fa-chevron-left"></i> Back to Home</a>
+    </nav>
+
+    <!-- HERO -->
+    <section class="pw-hero">
+        <div class="pw-hero-inner">
+            <div class="pw-hero-eyebrow">Community Prayer</div>
+            <h1>THE<br>PRAYER <span>WALL</span></h1>
+            <p>"Again I say to you, if two of you agree on earth about anything they ask, it will be done for them by my Father in heaven." — Matthew 18:19</p>
+            <div class="pw-stats-row">
+                <div class="pw-stat">
+                    <span class="pw-stat-num" id="totalRequests">—</span>
+                    <span class="pw-stat-lbl">Prayer Requests</span>
+                </div>
+                <div class="pw-stat">
+                    <span class="pw-stat-num" id="totalPrayers">—</span>
+                    <span class="pw-stat-lbl">Times Prayed</span>
+                </div>
+                <div class="pw-stat">
+                    <span class="pw-stat-num">24/7</span>
+                    <span class="pw-stat-lbl">We Never Stop Praying</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TOAST -->
+    <div id="pw-toast">
+        <div class="pw-toast-icon">🙏</div>
+        <div>
+            <div class="pw-toast-title" id="toastTitle">Prayer Submitted!</div>
+            <div class="pw-toast-sub" id="toastSub">May God answer speedily. We are standing with you.</div>
+        </div>
+        <button class="pw-toast-close" onclick="hidePwToast()"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- MAIN -->
+    <div class="pw-main">
+
+        <!-- SUBMIT FORM -->
+        <div class="pw-form-wrap">
+            <div class="pw-form-icon"><i class="fas fa-praying-hands"></i></div>
+            <h2>Submit a Request</h2>
+            <p>Share your prayer need with the community. You are not alone.</p>
+
+            <div class="pw-field">
+                <label class="pw-label">Your Name</label>
+                <input class="pw-input" type="text" id="prayerName" placeholder="e.g. Sister Grace" maxlength="60">
+            </div>
+
+            <div class="pw-field">
+                <label class="pw-label">Category</label>
+                <div class="pw-cats" id="pwCats">
+                    <button type="button" class="pw-cat-btn active" data-cat="healing">🙏 Healing</button>
+                    <button type="button" class="pw-cat-btn" data-cat="provision">💼 Provision</button>
+                    <button type="button" class="pw-cat-btn" data-cat="family">❤️ Family</button>
+                    <button type="button" class="pw-cat-btn" data-cat="guidance">🧭 Guidance</button>
+                    <button type="button" class="pw-cat-btn" data-cat="deliverance">⚡ Deliverance</button>
+                    <button type="button" class="pw-cat-btn" data-cat="thanksgiving">🌟 Thanksgiving</button>
+                    <button type="button" class="pw-cat-btn" data-cat="other">📌 Other</button>
+                </div>
+            </div>
+
+            <div class="pw-field">
+                <label class="pw-label">Your Prayer Request</label>
+                <textarea class="pw-input" id="prayerText" rows="5" placeholder="Share your need — God hears every word..." maxlength="600"></textarea>
+                <div style="text-align:right;font-size:11px;color:#d1d5db;margin-top:4px;" id="charCount">0 / 600</div>
+            </div>
+
+            <div class="pw-anon-row">
+                <input type="checkbox" id="anonCheck">
+                <label for="anonCheck">Post anonymously</label>
+            </div>
+
+            <button class="pw-submit-btn" id="pwSubmitBtn" onclick="submitPrayer()">
+                <i class="fas fa-paper-plane"></i> SUBMIT REQUEST
+            </button>
+        </div>
+
+        <!-- PRAYER WALL -->
+        <div>
+            <div class="pw-wall-header">
+                <div class="pw-wall-title">Prayer Requests</div>
+                <span class="pw-count-badge" id="pwCountBadge">Loading...</span>
+            </div>
+
+            <div class="pw-filters" id="pwFilters">
+                <button class="pw-filter-chip active" data-filter="all">All</button>
+                <button class="pw-filter-chip" data-filter="healing">Healing</button>
+                <button class="pw-filter-chip" data-filter="provision">Provision</button>
+                <button class="pw-filter-chip" data-filter="family">Family</button>
+                <button class="pw-filter-chip" data-filter="guidance">Guidance</button>
+                <button class="pw-filter-chip" data-filter="deliverance">Deliverance</button>
+                <button class="pw-filter-chip" data-filter="thanksgiving">Thanksgiving</button>
+            </div>
+
+            <div class="pw-list" id="pwList">
+                <div class="pw-loading">
+                    <div class="pw-spinner"></div>
+                    <p>Loading prayer requests...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ── CATEGORY SELECTOR ── */
+        let selectedCat = 'healing';
+        document.getElementById('pwCats').addEventListener('click', e => {
+            const btn = e.target.closest('.pw-cat-btn');
+            if (!btn) return;
+            document.querySelectorAll('.pw-cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedCat = btn.dataset.cat;
+        });
+
+        /* ── CHAR COUNT ── */
+        document.getElementById('prayerText').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length + ' / 600';
+        });
+
+        /* ── TOAST ── */
+        let toastTimer;
+        function showPwToast(title, sub) {
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastSub').textContent = sub;
+            const t = document.getElementById('pw-toast');
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(hidePwToast, 5000);
+        }
+        function hidePwToast() { document.getElementById('pw-toast').classList.remove('show'); }
+
+        /* ── ADMIN ── */
+        const isAdmin = sessionStorage.getItem('coc_admin') === 'true';
+        if (isAdmin) document.body.classList.add('is-admin');
+
+        /* ── FILTER ── */
+        let currentFilter = 'all';
+        document.getElementById('pwFilters').addEventListener('click', e => {
+            const chip = e.target.closest('.pw-filter-chip');
+            if (!chip) return;
+            document.querySelectorAll('.pw-filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentFilter = chip.dataset.filter;
+            renderPrayers();
+        });
+
+        /* ── PRAYED SET (persisted in localStorage, keyed by user ID) ── */
+        function getPrayedKey() {
+            let uid = '';
+            try {
+                if (window.COCUser) { const u = window.COCUser.getUser(); if (u && u.id) uid = u.id; }
+                if (!uid) {
+                    uid = localStorage.getItem('coc_anon_id');
+                    if (!uid) { uid = 'anon_' + Math.random().toString(36).slice(2); localStorage.setItem('coc_anon_id', uid); }
+                }
+            } catch {}
+            return 'coc_prayed_' + uid;
+        }
+        const prayedSet = new Set(JSON.parse(localStorage.getItem(getPrayedKey()) || '[]'));
+        function savePrayed() { localStorage.setItem(getPrayedKey(), JSON.stringify([...prayedSet])); }
+
+        /* ── CATEGORY HELPERS ── */
+        const CAT_CLASS = { healing:'cat-healing', provision:'cat-provision', family:'cat-family', guidance:'cat-guidance', deliverance:'cat-deliverance', thanksgiving:'cat-thanksgiving', other:'cat-other' };
+        const CAT_LABEL = { healing:'Healing', provision:'Provision', family:'Family', guidance:'Guidance', deliverance:'Deliverance', thanksgiving:'Thanksgiving', other:'Other' };
+
+        function getInitial(name) {
+            if (!name || name === 'Anonymous') return '🙏';
+            return name.trim()[0].toUpperCase();
+        }
+        function formatDate(ts) {
+            if (!ts) return 'Just now';
+            return ts.toDate().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+        }
+        function esc(s) { return s.replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, increment, serverTimestamp, query, orderBy, onSnapshot }
+            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const ADMIN_UID = 'tAqH3t6DX4OxHadWurRcBFBhmQA3';
+
+        const firebaseConfig = {
+            apiKey:            "AIzaSyB2gU2QrpRnIevjhLqd1kTj-xsjiWBHGqQ",
+            authDomain:        "joincoc.firebaseapp.com",
+            projectId:         "joincoc",
+            storageBucket:     "joincoc.firebasestorage.app",
+            messagingSenderId: "322343274719",
+            appId:             "1:322343274719:web:689229a5dd1ca422c9c16a"
+        };
+
+        const app  = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db   = getFirestore(app);
+        const col  = collection(db, 'prayerWall');
+
+        // Admin auth check
+        onAuthStateChanged(auth, user => {
+            if (user && user.uid === ADMIN_UID) {
+                sessionStorage.setItem('coc_admin', 'true');
+                document.body.classList.add('is-admin');
+            }
+        });
+
+        // All prayers cache
+        let allPrayers = [];
+
+        // Real-time listener
+        const q = query(col, orderBy('createdAt', 'desc'));
+        onSnapshot(q, snap => {
+            allPrayers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderPrayers();
+            updateStats();
+        }, err => {
+            document.getElementById('pwList').innerHTML = `<div class="pw-empty"><span class="pw-empty-icon">😢</span><p>Could not load requests. Please refresh.</p></div>`;
+        });
+
+        function updateStats() {
+            document.getElementById('totalRequests').textContent = allPrayers.length;
+            const total = allPrayers.reduce((sum, p) => sum + (p.prayCount || 0), 0);
+            document.getElementById('totalPrayers').textContent = total > 999 ? Math.floor(total/1000) + 'K+' : total;
+        }
+
+        window.renderPrayers = function() {
+            const filter = currentFilter;
+            const list = document.getElementById('pwList');
+            const badge = document.getElementById('pwCountBadge');
+
+            const filtered = filter === 'all' ? allPrayers : allPrayers.filter(p => p.category === filter);
+            badge.textContent = `${filtered.length} REQUEST${filtered.length !== 1 ? 'S' : ''}`;
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="pw-empty"><span class="pw-empty-icon">🙏</span><p>${filter === 'all' ? 'No prayer requests yet — be the first!' : 'No requests in this category yet.'}</p></div>`;
+                return;
+            }
+
+            list.innerHTML = filtered.map(p => {
+                const hasPrayed = prayedSet.has(p.id);
+                const catClass  = CAT_CLASS[p.category] || CAT_CLASS.other;
+                const catLabel  = CAT_LABEL[p.category] || 'Other';
+                const initial   = getInitial(p.name);
+                return `
+                <div class="pw-card" id="pc-${p.id}">
+                    <div class="pw-card-header">
+                        <div class="pw-card-avatar">${initial}</div>
+                        <div class="pw-card-meta">
+                            <span class="pw-card-name">${esc(p.name || 'Anonymous')}</span>
+                            <span class="pw-card-date">${formatDate(p.createdAt)}</span>
+                        </div>
+                        <span class="pw-card-cat ${catClass}">${catLabel}</span>
+                    </div>
+                    <p class="pw-card-text">"${esc(p.request || '')}"</p>
+                    <div class="pw-card-footer">
+                        <button class="pw-pray-btn ${hasPrayed ? 'prayed' : ''}" onclick="window.prayFor('${p.id}', this)" ${hasPrayed ? 'disabled' : ''}>
+                            🙏 ${hasPrayed ? 'Praying' : 'Pray'} <span class="pw-pray-count">${p.prayCount || 0}</span>
+                        </button>
+                        <button class="pw-admin-del" onclick="window.deletePrayer('${p.id}')"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </div>
+                </div>`;
+            }).join('');
+        };
+
+        window.prayFor = async function(docId, btn) {
+            if (prayedSet.has(docId)) return;
+            prayedSet.add(docId);
+            savePrayed();
+            btn.classList.add('prayed');
+            btn.disabled = true;
+            const countEl = btn.querySelector('.pw-pray-count');
+            if (countEl) countEl.textContent = parseInt(countEl.textContent || 0) + 1;
+            try {
+                await updateDoc(doc(db, 'prayerWall', docId), { prayCount: increment(1) });
+                showPwToast('Standing in Agreement! 🙏', 'God hears every prayer. Thank you for praying.');
+            } catch(e) {
+                console.error(e);
+            }
+        };
+
+        window.submitPrayer = async function() {
+            const nameRaw = document.getElementById('prayerName').value.trim();
+            const text    = document.getElementById('prayerText').value.trim();
+            const isAnon  = document.getElementById('anonCheck').checked;
+            const btn     = document.getElementById('pwSubmitBtn');
+
+            if (!text) { alert('Please enter your prayer request.'); return; }
+
+            const name = isAnon ? 'Anonymous' : (nameRaw || 'Anonymous');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> SUBMITTING...';
+
+            try {
+                await addDoc(col, {
+                    name,
+                    request:    text,
+                    category:   selectedCat,
+                    prayCount:  0,
+                    createdAt:  serverTimestamp()
+                });
+                document.getElementById('prayerName').value = '';
+                document.getElementById('prayerText').value = '';
+                document.getElementById('charCount').textContent = '0 / 600';
+                document.getElementById('anonCheck').checked = false;
+                showPwToast('Prayer Submitted! 🔥', 'May God answer speedily. We are standing with you.');
+            } catch(e) {
+                console.error(e);
+                alert('Something went wrong. Please try again.');
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> SUBMIT REQUEST';
+        };
+
+        window.deletePrayer = async function(docId) {
+            if (!confirm('Delete this prayer request?')) return;
+            try { await deleteDoc(doc(db, 'prayerWall', docId)); }
+            catch(e) { alert('Could not delete. Make sure you are signed in as admin.'); }
+        };
+    </script>
+
+</body>
+</html>

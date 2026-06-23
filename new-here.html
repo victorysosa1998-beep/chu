@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Here | City of Champion Fire International Assembly</title>
+    <link rel="icon" type="image/png" href="media/logo1.png">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #fff; color: #1a1a1a; overflow-x: hidden; }
+
+        /* NAV */
+        .nh-nav {
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nh-nav-logo { height: 44px; }
+        .nh-back { display: inline-flex; align-items: center; gap: 8px; color: #c8102e; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; font-family: 'Inter', sans-serif; transition: gap 0.2s; }
+        .nh-back:hover { gap: 12px; }
+
+        /* HERO */
+        .nh-hero {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0000 60%, #0a0a0a 100%);
+            padding: 100px 40px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .nh-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(200,16,46,0.2) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .nh-hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #c8102e;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 24px;
+        }
+        .nh-hero-eyebrow::before, .nh-hero-eyebrow::after { content: ''; display: block; width: 30px; height: 1px; background: #c8102e; }
+        .nh-hero h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(4rem, 12vw, 8rem);
+            color: #fff;
+            letter-spacing: 0.04em;
+            line-height: 0.92;
+            margin-bottom: 28px;
+        }
+        .nh-hero h1 span { color: #f0c842; }
+        .nh-hero-sub {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: rgba(255,255,255,0.6);
+            font-style: italic;
+            font-weight: 300;
+            max-width: 560px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+        .nh-hero-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #c8102e;
+            color: #fff;
+            padding: 16px 36px;
+            border-radius: 100px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(200,16,46,0.4);
+        }
+        .nh-hero-btn:hover { background: #fff; color: #c8102e; transform: translateY(-3px); }
+
+        /* FADE UP */
+        .fade-up { opacity: 0; transform: translateY(32px); transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+        .fade-up.d1 { transition-delay: 0.12s; }
+        .fade-up.d2 { transition-delay: 0.24s; }
+        .fade-up.d3 { transition-delay: 0.38s; }
+
+        /* STEPS */
+        .steps-section {
+            background: #f5f1eb;
+            padding: 96px 40px;
+        }
+        .steps-inner { max-width: 1100px; margin: 0 auto; }
+        .section-label {
+            color: #c8102e;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .section-label::before { content: ''; display: block; width: 28px; height: 1.5px; background: #c8102e; }
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            color: #1a1a1a;
+            letter-spacing: 0.04em;
+            line-height: 1;
+            margin-bottom: 56px;
+        }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .step-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 36px 32px;
+            border: 1px solid rgba(0,0,0,0.06);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .step-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
+        .step-num {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 5rem;
+            color: rgba(200,16,46,0.06);
+            line-height: 1;
+            letter-spacing: 0.04em;
+        }
+        .step-icon {
+            width: 56px;
+            height: 56px;
+            background: #fee2e2;
+            color: #c8102e;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+        .step-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
+        }
+        .step-card p {
+            font-size: 0.92rem;
+            color: #6b7280;
+            line-height: 1.65;
+        }
+        @media (max-width: 768px) { .steps-grid { grid-template-columns: 1fr; } }
+
+        /* WHAT WE BELIEVE */
+        .beliefs-section {
+            background: #0a0a0a;
+            padding: 96px 40px;
+        }
+        .beliefs-inner { max-width: 1100px; margin: 0 auto; }
+        .beliefs-section .section-label { margin-bottom: 14px; }
+        .beliefs-section .section-title { color: #fff; }
+        .beliefs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 48px;
+        }
+        .belief-item {
+            background: #131313;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 24px 28px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            transition: border-color 0.3s;
+        }
+        .belief-item:hover { border-color: rgba(200,16,46,0.4); }
+        .belief-icon { color: #f0c842; font-size: 18px; margin-top: 2px; flex-shrink: 0; }
+        .belief-text h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .belief-text p {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.6;
+        }
+        @media (max-width: 640px) { .beliefs-grid { grid-template-columns: 1fr; } }
+
+        /* SERVICE TIMES */
+        .services-section {
+            background: #f5f1eb;
+            padding: 96px 40px;
+        }
+        .services-inner { max-width: 1100px; margin: 0 auto; }
+        .service-times-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 48px;
+        }
+        .st-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px;
+            border: 1px solid rgba(0,0,0,0.06);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+        }
+        .st-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-color: #c8102e; }
+        .st-icon {
+            width: 64px;
+            height: 64px;
+            background: #fee2e2;
+            color: #c8102e;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 20px;
+        }
+        .st-day {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            color: #c8102e;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+        .st-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .st-time {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        @media (max-width: 768px) { .service-times-grid { grid-template-columns: 1fr; } }
+
+        /* SALVATION PRAYER */
+        .prayer-section {
+            background: linear-gradient(135deg, #8b0000 0%, #c8102e 50%, #8b0000 100%);
+            padding: 96px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .prayer-section::before {
+            content: '🔥';
+            position: absolute;
+            font-size: 20rem;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.04;
+            pointer-events: none;
+            line-height: 1;
+        }
+        .prayer-inner { max-width: 800px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
+        .prayer-section .section-label { color: rgba(255,255,255,0.6); justify-content: center; }
+        .prayer-section .section-label::before { background: rgba(255,255,255,0.4); }
+        .prayer-section .section-title { color: #fff; text-align: center; margin-bottom: 20px; }
+        .prayer-intro {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.15rem;
+            color: rgba(255,255,255,0.8);
+            font-style: italic;
+            font-weight: 300;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        .prayer-card {
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px;
+            padding: 40px;
+            text-align: left;
+            position: relative;
+            margin-bottom: 32px;
+        }
+        .prayer-card::before {
+            content: '❝';
+            position: absolute;
+            top: -20px;
+            left: 28px;
+            font-size: 5rem;
+            color: rgba(240,200,66,0.25);
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+        .prayer-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+            color: #fff;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+        .prayer-amen {
+            text-align: right;
+            margin-top: 16px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.6rem;
+            color: #f0c842;
+            letter-spacing: 0.08em;
+        }
+        .prayer-cta {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .prayer-cta-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            color: #c8102e;
+            padding: 16px 32px;
+            border-radius: 100px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .prayer-cta-primary:hover { background: #0a0a0a; color: #fff; transform: translateY(-2px); }
+        .prayer-cta-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 16px 32px;
+            border-radius: 100px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s;
+        }
+        .prayer-cta-secondary:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
+
+        /* CONTACT STRIP */
+        .contact-strip {
+            background: #0a0a0a;
+            padding: 56px 40px;
+        }
+        .contact-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        .contact-strip h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.2rem;
+            color: #fff;
+            letter-spacing: 0.04em;
+            margin-bottom: 6px;
+        }
+        .contact-strip p {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.4);
+        }
+        .contact-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.8);
+            padding: 12px 22px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+        .contact-btn:hover { background: #c8102e; border-color: #c8102e; color: #fff; transform: translateY(-2px); }
+
+        @media (max-width: 768px) {
+            .nh-nav { padding: 14px 20px; }
+            .nh-hero { padding: 72px 20px 56px; }
+            .steps-section, .beliefs-section, .services-section, .prayer-section, .contact-strip { padding: 64px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nh-nav">
+        <img src="media/logos.png" alt="COC Logo" class="nh-nav-logo" onerror="this.style.display='none'">
+        <a href="index.html" class="nh-back"><i class="fas fa-chevron-left"></i> Back to Home</a>
+    </nav>
+
+    <!-- HERO -->
+    <section class="nh-hero">
+        <div style="position:relative;z-index:1;">
+            <div class="nh-hero-eyebrow">Welcome</div>
+            <h1>YOU'RE IN<br>THE <span>RIGHT</span><br>PLACE.</h1>
+            <p class="nh-hero-sub">"God is in this place" — Genesis 28:16. We are so glad you found us. Your life is about to change.</p>
+            <a href="#start" class="nh-hero-btn"><i class="fas fa-fire"></i> START HERE</a>
+        </div>
+    </section>
+
+    <!-- STEPS — HOW TO GET STARTED -->
+    <section class="steps-section" id="start">
+        <div class="steps-inner">
+            <div class="fade-up">
+                <div class="section-label">Your Journey</div>
+                <p class="section-title">YOUR FIRST STEPS<br>WITH US</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card fade-up d1">
+                    <div class="step-num">01</div>
+                    <div class="step-icon"><i class="fas fa-door-open"></i></div>
+                    <h3>Just Show Up</h3>
+                    <p>Come as you are — no dress code, no prior church experience needed. Walk through our doors and be welcomed like family. Our ushers will guide you every step of the way.</p>
+                </div>
+                <div class="step-card fade-up d2">
+                    <div class="step-num">02</div>
+                    <div class="step-icon"><i class="fas fa-ear-listen"></i></div>
+                    <h3>Encounter the Word</h3>
+                    <p>Sit in and experience life-transforming teaching from God's Word. Every service is designed to meet you exactly where you are and propel you forward in purpose.</p>
+                </div>
+                <div class="step-card fade-up d3">
+                    <div class="step-num">03</div>
+                    <div class="step-icon"><i class="fas fa-handshake"></i></div>
+                    <h3>Connect with Us</h3>
+                    <p>After service, meet our pastors and volunteers. Let us know it's your first time — we'd love to personally welcome you and help you find your place in the family.</p>
+                </div>
+                <div class="step-card fade-up d1">
+                    <div class="step-num">04</div>
+                    <div class="step-icon"><i class="fas fa-book-bible"></i></div>
+                    <h3>Join a Group</h3>
+                    <p>Get rooted through our discipleship programs and small groups. Growth happens in community — and we have the perfect next step waiting for you.</p>
+                </div>
+                <div class="step-card fade-up d2">
+                    <div class="step-num">05</div>
+                    <div class="step-icon"><i class="fas fa-hands-praying"></i></div>
+                    <h3>Get Baptized</h3>
+                    <p>Water baptism is your public declaration of faith. We hold regular baptism services and would love to celebrate this milestone with you and your loved ones.</p>
+                </div>
+                <div class="step-card fade-up d3">
+                    <div class="step-num">06</div>
+                    <div class="step-icon"><i class="fas fa-fire-flame-curved"></i></div>
+                    <h3>Serve & Impact</h3>
+                    <p>Discover your gifts and use them for the Kingdom. From worship to evangelism, there's a place in this ministry where you can burn brightly for God.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHAT WE BELIEVE -->
+    <section class="beliefs-section">
+        <div class="beliefs-inner">
+            <div class="fade-up">
+                <div class="section-label">Our Foundation</div>
+                <p class="section-title" style="color:#fff;">WHAT WE<br>BELIEVE</p>
+            </div>
+            <div class="beliefs-grid">
+                <div class="belief-item fade-up d1">
+                    <div class="belief-icon"><i class="fas fa-bible"></i></div>
+                    <div class="belief-text">
+                        <h4>The Bible is God's Word</h4>
+                        <p>We believe the Holy Bible is the inspired, infallible Word of God — our ultimate authority for faith and daily living.</p>
+                    </div>
+                </div>
+                <div class="belief-item fade-up d2">
+                    <div class="belief-icon"><i class="fas fa-cross"></i></div>
+                    <div class="belief-text">
+                        <h4>Salvation Through Christ Alone</h4>
+                        <p>Jesus Christ, God's Son, died for our sins and rose again. Salvation is through faith in Him — it's a free gift, not earned.</p>
+                    </div>
+                </div>
+                <div class="belief-item fade-up d1">
+                    <div class="belief-icon"><i class="fas fa-fire"></i></div>
+                    <div class="belief-text">
+                        <h4>The Holy Spirit is Active Today</h4>
+                        <p>We believe in the baptism and gifts of the Holy Spirit for every believer — healing, miracles, and divine power are for today.</p>
+                    </div>
+                </div>
+                <div class="belief-item fade-up d2">
+                    <div class="belief-icon"><i class="fas fa-people-group"></i></div>
+                    <div class="belief-text">
+                        <h4>The Church is God's Family</h4>
+                        <p>The local church is God's plan to disciple, care for, and deploy believers into their God-given destiny and purpose.</p>
+                    </div>
+                </div>
+                <div class="belief-item fade-up d1">
+                    <div class="belief-icon"><i class="fas fa-heart-pulse"></i></div>
+                    <div class="belief-text">
+                        <h4>God Heals and Delivers</h4>
+                        <p>Divine healing is part of the redemptive work of Christ. We believe God still heals bodies, minds, and broken lives today.</p>
+                    </div>
+                </div>
+                <div class="belief-item fade-up d2">
+                    <div class="belief-icon"><i class="fas fa-star"></i></div>
+                    <div class="belief-text">
+                        <h4>Every Life Has a Destiny</h4>
+                        <p>God has a specific plan for every person. Our mission is to help you discover, develop, and deploy your God-given destiny.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICE TIMES -->
+    <section class="services-section">
+        <div class="services-inner">
+            <div class="fade-up">
+                <div class="section-label">Join Us</div>
+                <p class="section-title">WHEN WE<br>GATHER</p>
+            </div>
+            <div class="service-times-grid">
+                <div class="st-card fade-up d1">
+                    <div class="st-icon"><i class="fas fa-church"></i></div>
+                    <div class="st-day">Sunday</div>
+                    <div class="st-name">Celebration Service</div>
+                    <div class="st-time">8:00 AM — 10:30 AM</div>
+                </div>
+                <div class="st-card fade-up d2">
+                    <div class="st-icon"><i class="fas fa-fire"></i></div>
+                    <div class="st-day">Monday</div>
+                    <div class="st-name">Healing & Deliverance</div>
+                    <div class="st-time">5:00 PM</div>
+                </div>
+                <div class="st-card fade-up d3">
+                    <div class="st-icon"><i class="fas fa-dove"></i></div>
+                    <div class="st-day">Wednesday</div>
+                    <div class="st-name">Power Communion</div>
+                    <div class="st-time">5:30 PM</div>
+                </div>
+            </div>
+            <div class="fade-up" style="text-align:center;margin-top:32px;">
+                <a href="branches.html" style="display:inline-flex;align-items:center;gap:8px;color:#c8102e;font-size:12px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;font-family:'Inter',sans-serif;transition:gap 0.2s;">
+                    <i class="fas fa-map-marker-alt"></i> Find a Branch Near You
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SALVATION PRAYER -->
+    <section class="prayer-section" id="salvation">
+        <div class="prayer-inner">
+            <div class="fade-up">
+                <div class="section-label" style="justify-content:center;">Give Your Heart to God</div>
+                <p class="section-title">THE PRAYER<br>THAT CHANGES<br>EVERYTHING</p>
+                <p class="prayer-intro">If you've never given your heart to Jesus, or you want to recommit your life to Him — say this prayer with us right now. It's the most important decision you'll ever make.</p>
+            </div>
+            <div class="prayer-card fade-up d1">
+                <p class="prayer-text">
+                    "Lord Jesus, I believe You are the Son of God. I believe You died for my sins and rose again. I confess my sins and ask You to forgive me. I invite You into my heart as my Lord and Saviour. From today, I belong to You. Fill me with Your Holy Spirit and lead me into the fullness of Your plan for my life. Thank You for saving me.
+                </p>
+                <p class="prayer-amen">Amen.</p>
+            </div>
+            <p class="fade-up" style="color:rgba(255,255,255,0.65);font-size:0.95rem;line-height:1.7;font-family:'Inter',sans-serif;margin-bottom:36px;">If you just prayed that prayer — congratulations! You are now a child of God. We would love to walk this journey with you. Please reach out to us so we can celebrate with you and connect you to a church family.</p>
+            <div class="prayer-cta fade-up d2">
+                <a href="https://wa.me/+2348032740443" target="_blank" class="prayer-cta-primary"><i class="fab fa-whatsapp"></i> Tell Us You Prayed</a>
+                <a href="branches.html" class="prayer-cta-secondary"><i class="fas fa-map-marker-alt"></i> Find a Branch</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT STRIP -->
+    <section class="contact-strip">
+        <div class="contact-inner fade-up">
+            <div>
+                <h3>STILL HAVE QUESTIONS?</h3>
+                <p>We're here for you. Reach out — no question is too small.</p>
+            </div>
+            <div class="contact-btns">
+                <a href="https://wa.me/+2348032740443" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> WhatsApp Us</a>
+                <a href="tel:+2348032740443" class="contact-btn"><i class="fas fa-phone"></i> Call Us</a>
+                <a href="prayer.html" class="contact-btn"><i class="fas fa-praying-hands"></i> Prayer Wall</a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const fades = document.querySelectorAll('.fade-up');
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        fades.forEach(el => obs.observe(el));
+
+        // Hero elements are visible immediately
+        document.querySelectorAll('.nh-hero .fade-up').forEach(el => el.classList.add('visible'));
+    </script>
+
+</body>
+</html>

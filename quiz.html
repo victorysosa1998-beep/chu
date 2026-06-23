@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Quiz | City of Champion Fire</title>
+    <link rel="icon" type="image/png" href="media/logo1.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --red: #c8102e; --red-dark: #9a0b22; --red-glow: rgba(200,16,46,0.25);
+            --gold: #f0c842; --gold-dim: rgba(240,200,66,0.12);
+            --green: #22c55e; --green-dim: rgba(34,197,94,0.12);
+            --yellow: #f59e0b; --yellow-dim: rgba(245,158,11,0.12);
+            --bg: #0a0a0b; --bg-card: #111113; --bg-card2: #161618;
+            --border: rgba(255,255,255,0.07); --border-red: rgba(200,16,46,0.3);
+            --text: #f0f0f2; --text-muted: #6b6b75; --text-dim: #9999a8;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+        /* ── NAV ── */
+        nav {
+            background: rgba(10,10,11,0.88); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+            padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-back { color: var(--red); font-weight: 700; font-size: 12px; letter-spacing: 0.08em;
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase; transition: color 0.2s; }
+        .nav-back:hover { color: #ff1a3d; }
+        .nav-brand { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.05em;
+            color: var(--text); display: flex; align-items: center; gap: 10px; }
+        .nav-brand .icon { color: var(--gold); }
+        .nav-logo img { height: 36px; object-fit: contain; }
+
+        /* ── HERO ── */
+        .hero { position: relative; overflow: hidden; padding: 80px 24px 64px; text-align: center; }
+        .hero-bg {
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% -10%, rgba(200,16,46,0.14) 0%, transparent 65%),
+                        radial-gradient(ellipse 50% 40% at 20% 100%, rgba(240,200,66,0.06) 0%, transparent 70%);
+        }
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.016) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.016) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(200,16,46,0.1); border: 1px solid rgba(200,16,46,0.25);
+            color: var(--red); font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; padding: 6px 16px; border-radius: 100px; margin-bottom: 22px;
+        }
+        .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(50px, 10vw, 82px);
+            line-height: 0.95; letter-spacing: 0.02em; color: var(--text); margin-bottom: 16px; }
+        .hero-title .accent { color: var(--red); }
+        .hero-sub { font-size: 16px; color: var(--text-dim); font-weight: 300; line-height: 1.6;
+            max-width: 460px; margin: 0 auto; }
+
+        /* ── MAIN ── */
+        main { max-width: 760px; margin: 0 auto; padding: 52px 20px 100px; }
+
+        /* ── DIFFICULTY SELECTOR ── */
+        #difficultyScreen { animation: fadeUp 0.4s ease both; }
+        .diff-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--text-muted); margin-bottom: 20px; text-align: center; }
+
+        .diff-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 36px; }
+        @media (max-width: 560px) { .diff-cards { grid-template-columns: 1fr; } }
+
+        .diff-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px;
+            padding: 24px 18px; text-align: center; cursor: pointer;
+            transition: all 0.22s ease; position: relative; overflow: hidden;
+        }
+        .diff-card::before { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.22s; }
+        .diff-card:hover { transform: translateY(-3px); }
+        .diff-card.easy:hover, .diff-card.easy.active { border-color: var(--green); box-shadow: 0 0 24px rgba(34,197,94,0.18); }
+        .diff-card.medium:hover, .diff-card.medium.active { border-color: var(--yellow); box-shadow: 0 0 24px rgba(245,158,11,0.18); }
+        .diff-card.hard:hover, .diff-card.hard.active { border-color: var(--red); box-shadow: 0 0 24px var(--red-glow); }
+        .diff-card.active { transform: translateY(-3px); }
+
+        .diff-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+        .diff-name { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 17px; color: var(--text); margin-bottom: 4px; }
+        .diff-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+        .diff-pts { display: inline-block; margin-top: 10px; padding: 3px 10px; border-radius: 100px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.06em; }
+        .easy .diff-pts { background: var(--green-dim); color: var(--green); }
+        .medium .diff-pts { background: var(--yellow-dim); color: var(--yellow); }
+        .hard .diff-pts { background: rgba(200,16,46,0.12); color: var(--red); }
+
+        /* ── LEVEL PICKER ── */
+        .levels-section { margin-top: 4px; }
+        .levels-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .levels-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 15px; color: var(--text); }
+        .levels-subtitle { font-size: 12px; color: var(--text-muted); }
+
+        .levels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 10px; }
+        .level-btn {
+            background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px;
+            padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.2s;
+            position: relative;
+        }
+        .level-btn:hover { border-color: rgba(200,16,46,0.4); background: rgba(200,16,46,0.06); }
+        .level-btn.active { border-color: var(--red); background: rgba(200,16,46,0.08); }
+        .level-btn .lv-num { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.04em; color: var(--text); display: block; line-height: 1; }
+        .level-btn .lv-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+        .level-btn .lv-badge { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px;
+            background: var(--green); border-radius: 50%; border: 2px solid var(--bg); display: none; }
+        .level-btn.completed .lv-badge { display: block; }
+        .level-btn.locked { opacity: 0.4; cursor: not-allowed; }
+        .level-btn.locked:hover { border-color: var(--border); background: var(--bg-card2); }
+
+        .start-btn {
+            width: 100%; margin-top: 22px; padding: 16px 24px;
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            color: #fff; border: none; border-radius: 14px; cursor: pointer;
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 16px;
+            letter-spacing: 0.02em; display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: all 0.22s; position: relative; overflow: hidden;
+        }
+        .start-btn::after { content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent); }
+        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px var(--red-glow); }
+        .start-btn:active { transform: translateY(0); }
+
+        /* ── QUIZ AREA ── */
+        #quizScreen { display: none; animation: fadeUp 0.35s ease both; }
+
+        .quiz-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .quiz-meta { display: flex; align-items: center; gap: 12px; }
+        .quiz-diff-tag { padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+        .tag-easy { background: var(--green-dim); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+        .tag-medium { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(245,158,11,0.25); }
+        .tag-hard { background: rgba(200,16,46,0.12); color: var(--red); border: 1px solid rgba(200,16,46,0.25); }
+        .quiz-level-tag { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--text-muted); letter-spacing: 0.08em; }
+        .quiz-counter { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--text-dim); letter-spacing: 0.06em; }
+
+        /* Progress bar */
+        .progress-bar-wrap { background: var(--bg-card2); border-radius: 100px; height: 4px; margin-bottom: 28px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--red), #ff3355); border-radius: 100px; transition: width 0.4s ease; }
+
+        /* Progress dots */
+        .progress-dots { display: flex; gap: 6px; margin-bottom: 26px; flex-wrap: wrap; }
+        .p-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--bg-card2); border: 1px solid var(--border); transition: all 0.3s; }
+        .p-dot.active { background: var(--red); border-color: var(--red); box-shadow: 0 0 8px var(--red-glow); }
+        .p-dot.correct { background: var(--green); border-color: var(--green); }
+        .p-dot.wrong { background: #ef4444; border-color: #ef4444; }
+
+        /* Question card */
+        .question-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+            padding: 32px 28px; margin-bottom: 16px;
+            position: relative; overflow: hidden;
+            animation: fadeUp 0.3s ease both;
+        }
+        .question-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200,16,46,0.4), transparent); }
+
+        .question-num { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--red); margin-bottom: 12px; }
+        .question-text { font-family: 'Outfit', sans-serif; font-size: clamp(17px, 2.5vw, 20px);
+            font-weight: 700; color: var(--text); line-height: 1.45; margin-bottom: 28px; }
+
+        /* Options */
+        .options-grid { display: grid; gap: 10px; }
+        .quiz-option {
+            background: var(--bg-card2); border: 1px solid var(--border); border-radius: 13px;
+            padding: 14px 16px; display: flex; align-items: center; gap: 14px;
+            cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .quiz-option:hover:not(.disabled) { border-color: rgba(200,16,46,0.4); background: rgba(200,16,46,0.05); transform: translateX(3px); }
+        .quiz-option.correct { border-color: var(--green); background: rgba(34,197,94,0.08); }
+        .quiz-option.wrong { border-color: #ef4444; background: rgba(239,68,68,0.08); }
+        .quiz-option.disabled { cursor: default; }
+        .opt-letter {
+            width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.06);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 13px;
+            color: var(--text-muted); flex-shrink: 0; transition: all 0.2s;
+        }
+        .quiz-option.correct .opt-letter { background: var(--green); color: #fff; }
+        .quiz-option.wrong .opt-letter { background: #ef4444; color: #fff; }
+        .quiz-option:hover:not(.disabled) .opt-letter { background: var(--red); color: #fff; }
+        .opt-text { font-size: 15px; color: var(--text); font-weight: 500; line-height: 1.4; }
+        .opt-icon { margin-left: auto; font-size: 14px; opacity: 0; transition: opacity 0.2s; }
+        .quiz-option.correct .opt-icon, .quiz-option.wrong .opt-icon { opacity: 1; }
+        .quiz-option.correct .opt-icon { color: var(--green); }
+        .quiz-option.wrong .opt-icon { color: #ef4444; }
+
+        /* Question footer */
+        .question-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; }
+        .pts-badge { display: flex; align-items: center; gap: 6px; padding: 6px 14px;
+            background: var(--bg-card2); border: 1px solid var(--border); border-radius: 100px;
+            font-size: 12px; font-weight: 700; color: var(--text-muted); transition: all 0.3s; }
+        .pts-badge.earned { border-color: rgba(240,200,66,0.3); color: var(--gold); background: var(--gold-dim); }
+        .pts-badge.lost { border-color: rgba(239,68,68,0.2); color: #ef4444; }
+        .next-btn {
+            padding: 10px 24px; background: var(--red); color: #fff; border: none;
+            border-radius: 100px; cursor: pointer; font-family: 'Outfit', sans-serif;
+            font-weight: 700; font-size: 13px; letter-spacing: 0.03em;
+            display: none; align-items: center; gap: 8px; transition: all 0.2s;
+        }
+        .next-btn:hover { background: var(--red-dark); transform: translateX(2px); }
+        .next-btn.show { display: flex; }
+
+        /* ── RESULTS ── */
+        #resultsScreen { display: none; animation: fadeUp 0.4s ease both; }
+
+        .result-card {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 22px;
+            padding: 40px 32px; text-align: center; position: relative; overflow: hidden;
+        }
+        .result-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+        .result-glow { position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(240,200,66,0.08), transparent 70%);
+            top: -100px; left: 50%; transform: translateX(-50%); pointer-events: none; }
+
+        .result-emoji { font-size: 56px; margin-bottom: 14px; display: block; line-height: 1; }
+        .result-title { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 0.03em;
+            color: var(--text); margin-bottom: 8px; }
+        .result-sub { font-size: 15px; color: var(--text-dim); margin-bottom: 30px; }
+
+        .result-score-ring {
+            width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 28px;
+            background: conic-gradient(var(--red) 0%, transparent 0%);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        .result-score-ring::before { content: ''; position: absolute; inset: 8px;
+            background: var(--bg-card); border-radius: 50%; }
+        .result-score-num { font-family: 'Bebas Neue', sans-serif; font-size: 36px;
+            letter-spacing: 0.04em; color: var(--text); position: relative; z-index: 1; }
+
+        .result-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+        .result-stat { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 14px; padding: 16px 10px; }
+        .result-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); display: block; }
+        .result-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+
+        .result-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn-primary { background: linear-gradient(135deg, var(--red), var(--red-dark)); color: #fff;
+            border: none; padding: 12px 26px; border-radius: 100px;
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 13px;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+            text-decoration: none; transition: all 0.2s; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--red-glow); }
+        .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border);
+            padding: 12px 26px; border-radius: 100px;
+            font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13px;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+            text-decoration: none; transition: all 0.2s; }
+        .btn-ghost:hover { border-color: var(--red); color: var(--red); }
+
+        .badges-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        .badge-chip { display: inline-flex; align-items: center; gap: 6px;
+            background: var(--gold-dim); border: 1px solid rgba(240,200,66,0.25);
+            color: var(--gold); padding: 6px 14px; border-radius: 100px;
+            font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 12px; }
+
+        /* ── UTILS ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: var(--bg-card); border: 1px solid var(--border); color: var(--text);
+            padding: 12px 22px; border-radius: 100px; font-family: 'Outfit', sans-serif;
+            font-weight: 700; font-size: 13px; z-index: 9999; pointer-events: none;
+            opacity: 0; transition: all 0.3s; white-space: nowrap;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Explanation box */
+        .explanation-box {
+            background: rgba(240,200,66,0.05); border: 1px solid rgba(240,200,66,0.15);
+            border-radius: 12px; padding: 14px 16px; margin-top: 14px;
+            font-size: 13px; color: var(--text-dim); line-height: 1.6;
+            display: none;
+        }
+        .explanation-box.show { display: block; animation: fadeUp 0.3s ease; }
+        .explanation-box strong { color: var(--gold); }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i></a>
+    <div class="nav-brand"><span class="icon"><i class="fas fa-brain"></i></span> Bible Quiz</div>
+    <div class="nav-logo"><img src="media/logo1.png" alt="COC" onerror="this.style.display='none'"></div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+        <div class="hero-eyebrow"><i class="fas fa-fire"></i> City of Champion Fire</div>
+        <h1 class="hero-title">BIBLE QUIZ<br><span class="accent">CHALLENGE</span></h1>
+        <p class="hero-sub">Test your Scripture knowledge, climb levels, earn points, and prove you're a Champion.</p>
+    </div>
+</div>
+
+<main>
+
+    <!-- ── DIFFICULTY SCREEN ── -->
+    <div id="difficultyScreen">
+        <p class="diff-label">Choose your difficulty</p>
+
+        <div class="diff-cards">
+            <div class="diff-card easy" onclick="selectDifficulty('easy')">
+                <span class="diff-icon">🌱</span>
+                <div class="diff-name">Easy</div>
+                <div class="diff-desc">Core Bible stories & basic facts</div>
+                <span class="diff-pts">+10 pts/question</span>
+            </div>
+            <div class="diff-card medium" onclick="selectDifficulty('medium')">
+                <span class="diff-icon">🔥</span>
+                <div class="diff-name">Medium</div>
+                <div class="diff-desc">Deeper knowledge & context</div>
+                <span class="diff-pts">+15 pts/question</span>
+            </div>
+            <div class="diff-card hard" onclick="selectDifficulty('hard')">
+                <span class="diff-icon">☠️</span>
+                <div class="diff-name">Hard</div>
+                <div class="diff-desc">Advanced theology & rare facts</div>
+                <span class="diff-pts">+25 pts/question</span>
+            </div>
+        </div>
+
+        <div class="levels-section" id="levelsSection" style="display:none;">
+            <div class="levels-header">
+                <div>
+                    <div class="levels-title" id="levelsSectionTitle">Easy Levels</div>
+                    <div class="levels-subtitle">Each level has 10 unique questions. Skip to any level.</div>
+                </div>
+            </div>
+            <div class="levels-grid" id="levelsGrid"></div>
+            <button class="start-btn" onclick="beginQuiz()">
+                <i class="fas fa-play"></i> Start <span id="startBtnLabel">Easy — Level 1</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ── QUIZ SCREEN ── -->
+    <div id="quizScreen">
+        <div class="quiz-header">
+            <div class="quiz-meta">
+                <span class="quiz-diff-tag" id="quizDiffTag">Easy</span>
+                <span class="quiz-level-tag" id="quizLevelTag">LVL 1</span>
+            </div>
+            <span class="quiz-counter" id="quizCounter">1 / 10</span>
+        </div>
+
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressBarFill" style="width:0%"></div>
+        </div>
+
+        <div class="progress-dots" id="progressDots"></div>
+
+        <div class="question-card" id="questionCard">
+            <div class="question-num" id="questionNum">Question 1</div>
+            <div class="question-text" id="questionText">Loading…</div>
+            <div class="options-grid" id="optionsGrid"></div>
+            <div class="explanation-box" id="explanationBox"></div>
+            <div class="question-footer">
+                <div class="pts-badge" id="ptsBadge"><i class="fas fa-bolt"></i> <span id="ptsText">+0 pts</span></div>
+                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── RESULTS SCREEN ── -->
+    <div id="resultsScreen">
+        <div class="result-card">
+            <div class="result-glow"></div>
+            <span class="result-emoji" id="resultEmoji">🎉</span>
+            <div class="result-title" id="resultTitle">Amazing!</div>
+            <div class="result-sub" id="resultSub">You completed Level 1</div>
+
+            <div class="result-score-ring" id="resultRing">
+                <span class="result-score-num" id="resultScore">80%</span>
+            </div>
+
+            <div class="result-stats">
+                <div class="result-stat">
+                    <span class="result-stat-num" id="statCorrect">8</span>
+                    <span class="result-stat-label">Correct</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-stat-num" id="statPts">+80</span>
+                    <span class="result-stat-label">Points</span>
+                </div>
+                <div class="result-stat">
+                    <span class="result-stat-num" id="statLevel">L1</span>
+                    <span class="result-stat-label">Level</span>
+                </div>
+            </div>
+
+            <div class="result-actions">
+                <button class="btn-primary" onclick="retryLevel()"><i class="fas fa-redo"></i> Retry Level</button>
+                <button class="btn-primary" id="nextLevelBtn" onclick="goNextLevel()" style="display:none;background:linear-gradient(135deg,#22c55e,#16a34a);">
+                    <i class="fas fa-arrow-right"></i> Next Level
+                </button>
+                <button class="btn-ghost" onclick="backToDifficulty()"><i class="fas fa-th"></i> Levels</button>
+                <a href="leaderboard.html" class="btn-ghost"><i class="fas fa-trophy"></i> Leaderboard</a>
+            </div>
+            <div class="badges-row" id="resultBadges"></div>
+        </div>
+    </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="/scripts/coc-user.js"></script>
+<script src="/scripts/coc-points.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+//  QUIZ DATA  — 5 levels × 3 difficulties, 10 questions each
+//  Questions are shuffled per visit so no two sessions repeat
+// ══════════════════════════════════════════════════════════════
+const QUIZ_DB = {
+    easy: {
+        1: [
+            { q: 'What is the first book of the Bible?', opts: ['Genesis','Exodus','Leviticus','Numbers'], a: 0, exp: 'Genesis means "origin" or "beginning" in Greek.' },
+            { q: 'Who built the Ark?', opts: ['Moses','Noah','Abraham','David'], a: 1, exp: 'Noah built the Ark on God\'s command before the great flood (Genesis 6).' },
+            { q: 'How many days did God take to create the world?', opts: ['5','6','7','8'], a: 1, exp: 'God created in 6 days and rested on the 7th (Genesis 1–2).' },
+            { q: 'Who was the first man created by God?', opts: ['Abel','Noah','Adam','Seth'], a: 2, exp: 'Adam was formed from the dust of the ground (Genesis 2:7).' },
+            { q: 'What is the last book of the Bible?', opts: ['Jude','Hebrews','Revelation','Acts'], a: 2, exp: 'The Book of Revelation, written by John, closes the New Testament.' },
+            { q: 'In what city was Jesus born?', opts: ['Nazareth','Jerusalem','Bethlehem','Jericho'], a: 2, exp: 'Jesus was born in Bethlehem, fulfilling Micah 5:2.' },
+            { q: 'How many books are in the Bible?', opts: ['66','73','39','27'], a: 0, exp: 'The Protestant Bible has 66 books: 39 OT and 27 NT.' },
+            { q: 'Who wrote the book of Psalms mostly?', opts: ['Solomon','David','Moses','Asaph'], a: 1, exp: 'King David is credited with about 73 of the 150 Psalms.' },
+            { q: 'What is the shortest verse in the Bible?', opts: ['God is love','Jesus wept','Pray always','Fear not'], a: 1, exp: '"Jesus wept" (John 11:35) is the shortest verse in the KJV.' },
+            { q: 'Who was the first king of Israel?', opts: ['David','Solomon','Saul','Samuel'], a: 2, exp: 'Saul was anointed by Samuel as Israel\'s first king (1 Samuel 10).' },
+            { q: 'How many commandments did God give Moses?', opts: ['5','7','10','12'], a: 2, exp: 'The Ten Commandments are recorded in Exodus 20.' },
+            { q: 'What is the first miracle of Jesus?', opts: ['Healing the blind','Water to wine','Walking on water','Feeding 5000'], a: 1, exp: 'Jesus turned water into wine at Cana — His first miracle (John 2:1–11).' },
+            { q: 'Who swallowed Jonah?', opts: ['A whale','A shark','A great fish','A sea serpent'], a: 2, exp: 'The Bible says "a great fish" — not specifically a whale (Jonah 1:17).' },
+            { q: 'What river was Jesus baptized in?', opts: ['Nile','Euphrates','Jordan','Galilee'], a: 2, exp: 'John the Baptist baptized Jesus in the Jordan River (Matthew 3:13).' },
+            { q: 'Who denied Jesus three times?', opts: ['Judas','Thomas','Peter','James'], a: 2, exp: 'Peter denied knowing Jesus three times before the rooster crowed (Luke 22).' },
+        ],
+        2: [
+            { q: 'What is the longest book in the Bible?', opts: ['Psalms','Isaiah','Jeremiah','Genesis'], a: 0, exp: 'Psalms has 150 chapters, the most of any book.' },
+            { q: 'What is the last book of the Old Testament?', opts: ['Zechariah','Malachi','Haggai','Zephaniah'], a: 1, exp: 'Malachi is the final book of the OT, written around 420 BC.' },
+            { q: 'What did God create on the fourth day?', opts: ['Sun and moon','Animals','Plants','Fish'], a: 0, exp: 'On day 4 God made the sun, moon, and stars (Genesis 1:14–19).' },
+            { q: 'Who wrote the book of Revelation?', opts: ['Paul','Peter','John','James'], a: 2, exp: 'The Apostle John wrote Revelation while exiled on Patmos.' },
+            { q: 'What food did God send from heaven to the Israelites?', opts: ['Bread','Manna','Quail','Fruit'], a: 1, exp: 'God sent manna — a bread-like substance — every morning (Exodus 16).' },
+            { q: 'How many disciples did Jesus have?', opts: ['10','12','14','16'], a: 1, exp: 'Jesus chose 12 disciples (also called apostles) to follow Him.' },
+            { q: 'Who was the mother of Jesus?', opts: ['Elizabeth','Martha','Mary','Miriam'], a: 2, exp: 'Mary, a virgin from Nazareth, was chosen to bear the Son of God.' },
+            { q: 'In what language was the New Testament first written?', opts: ['Hebrew','Latin','Aramaic','Greek'], a: 3, exp: 'The NT was originally written in Koine Greek, the common language of the day.' },
+            { q: 'What does "Amen" mean?', opts: ['Praise God','So be it','Truly','Thank you'], a: 1, exp: '"Amen" means "so be it" or "truly" — a word of affirmation and agreement.' },
+            { q: 'Which apostle was a tax collector?', opts: ['Peter','John','Matthew','Thomas'], a: 2, exp: 'Matthew (also called Levi) was a tax collector before Jesus called him.' },
+            { q: 'What garden did Adam and Eve live in?', opts: ['Gethsemane','Eden','Gilead','Canaan'], a: 1, exp: 'God placed Adam and Eve in the Garden of Eden (Genesis 2:8).' },
+            { q: 'Who interpreted Pharaoh\'s dream?', opts: ['Moses','Joseph','Daniel','Samuel'], a: 1, exp: 'Joseph interpreted Pharaoh\'s dream of 7 fat and 7 thin cows (Genesis 41).' },
+            { q: 'What instrument did David play?', opts: ['Trumpet','Flute','Harp','Lyre'], a: 3, exp: 'David played the lyre (also described as harp) to soothe King Saul.' },
+            { q: 'What was the name of Abraham\'s wife?', opts: ['Leah','Rachel','Sarah','Rebekah'], a: 2, exp: 'Sarah was Abraham\'s wife and the mother of Isaac.' },
+            { q: 'How many Gospels are in the New Testament?', opts: ['3','4','5','6'], a: 1, exp: 'The four Gospels are Matthew, Mark, Luke, and John.' },
+        ],
+        3: [
+            { q: 'What is the New Testament\'s first book?', opts: ['Acts','Romans','Matthew','John'], a: 2, exp: 'Matthew opens the New Testament with the genealogy of Jesus Christ.' },
+            { q: 'Which king had the wisdom of God?', opts: ['David','Solomon','Hezekiah','Josiah'], a: 1, exp: 'God granted Solomon extraordinary wisdom (1 Kings 3:12).' },
+            { q: 'How many plagues did God send on Egypt?', opts: ['7','8','10','12'], a: 2, exp: 'There were 10 plagues sent on Egypt before Pharaoh released Israel (Exodus 7–12).' },
+            { q: 'Who was Moses\' brother?', opts: ['Joshua','Caleb','Aaron','Hur'], a: 2, exp: 'Aaron was Moses\' older brother and spoke on his behalf to Pharaoh.' },
+            { q: 'What was the name of Noah\'s wife?', opts: ['The Bible does not say','Sarah','Ruth','Naomi'], a: 0, exp: 'The Bible does not record Noah\'s wife\'s name.' },
+            { q: 'Where was Jesus crucified?', opts: ['Bethlehem','Calvary / Golgotha','Mount Sinai','Jerusalem city center'], a: 1, exp: 'Jesus was crucified at Golgotha, meaning "place of the skull" (John 19:17).' },
+            { q: 'Who baptized Jesus?', opts: ['Peter','Paul','John the Baptist','Elijah'], a: 2, exp: 'John the Baptist baptized Jesus in the Jordan River (Matthew 3:13–17).' },
+            { q: 'What does the name "Jesus" mean?', opts: ['Son of God','The Lord saves','Messiah','Prince of Peace'], a: 1, exp: '"Jesus" is the Greek form of Yeshua, meaning "The LORD saves" (Matthew 1:21).' },
+            { q: 'How many sons did Jacob have?', opts: ['10','11','12','13'], a: 2, exp: 'Jacob had 12 sons who became the 12 tribes of Israel.' },
+            { q: 'What is the great commandment Jesus gave?', opts: ['Honor parents','Love God and neighbor','Keep the Sabbath','Give tithes'], a: 1, exp: 'Jesus said to love God with all your heart and love your neighbor (Matthew 22:37–39).' },
+            { q: 'How was Jesus taken to heaven after resurrection?', opts: ['He disappeared','He was taken in a cloud','Angels carried Him','He walked through a gate'], a: 1, exp: 'Jesus ascended into heaven in a cloud while the disciples watched (Acts 1:9).' },
+            { q: 'What did Jesus break and share at the Last Supper?', opts: ['Fish and wine','Bread and wine','Grapes and grain','Unleavened cakes'], a: 1, exp: 'Jesus took bread and wine and instituted the Lord\'s Supper (Luke 22:19–20).' },
+            { q: 'Who was the first apostle called by Jesus?', opts: ['John','Andrew','Peter','James'], a: 2, exp: 'Peter (Simon) was the first called — "Follow me" (Matthew 4:18–19).' },
+            { q: 'What is the fruit of the Spirit listed first in Galatians?', opts: ['Joy','Peace','Love','Patience'], a: 2, exp: 'Galatians 5:22 lists Love first among the fruits of the Spirit.' },
+            { q: 'On which day did Jesus rise from the dead?', opts: ['The first day','The third day','The seventh day','Forty days later'], a: 1, exp: 'Jesus rose on the third day, as He had prophesied (Luke 24:7).' },
+        ],
+    },
+    medium: {
+        1: [
+            { q: 'What is the first martyr of the Christian faith?', opts: ['Peter','Paul','Stephen','James'], a: 2, exp: 'Stephen was stoned to death making him Christianity\'s first martyr (Acts 7:54–60).' },
+            { q: 'Who was the father of John the Baptist?', opts: ['Zacharias','Simeon','Joseph','Eli'], a: 0, exp: 'Zacharias (Zechariah) and his wife Elizabeth were John the Baptist\'s parents (Luke 1).' },
+            { q: 'How many books are in the New Testament?', opts: ['25','27','29','31'], a: 1, exp: 'The NT contains 27 books, from Matthew to Revelation.' },
+            { q: 'What is the second book of the Bible?', opts: ['Genesis','Exodus','Leviticus','Numbers'], a: 1, exp: 'Exodus narrates Israel\'s escape from Egypt under Moses.' },
+            { q: 'What does the name "Emmanuel" mean?', opts: ['God saves','God with us','Lord of lords','God is great'], a: 1, exp: '"Emmanuel" means "God with us" — prophesied in Isaiah 7:14.' },
+            { q: 'Who was the Roman governor who sentenced Jesus to death?', opts: ['Herod Agrippa','Caiaphas','Pontius Pilate','Claudius'], a: 2, exp: 'Pontius Pilate, the Roman governor of Judea, ordered Jesus\' crucifixion.' },
+            { q: 'How many times did Daniel pray each day?', opts: ['1','2','3','4'], a: 2, exp: 'Daniel knelt and prayed three times a day (Daniel 6:10).' },
+            { q: 'What was Paul\'s name before his conversion?', opts: ['Simon','Barnabas','Silas','Saul'], a: 3, exp: 'Paul was called Saul of Tarsus before his encounter with Jesus on the Damascus road.' },
+            { q: 'Who was the oldest person in the Bible?', opts: ['Adam','Methuselah','Noah','Jared'], a: 1, exp: 'Methuselah lived 969 years — the longest recorded lifespan (Genesis 5:27).' },
+            { q: 'What is the central theme of the book of Romans?', opts: ['Prayer','Righteousness by faith','Spiritual gifts','Church unity'], a: 1, exp: 'Romans develops the doctrine of justification by faith in Christ.' },
+            { q: 'Which tribe of Israel did Paul belong to?', opts: ['Judah','Levi','Benjamin','Ephraim'], a: 2, exp: 'Paul was from the tribe of Benjamin (Romans 11:1; Philippians 3:5).' },
+            { q: 'How many times did Peter deny Jesus?', opts: ['1','2','3','4'], a: 2, exp: 'Peter denied Jesus three times before the rooster crowed (Mark 14:72).' },
+            { q: 'What is the shortest book in the Old Testament?', opts: ['Obadiah','Haggai','Joel','Nahum'], a: 0, exp: 'Obadiah has only 21 verses, making it the shortest OT book.' },
+            { q: 'Who anointed David as king?', opts: ['Moses','Nathan','Samuel','Elijah'], a: 2, exp: 'The prophet Samuel anointed David at God\'s direction (1 Samuel 16:13).' },
+            { q: 'What did Samson\'s strength depend on?', opts: ['His sword','His prayer','His long hair','His lineage'], a: 2, exp: 'Samson\'s supernatural strength was tied to his uncut Nazirite hair (Judges 16).' },
+        ],
+        2: [
+            { q: 'Who replaced Judas Iscariot as an apostle?', opts: ['Paul','Barnabas','Matthias','Silas'], a: 2, exp: 'Matthias was chosen by lots to replace Judas among the twelve (Acts 1:26).' },
+            { q: 'What were the names of Moses\' parents?', opts: ['Amram and Jochebed','Aaron and Miriam','Levi and Leah','Nun and Elisheba'], a: 0, exp: 'Moses\' parents were Amram and Jochebed, both from the tribe of Levi (Exodus 6:20).' },
+            { q: 'Which king of Israel had 700 wives?', opts: ['David','Rehoboam','Ahab','Solomon'], a: 3, exp: 'Solomon had 700 wives and 300 concubines — which led to his downfall (1 Kings 11:3).' },
+            { q: 'What symbol did God give after the flood as a covenant sign?', opts: ['A dove','A rainbow','A star','A burning bush'], a: 1, exp: 'God placed a rainbow in the sky as a covenant sign with Noah (Genesis 9:13).' },
+            { q: 'Who was the judge of Israel before the first king?', opts: ['Moses','Joshua','Samson','Samuel'], a: 3, exp: 'Samuel was Israel\'s last judge and anointed both Saul and David as kings.' },
+            { q: 'Which prophet said "can these dry bones live?"', opts: ['Isaiah','Jeremiah','Ezekiel','Daniel'], a: 2, exp: 'Ezekiel received the vision of the valley of dry bones (Ezekiel 37).' },
+            { q: 'What was the name of Abraham\'s first son?', opts: ['Isaac','Jacob','Ishmael','Esau'], a: 2, exp: 'Ishmael was born to Hagar, Abraham\'s servant, before Isaac was born to Sarah.' },
+            { q: 'What does Pentecost celebrate?', opts: ['Jesus\' birth','Jesus\' resurrection','The giving of the Holy Spirit','Moses receiving the Law'], a: 2, exp: 'Pentecost commemorates the Holy Spirit\'s descent on the disciples (Acts 2).' },
+            { q: 'How many loaves did Jesus use to feed 5,000?', opts: ['2','5','7','12'], a: 1, exp: 'Jesus used 5 loaves and 2 fish to feed 5,000 men (Matthew 14:17–21).' },
+            { q: 'What was the sign that Rahab hung from her window?', opts: ['White cloth','Scarlet cord','Olive branch','Stone tablet'], a: 1, exp: 'Rahab hung a scarlet cord so the Israelite spies would spare her house (Joshua 2:18).' },
+            { q: 'Which NT book is known as the "Love chapter"?', opts: ['John 3','Romans 8','1 Corinthians 13','Ephesians 3'], a: 2, exp: '1 Corinthians 13 famously defines love in its many attributes.' },
+            { q: 'How many days did Jesus fast in the wilderness?', opts: ['20','30','40','50'], a: 2, exp: 'Jesus fasted 40 days and nights before being tempted by Satan (Matthew 4:2).' },
+            { q: 'Who was the first person to see the resurrected Jesus?', opts: ['Peter','Mary Magdalene','John','Thomas'], a: 1, exp: 'Mary Magdalene was the first to see Jesus after His resurrection (John 20:14–16).' },
+            { q: 'What did the wise men (Magi) follow to find Jesus?', opts: ['An angel','A cloud','A star','A vision'], a: 2, exp: 'The Magi followed a star from the East to find the newborn King (Matthew 2:2).' },
+            { q: 'What is the book of Revelation also called?', opts: ['The Prophecy','The Apocalypse','The Vision','The Unveiling'], a: 1, exp: 'Revelation is also called The Apocalypse — from the Greek word meaning "unveiling."' },
+        ],
+        3: [
+            { q: 'How many years did the Israelites wander in the wilderness?', opts: ['20','40','50','70'], a: 1, exp: 'Israel wandered 40 years in the wilderness due to unbelief (Numbers 14:33–34).' },
+            { q: 'What is the shortest book in the New Testament?', opts: ['Philemon','2 John','3 John','Jude'], a: 2, exp: '3 John has only 219 words in Greek, making it the shortest NT book.' },
+            { q: 'Who wrote the most books in the New Testament?', opts: ['Peter','John','Paul','Luke'], a: 2, exp: 'Paul wrote 13 (or 14) NT epistles — more than any other author.' },
+            { q: 'What city\'s walls fell when Joshua\'s army marched around it?', opts: ['Jerusalem','Ai','Jericho','Gibeon'], a: 2, exp: 'The walls of Jericho collapsed after the Israelites marched around them for 7 days (Joshua 6).' },
+            { q: 'What was the name of the high priest who questioned Jesus?', opts: ['Annas','Caiaphas','Simeon','Ananias'], a: 1, exp: 'Caiaphas was the high priest who declared Jesus must die (John 11:49–53).' },
+            { q: 'Which book of the Bible speaks of Job\'s suffering?', opts: ['Psalms','Proverbs','Job','Lamentations'], a: 2, exp: 'The book of Job explores suffering, faith, and God\'s sovereignty.' },
+            { q: 'What did Jesus say are the two greatest commandments?', opts: ['Worship and tithe','Love God and love neighbor','Pray and fast','Honor parents and Sabbath'], a: 1, exp: 'Love God with all your heart, and love your neighbor as yourself (Matthew 22:37–39).' },
+            { q: 'Who was the first to receive the gift of the Holy Spirit at Pentecost?', opts: ['Peter alone','All 120 disciples','The 12 apostles only','Paul and Barnabas'], a: 1, exp: 'All 120 disciples gathered in the upper room received the Spirit (Acts 1:15; 2:1–4).' },
+            { q: 'How many silver coins did Judas receive to betray Jesus?', opts: ['10','20','30','40'], a: 2, exp: 'Judas was paid 30 pieces of silver — fulfilling Zechariah 11:12 (Matthew 26:15).' },
+            { q: 'Which prophet was taken to heaven in a chariot of fire?', opts: ['Elisha','Enoch','Elijah','Isaiah'], a: 2, exp: 'Elijah was taken to heaven in a whirlwind with a chariot of fire (2 Kings 2:11).' },
+            { q: 'Who was the woman of faith who hid the Israelite spies?', opts: ['Deborah','Ruth','Rahab','Esther'], a: 2, exp: 'Rahab, a resident of Jericho, hid the two spies sent by Joshua (Joshua 2:1–6).' },
+            { q: 'What does the Greek word "ekklesia" (translated "church") mean?', opts: ['Temple','Building','Called-out assembly','Holy gathering'], a: 2, exp: '"Ekklesia" means "called-out assembly" — referring to believers gathered together.' },
+            { q: 'Which OT book quotes the most in the New Testament?', opts: ['Genesis','Isaiah','Psalms','Deuteronomy'], a: 2, exp: 'Psalms is quoted more than any other OT book in the New Testament.' },
+            { q: 'What was the name of the first church deacon martyred?', opts: ['Philip','Nicolas','Stephen','Prochorus'], a: 2, exp: 'Stephen, one of the seven deacons, became the first Christian martyr (Acts 6–7).' },
+            { q: 'Who wrote the book of Acts?', opts: ['Paul','Mark','Luke','John'], a: 2, exp: 'Luke wrote both the Gospel of Luke and Acts as a two-part historical account.' },
+        ],
+    },
+    hard: {
+        1: [
+            { q: 'How many times does the word "faith" appear in the KJV Bible?', opts: ['247','336','458','529'], a: 1, exp: '"Faith" appears approximately 336 times in the King James Version.' },
+            { q: 'What is the longest chapter in the Bible?', opts: ['Psalm 23','Psalm 119','Psalm 150','Isaiah 53'], a: 1, exp: 'Psalm 119 has 176 verses, making it the longest chapter in the Bible.' },
+            { q: 'Who was the first person to be raised from the dead in the Bible?', opts: ['Lazarus','The widow\'s son at Zarephath','Jairus\' daughter','Eutychus'], a: 1, exp: 'Elijah raised the widow of Zarephath\'s son — the first resurrection account (1 Kings 17:22).' },
+            { q: 'Which king rebuilt the temple after the exile?', opts: ['Solomon','Hezekiah','Josiah','Zerubbabel'], a: 3, exp: 'Zerubbabel led the reconstruction of the Second Temple after Babylon (Ezra 3–6).' },
+            { q: 'What is the meaning of the Hebrew word "Selah" found in Psalms?', opts: ['Praise forever','A musical pause','Amen','Holy'], a: 1, exp: '"Selah" likely indicates a musical pause or interlude in Psalms — its exact meaning is debated.' },
+            { q: 'Who wrote the book of Hebrews?', opts: ['Paul','Apollos','Barnabas','Unknown'], a: 3, exp: 'The author of Hebrews is unknown — possibilities include Paul, Apollos, or Barnabas.' },
+            { q: 'What was the name of Moses\' father-in-law?', opts: ['Laban','Jethro','Hobab','Raguel'], a: 1, exp: 'Jethro (also called Reuel) was a Midianite priest and Moses\' father-in-law (Exodus 3:1).' },
+            { q: 'How many original disciples of Jesus were martyred for their faith?', opts: ['9','10','11','12'], a: 2, exp: '11 of the 12 apostles are traditionally believed to have been martyred (Judas died by suicide).' },
+            { q: 'What was the first city the Israelites conquered in Canaan?', opts: ['Ai','Hazor','Jericho','Hebron'], a: 2, exp: 'Jericho was the first city conquered by the Israelites under Joshua (Joshua 6).' },
+            { q: 'In which book of the Bible does the phrase "fear not" appear most?', opts: ['Psalms','Isaiah','Matthew','Luke'], a: 1, exp: '"Fear not" (or "do not be afraid") appears most frequently in Isaiah.' },
+            { q: 'What are the five books of Moses called?', opts: ['The Psalter','The Torah','The Prophets','The Writings'], a: 1, exp: 'The first 5 books of the Bible (Genesis–Deuteronomy) are called the Torah or Pentateuch.' },
+            { q: 'Which prophet was known as the "weeping prophet"?', opts: ['Isaiah','Ezekiel','Jeremiah','Amos'], a: 2, exp: 'Jeremiah is called the "weeping prophet" because of his laments over Israel\'s sin.' },
+            { q: 'What was the name of the angel who appeared to Mary?', opts: ['Michael','Raphael','Gabriel','Uriel'], a: 2, exp: 'The angel Gabriel announced to Mary that she would bear the Son of God (Luke 1:26–28).' },
+            { q: 'How many years did Solomon reign over Israel?', opts: ['20','33','40','50'], a: 2, exp: 'Solomon reigned 40 years over all Israel (1 Kings 11:42).' },
+            { q: 'Which NT letter was written to slaves and masters?', opts: ['Titus','Philemon','Colossians','Ephesians'], a: 1, exp: 'Philemon is Paul\'s personal letter urging a master to receive his runaway slave as a brother.' },
+        ],
+        2: [
+            { q: 'What Hebrew name means "God is salvation"?', opts: ['Emmanuel','Joshua / Yeshua','Elijah','Nathan'], a: 1, exp: 'Yeshua (Joshua / Jesus) means "YHWH is salvation" — the same root as the NT name Jesus.' },
+            { q: 'How many elders are around the throne in Revelation?', opts: ['7','12','24','144'], a: 2, exp: 'Twenty-four elders surround God\'s throne in Revelation 4:4.' },
+            { q: 'What is the longest book in the New Testament?', opts: ['John','Luke','Acts','Matthew'], a: 2, exp: 'Acts has 28 chapters, making it the longest NT book by chapter count.' },
+            { q: 'What did the veil of the temple do at Jesus\' death?', opts: ['It disappeared','It burst into flame','It tore from top to bottom','It turned white'], a: 2, exp: 'The temple veil tore from top to bottom — symbolizing open access to God (Matthew 27:51).' },
+            { q: 'Which king of Judah found the Book of the Law during temple repairs?', opts: ['Hezekiah','Manasseh','Josiah','Asa'], a: 2, exp: 'King Josiah found the lost Book of the Law and led a national revival (2 Kings 22:8).' },
+            { q: 'What does "Abba" mean?', opts: ['Lord','Father','Holy One','Creator'], a: 1, exp: '"Abba" is an Aramaic term of intimate address for father, used by Jesus in Gethsemane (Mark 14:36).' },
+            { q: 'Which apostle wrote five books of the New Testament?', opts: ['Paul','Peter','John','Luke'], a: 2, exp: 'John wrote the Gospel of John, 1–3 John, and Revelation — five NT books.' },
+            { q: 'What is the sin that cannot be forgiven according to Jesus?', opts: ['Murder','Adultery','Blaspheming the Holy Spirit','Denying Christ'], a: 2, exp: 'Jesus calls blasphemy against the Holy Spirit the unforgivable sin (Matthew 12:31–32).' },
+            { q: 'Which OT book contains the famous "Suffering Servant" passage?', opts: ['Jeremiah 50','Isaiah 53','Psalm 22','Zechariah 12'], a: 1, exp: 'Isaiah 53 prophetically describes the suffering, death, and victory of the Messiah.' },
+            { q: 'In the Lord\'s Prayer, what does "hallowed" mean?', opts: ['Blessed','Holy/set apart','Ancient','Powerful'], a: 1, exp: '"Hallowed" means holy, set apart, revered — from the Old English for "holy."' },
+            { q: 'What language was most of the Old Testament written in?', opts: ['Aramaic','Greek','Hebrew','Latin'], a: 2, exp: 'The OT was written primarily in Hebrew, with some portions in Aramaic.' },
+            { q: 'Who was Barnabas\' real name?', opts: ['Simeon','Joses','Lucius','Niger'], a: 1, exp: 'Barnabas\' real name was Joses (Joseph); the apostles gave him the name Barnabas (Acts 4:36).' },
+            { q: 'What is the Septuagint?', opts: ['A Jewish prayer book','Greek translation of the OT','The Dead Sea Scrolls','A Babylonian text'], a: 1, exp: 'The Septuagint (LXX) is the Greek translation of the Hebrew OT, made around 200 BC.' },
+            { q: 'Who was the first Gentile to receive the Holy Spirit?', opts: ['Lydia','Cornelius','The Ethiopian eunuch','Titus'], a: 1, exp: 'Cornelius, a Roman centurion, was the first Gentile to receive the Holy Spirit (Acts 10).' },
+            { q: 'What is the term for the first five books of Moses?', opts: ['Torah/Pentateuch','Hexateuch','Hagiographa','Apocrypha'], a: 0, exp: 'The first five books (Genesis–Deuteronomy) are called the Torah (Hebrew) or Pentateuch (Greek).' },
+        ],
+        3: [
+            { q: 'What is the "Tetragrammaton"?', opts: ['The four horsemen','God\'s four-letter name (YHWH)','Four major prophets','The four Gospels'], a: 1, exp: 'The Tetragrammaton refers to the four Hebrew letters YHWH — God\'s personal covenant name.' },
+            { q: 'Which council in AD 325 affirmed the deity of Christ?', opts: ['Council of Jerusalem','Council of Trent','Council of Nicea','Council of Chalcedon'], a: 2, exp: 'The First Council of Nicaea (AD 325) established the Nicene Creed, affirming Christ\'s full deity.' },
+            { q: 'What does "propitiation" mean in theology?', opts: ['Cleansing of sin','Satisfaction of God\'s wrath','Forgiveness of debt','Prayer of confession'], a: 1, exp: 'Propitiation means the satisfying of God\'s holy wrath against sin through Christ\'s sacrifice (Romans 3:25).' },
+            { q: 'How many psalms are attributed to the "Sons of Korah"?', opts: ['8','11','14','17'], a: 1, exp: 'Eleven psalms (42–49, 84–85, 87–88) are attributed to the Sons of Korah.' },
+            { q: 'What was the name of the high priest in Acts whose son was beaten by a demon-possessed man?', opts: ['Annas','Caiaphas','Sceva','Ananias'], a: 2, exp: 'The sons of Sceva tried to exorcise in Jesus\' name and were attacked (Acts 19:14).' },
+            { q: 'Who is described as "a man after God\'s own heart"?', opts: ['Abraham','Moses','David','Solomon'], a: 2, exp: 'God called David "a man after His own heart" (1 Samuel 13:14; Acts 13:22).' },
+            { q: 'What is the theological term for God\'s presence filling the temple?', opts: ['Shekinah','Logos','Parousia','Theophany'], a: 0, exp: '"Shekinah" (from Hebrew shakan, to dwell) refers to the visible glory of God\'s presence.' },
+            { q: 'Which book records the giving of the Law at Sinai?', opts: ['Genesis','Leviticus','Exodus','Numbers'], a: 2, exp: 'Exodus 19–20 records Moses receiving the Law on Mount Sinai.' },
+            { q: 'What does "soteriology" study?', opts: ['Angels','The church','Salvation','End times'], a: 2, exp: 'Soteriology is the branch of theology that studies the doctrine of salvation.' },
+            { q: 'What event does the Jewish Passover commemorate?', opts: ['Creation','Exodus from Egypt','Entering Canaan','The giving of the Law'], a: 1, exp: 'Passover commemorates the night God struck Egypt\'s firstborn while passing over Israel (Exodus 12).' },
+            { q: 'Which church in Revelation was described as "neither cold nor hot"?', opts: ['Ephesus','Smyrna','Sardis','Laodicea'], a: 3, exp: 'Laodicea was rebuked for being lukewarm — neither cold nor hot (Revelation 3:16).' },
+            { q: 'What is the "Didache"?', opts: ['The Dead Sea Scrolls','An early Christian teaching document','A Roman census','Paul\'s lost letter'], a: 1, exp: 'The Didache (c. 1st–2nd century) is one of the earliest Christian writings on church practice.' },
+            { q: 'What Hebrew word begins the book of Genesis and means "In the beginning"?', opts: ['Shalom','Bereshit','Elohim','Yahweh'], a: 1, exp: '"Bereshit" (בְּרֵאשִׁית) is the first word of Genesis and also the Hebrew name of the book.' },
+            { q: 'Who prophesied that the Messiah would be born in Bethlehem?', opts: ['Isaiah','Amos','Micah','Nahum'], a: 2, exp: 'Micah 5:2 prophesied that the ruler of Israel would come from Bethlehem Ephrathah.' },
+            { q: 'What is the book of Lamentations primarily about?', opts: ['The fall of Jerusalem','The Babylonian exile','David\'s sins','The Maccabees'], a: 0, exp: 'Lamentations is Jeremiah\'s poetic mourning over the destruction of Jerusalem in 586 BC.' },
+        ],
+    }
+};
+
+// ── POINTS PER DIFFICULTY ──
+const POINTS_MAP = { easy: 10, medium: 15, hard: 25 };
+const TOTAL_LEVELS = 3;
+const QUESTIONS_PER_LEVEL = 10;
+
+// ── STATE ──
+let state = {
+    difficulty: null,
+    level: 1,
+    questions: [],
+    currentIndex: 0,
+    score: 0,
+    answers: [], // true/false per question
+};
+
+// ── PROGRESS TRACKING (localStorage) ──
+function getProgress() {
+    try { return JSON.parse(localStorage.getItem('coc_quiz_progress') || '{}'); } catch { return {}; }
+}
+function saveProgress(diff, level, passed) {
+    const p = getProgress();
+    const key = `${diff}_${level}`;
+    if (passed) p[key] = true;
+    localStorage.setItem('coc_quiz_progress', JSON.stringify(p));
+}
+function isLevelCompleted(diff, level) {
+    return !!getProgress()[`${diff}_${level}`];
+}
+
+// ── DIFFICULTY SELECTION ──
+function selectDifficulty(diff) {
+    state.difficulty = diff;
+    state.level = 1;
+
+    // Highlight card
+    document.querySelectorAll('.diff-card').forEach(c => c.classList.remove('active'));
+    document.querySelector(`.diff-card.${diff}`).classList.add('active');
+
+    // Build level grid
+    const grid = document.getElementById('levelsGrid');
+    const title = document.getElementById('levelsSectionTitle');
+    title.textContent = diff.charAt(0).toUpperCase() + diff.slice(1) + ' Levels';
+
+    grid.innerHTML = Array.from({ length: TOTAL_LEVELS }, (_, i) => {
+        const lv = i + 1;
+        const done = isLevelCompleted(diff, lv);
+        return `
+        <div class="level-btn ${done ? 'completed' : ''}" onclick="selectLevel(${lv})" id="lvBtn_${lv}">
+            <div class="lv-badge"></div>
+            <span class="lv-num">${lv}</span>
+            <span class="lv-label">Level ${lv}</span>
+        </div>`;
+    }).join('');
+
+    selectLevel(1);
+    document.getElementById('levelsSection').style.display = 'block';
+    document.getElementById('levelsSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function selectLevel(lv) {
+    state.level = lv;
+    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById('lvBtn_' + lv);
+    if (btn) btn.classList.add('active');
+    document.getElementById('startBtnLabel').textContent =
+        `${state.difficulty.charAt(0).toUpperCase() + state.difficulty.slice(1)} — Level ${lv}`;
+}
+
+// ── SHUFFLE helper ──
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+// ── BEGIN QUIZ ──
+function beginQuiz() {
+    const pool = QUIZ_DB[state.difficulty][state.level];
+    state.questions = shuffle(pool).slice(0, QUESTIONS_PER_LEVEL);
+    state.currentIndex = 0;
+    state.score = 0;
+    state.answers = [];
+
+    document.getElementById('difficultyScreen').style.display = 'none';
+    document.getElementById('resultsScreen').style.display = 'none';
+    document.getElementById('quizScreen').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Tag styling
+    const tag = document.getElementById('quizDiffTag');
+    tag.textContent = state.difficulty.charAt(0).toUpperCase() + state.difficulty.slice(1);
+    tag.className = 'quiz-diff-tag tag-' + state.difficulty;
+    document.getElementById('quizLevelTag').textContent = 'LVL ' + state.level;
+
+    renderQuestion();
+}
+
+// ── RENDER QUESTION ──
+function renderQuestion() {
+    const q = state.questions[state.currentIndex];
+    const total = state.questions.length;
+    const idx = state.currentIndex;
+
+    document.getElementById('questionNum').textContent = `Question ${idx + 1}`;
+    document.getElementById('questionText').textContent = q.q;
+    document.getElementById('quizCounter').textContent = `${idx + 1} / ${total}`;
+
+    // Progress bar
+    document.getElementById('progressBarFill').style.width = `${(idx / total) * 100}%`;
+
+    // Dots
+    const dots = document.getElementById('progressDots');
+    dots.innerHTML = Array.from({ length: total }, (_, i) => {
+        let cls = 'p-dot';
+        if (i === idx) cls += ' active';
+        else if (i < idx) cls += state.answers[i] ? ' correct' : ' wrong';
+        return `<div class="${cls}"></div>`;
+    }).join('');
+
+    // Options — shuffle display order
+    const letters = ['A','B','C','D'];
+    const indices = shuffle([0,1,2,3]);
+    const grid = document.getElementById('optionsGrid');
+    grid.innerHTML = indices.map((origIdx, displayPos) => `
+        <div class="quiz-option" onclick="selectOption(${origIdx})" data-orig="${origIdx}">
+            <div class="opt-letter">${letters[displayPos]}</div>
+            <div class="opt-text">${q.opts[origIdx]}</div>
+            <i class="fas fa-check opt-icon correct-icon" style="display:none;"></i>
+            <i class="fas fa-times opt-icon wrong-icon" style="display:none;"></i>
+        </div>
+    `).join('');
+
+    // Reset
+    const pts = POINTS_MAP[state.difficulty];
+    document.getElementById('ptsBadge').className = 'pts-badge';
+    document.getElementById('ptsText').textContent = `+${pts} pts`;
+    document.getElementById('nextBtn').className = 'next-btn';
+    document.getElementById('explanationBox').className = 'explanation-box';
+
+    // Animate card
+    const card = document.getElementById('questionCard');
+    card.style.animation = 'none';
+    card.offsetHeight; // reflow
+    card.style.animation = 'fadeUp 0.3s ease both';
+}
+
+// ── SELECT OPTION ──
+function selectOption(origIdx) {
+    if (document.querySelector('.quiz-option.disabled')) return;
+
+    const q = state.questions[state.currentIndex];
+    const isCorrect = origIdx === q.a;
+    const opts = document.querySelectorAll('.quiz-option');
+    const pts = POINTS_MAP[state.difficulty];
+
+    opts.forEach(opt => {
+        opt.classList.add('disabled');
+        const oi = parseInt(opt.dataset.orig);
+        if (oi === q.a) {
+            opt.classList.add('correct');
+            opt.querySelector('.fa-check').style.display = 'block';
+        }
+        if (oi === origIdx && !isCorrect) {
+            opt.classList.add('wrong');
+            opt.querySelector('.fa-times').style.display = 'block';
+        }
+    });
+
+    if (isCorrect) state.score++;
+    state.answers.push(isCorrect);
+
+    // Update dot
+    const dotList = document.querySelectorAll('.p-dot');
+    dotList[state.currentIndex].classList.remove('active');
+    dotList[state.currentIndex].classList.add(isCorrect ? 'correct' : 'wrong');
+
+    // Badge
+    const badge = document.getElementById('ptsBadge');
+    const ptsText = document.getElementById('ptsText');
+    if (isCorrect) {
+        badge.className = 'pts-badge earned';
+        ptsText.textContent = `+${pts} pts`;
+    } else {
+        badge.className = 'pts-badge lost';
+        ptsText.textContent = '+0 pts';
+    }
+
+    // Explanation
+    if (q.exp) {
+        const box = document.getElementById('explanationBox');
+        box.innerHTML = `<strong><i class="fas fa-book-open" style="margin-right:6px;"></i>Note:</strong> ${q.exp}`;
+        box.className = 'explanation-box show';
+    }
+
+    // Show next or finish
+    const isLast = state.currentIndex === state.questions.length - 1;
+    const btn = document.getElementById('nextBtn');
+    btn.className = 'next-btn show';
+    btn.innerHTML = isLast
+        ? '<i class="fas fa-flag-checkered"></i> See Results'
+        : 'Next <i class="fas fa-arrow-right"></i>';
+}
+
+// ── NEXT QUESTION ──
+function nextQuestion() {
+    state.currentIndex++;
+    if (state.currentIndex >= state.questions.length) {
+        showResults();
+    } else {
+        renderQuestion();
+    }
+}
+
+// ── RESULTS ──
+function showResults() {
+    document.getElementById('quizScreen').style.display = 'none';
+    document.getElementById('resultsScreen').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const total = state.questions.length;
+    const percent = Math.round((state.score / total) * 100);
+    const passed = percent >= 70;
+    const perfect = state.score === total;
+    const pts = state.score * POINTS_MAP[state.difficulty];
+
+    // Save progress
+    if (passed) saveProgress(state.difficulty, state.level, true);
+
+    // Score ring animation
+    const ring = document.getElementById('resultRing');
+    ring.style.background = `conic-gradient(${passed ? 'var(--green)' : 'var(--red)'} ${percent * 3.6}deg, rgba(255,255,255,0.05) 0deg)`;
+
+    document.getElementById('resultEmoji').textContent = perfect ? '🏆' : passed ? '🎉' : '💪';
+    document.getElementById('resultTitle').textContent = perfect ? 'PERFECT!' : passed ? 'CHAMPION!' : 'KEEP GOING!';
+    document.getElementById('resultSub').textContent = passed
+        ? `${state.difficulty.toUpperCase()} Level ${state.level} — Conquered!`
+        : `${state.difficulty.toUpperCase()} Level ${state.level} — Score 70%+ to pass`;
+    document.getElementById('resultScore').textContent = percent + '%';
+    document.getElementById('statCorrect').textContent = `${state.score}/${total}`;
+    document.getElementById('statPts').textContent = `+${pts}`;
+    document.getElementById('statLevel').textContent = `L${state.level}`;
+
+    // Next level button
+    const nextLvBtn = document.getElementById('nextLevelBtn');
+    if (passed && state.level < TOTAL_LEVELS) {
+        nextLvBtn.style.display = 'inline-flex';
+    } else {
+        nextLvBtn.style.display = 'none';
+    }
+
+    // Badges
+    const badgesRow = document.getElementById('resultBadges');
+    badgesRow.innerHTML = '';
+    const user = window.COCUser ? window.COCUser.getUser() : null;
+    const badges = [];
+    if (perfect) badges.push('🧠 Bible Scholar');
+    if (state.difficulty === 'hard' && passed) badges.push('🔥 Hard Mode Champion');
+    if (passed && state.level === TOTAL_LEVELS) badges.push('👑 Level Master');
+    if (badges.length) {
+        badgesRow.innerHTML = badges.map(b => `<span class="badge-chip"><i class="fas fa-shield-halved"></i> ${b}</span>`).join('');
+        if (user && window.COCUser) {
+            badges.forEach(b => { if (!user.badges.includes(b)) { user.badges.push(b); } });
+            window.COCUser.saveUser(user);
+        }
+    }
+
+    // Earn points
+    if (user && window.COCUser) {
+        window.COCUser.recordQuiz(perfect);
+        if (passed && window.COCPoints) window.COCPoints.earnPoints('quiz_complete', { score: state.score, total });
+    }
+
+    showToast(passed ? `🎉 ${pts} points earned!` : `Study up and try again!`);
+}
+
+// ── NAVIGATION ──
+function retryLevel() {
+    beginQuiz();
+}
+function goNextLevel() {
+    state.level++;
+    document.getElementById('resultsScreen').style.display = 'none';
+    document.getElementById('difficultyScreen').style.display = 'block';
+    selectDifficulty(state.difficulty);
+    selectLevel(state.level);
+    // Auto scroll to levels
+    setTimeout(() => document.getElementById('levelsSection').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+function backToDifficulty() {
+    document.getElementById('resultsScreen').style.display = 'none';
+    document.getElementById('quizScreen').style.display = 'none';
+    document.getElementById('difficultyScreen').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── TOAST ──
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown', e => {
+    if (document.getElementById('quizScreen').style.display === 'none') return;
+    const opts = document.querySelectorAll('.quiz-option:not(.disabled)');
+    if (e.key >= '1' && e.key <= '4') {
+        if (opts[parseInt(e.key) - 1]) opts[parseInt(e.key) - 1].click();
+    }
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.tagName !== 'BUTTON') {
+        const nb = document.getElementById('nextBtn');
+        if (nb.classList.contains('show')) nb.click();
+    }
+});
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.COCUser) {
+        const user = window.COCUser.getUser();
+        if (user?.displayName) window.COCUser.recordVisit();
+    }
+});
+</script>
+</body>
+</html>

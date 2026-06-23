@@ -5,702 +5,395 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Branches | City of Champion Fire</title>
     <link rel="icon" type="image/png" href="media/logo1.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
         :root {
-            --red: #c0000a;
-            --red-bright: #e8000d;
-            --black: #0a0a0a;
-            --off-white: #f5f0eb;
-            --gray-light: #f0ece7;
-            --gray-mid: #c8c0b8;
-            --gray-text: #6b6560;
+            --red: #c8102e; --red-dark: #9a0b22; --red-glow: rgba(200,16,46,0.25);
+            --gold: #f0c842; --gold-dim: rgba(240,200,66,0.12);
+            --bg: #0a0a0b; --bg-card: #111113; --bg-card2: #161618;
+            --border: rgba(255,255,255,0.07); --border-red: rgba(200,16,46,0.3);
+            --text: #f0f0f2; --text-muted: #6b6b75; --text-dim: #9999a8;
         }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 
-        body {
-            font-family: 'Barlow', sans-serif;
-            background-color: var(--off-white);
-            color: var(--black);
-            overflow-x: hidden;
+        /* NAV */
+        nav {
+            background: rgba(10,10,11,0.88); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+            padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between;
         }
+        .nav-back { color: var(--red); font-weight: 700; font-size: 12px; letter-spacing: 0.08em;
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase; transition: color 0.2s; }
+        .nav-back:hover { color: #ff1a3d; }
+        .nav-brand { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.05em;
+            color: var(--text); display: flex; align-items: center; gap: 10px; }
+        .nav-brand .icon { color: var(--gold); }
+        .nav-logo img { height: 36px; object-fit: contain; }
 
-        /* ── NOISE TEXTURE OVERLAY ── */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-            opacity: 0.03;
-            pointer-events: none;
-            z-index: 9999;
+        /* HERO */
+        .hero {
+            position: relative; overflow: hidden;
+            padding: 0; min-height: 420px; display: flex; align-items: flex-end;
         }
+        .hero-img { position: absolute; inset: 0; }
+        .hero-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.2; filter: grayscale(60%); }
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(160deg, rgba(200,16,46,0.15) 0%, rgba(10,10,11,0.75) 50%, var(--bg) 100%);
+        }
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.014) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+        .hero-inner { position: relative; z-index: 2; padding: 80px 40px 64px; width: 100%; text-align: center; }
+        .hero-eyebrow {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+            color: var(--red); display: inline-flex; align-items: center; gap: 14px; margin-bottom: 20px;
+        }
+        .hero-eyebrow::before, .hero-eyebrow::after { content: ''; display: block; width: 32px; height: 1px; background: var(--red); }
+        .hero-title { font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(5rem, 14vw, 11rem); line-height: 0.88; letter-spacing: 0.02em; color: var(--text); }
+        .hero-title span { display: block; color: var(--red); }
 
-        /* ── HEADER ── */
-        header {
-            background-color: var(--black);
-            color: white;
-            position: relative;
-            overflow: hidden;
-            padding: 0;
-        }
-
-        .header-bg {
-            position: absolute;
-            inset: 0;
-        }
-        .header-bg img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            opacity: 0.18;
-            filter: grayscale(60%);
-        }
-        .header-bg::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(160deg, rgba(192,0,10,0.18) 0%, rgba(0,0,0,0.6) 60%);
-        }
-
-        .header-inner {
-            position: relative;
-            z-index: 2;
-            padding: 90px 40px 80px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .header-eyebrow {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 700;
-            font-size: 0.7rem;
-            letter-spacing: 0.35em;
-            text-transform: uppercase;
-            color: var(--red-bright);
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .header-eyebrow::before,
-        .header-eyebrow::after {
-            content: '';
-            display: block;
-            width: 40px;
-            height: 1px;
-            background: var(--red-bright);
-        }
-
-        .header-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(5rem, 14vw, 11rem);
-            line-height: 0.88;
-            letter-spacing: 0.02em;
-            color: white;
-            text-transform: uppercase;
-        }
-        .header-title span {
-            display: block;
-            color: var(--red-bright);
-        }
-
-        /* ── SEARCH BAR ── */
+        /* SEARCH */
         .search-wrap {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            justify-content: center;
-            margin-top: -28px;
-            padding: 0 24px;
+            position: relative; z-index: 10;
+            display: flex; justify-content: center;
+            margin-top: -28px; padding: 0 24px;
         }
         .search-box {
-            background: white;
-            border-radius: 100px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 8px 8px 24px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
-            width: 100%;
-            max-width: 560px;
-            border: 1px solid rgba(0,0,0,0.07);
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 100px;
+            display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 22px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4); width: 100%; max-width: 560px;
+            transition: border-color 0.2s;
         }
-        .search-box i { color: var(--gray-mid); font-size: 0.9rem; }
+        .search-box:focus-within { border-color: rgba(200,16,46,0.4); }
+        .search-box i { color: var(--text-muted); font-size: 13px; flex-shrink: 0; }
         .search-box input {
-            flex: 1;
-            border: none;
-            outline: none;
-            font-family: 'Barlow', sans-serif;
-            font-size: 0.95rem;
-            color: var(--black);
-            background: transparent;
+            flex: 1; border: none; outline: none; background: transparent;
+            font-family: 'Inter', sans-serif; font-size: 14px; color: var(--text);
         }
-        .search-box input::placeholder { color: var(--gray-mid); }
+        .search-box input::placeholder { color: var(--text-muted); }
         .search-btn {
-            background: var(--red);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 700;
-            font-size: 0.78rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            padding: 12px 26px;
-            border-radius: 100px;
-            transition: background 0.25s, transform 0.18s;
+            background: var(--red); color: #fff; border: none; cursor: pointer;
+            font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 11px;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            padding: 11px 24px; border-radius: 100px; transition: all 0.22s; white-space: nowrap;
         }
-        .search-btn:hover { background: var(--black); transform: scale(1.04); }
+        .search-btn:hover { background: var(--red-dark); transform: scale(1.03); }
 
-        /* ── MAIN GRID ── */
-        main {
-            padding: 80px 32px 80px;
-            max-width: 1280px;
-            margin: 0 auto;
-        }
-
+        /* MAIN */
+        main { max-width: 1280px; margin: 0 auto; padding: 72px 24px 80px; }
         .section-label {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 700;
-            font-size: 0.7rem;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            color: var(--gray-text);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 48px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--text-muted); display: flex; align-items: center; gap: 14px; margin-bottom: 44px;
         }
-        .section-label::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--gray-mid);
-        }
+        .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-        .branches-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 24px;
-        }
+        .branches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; }
 
-        /* ── BRANCH CARD ── */
+        /* BRANCH CARD */
         .branch-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.06);
-            transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1),
-                        box-shadow 0.35s cubic-bezier(0.23, 1, 0.32, 1);
-            display: flex;
-            flex-direction: column;
-        }
-        .branch-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 24px 48px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
-        }
-
-        .card-image {
-            height: 200px;
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+            overflow: hidden; display: flex; flex-direction: column;
+            transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative;
-            overflow: hidden;
-            background: #1a1a1a;
         }
-        .card-image img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            filter: grayscale(30%) contrast(1.05);
-            transition: transform 0.5s ease, filter 0.4s ease;
-        }
-        .branch-card:hover .card-image img {
-            transform: scale(1.06);
-            filter: grayscale(0%) contrast(1.1);
-        }
+        .branch-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200,16,46,0.4), transparent);
+            opacity: 0; transition: opacity 0.3s; }
+        .branch-card:hover { transform: translateY(-6px); border-color: rgba(200,16,46,0.2);
+            box-shadow: 0 24px 56px rgba(0,0,0,0.5); }
+        .branch-card:hover::before { opacity: 1; }
 
-        /* Dark gradient over image */
-        .card-image::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 70%;
-            background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
-            pointer-events: none;
-        }
+        .card-image { height: 200px; position: relative; overflow: hidden; background: #1a1a1e; }
+        .card-image img { width: 100%; height: 100%; object-fit: cover;
+            filter: grayscale(40%) brightness(0.7); transition: transform 0.5s ease, filter 0.4s ease; }
+        .branch-card:hover .card-image img { transform: scale(1.06); filter: grayscale(0%) brightness(0.85); }
+        .card-image::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 70%;
+            background: linear-gradient(to top, rgba(10,10,11,0.7), transparent); pointer-events: none; }
 
         .card-badge {
-            position: absolute;
-            top: 14px; right: 14px;
-            background: var(--red);
-            color: white;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 700;
-            font-size: 0.6rem;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            padding: 5px 12px;
-            border-radius: 100px;
-            z-index: 2;
+            position: absolute; top: 14px; right: 14px; z-index: 2;
+            background: var(--red); color: #fff;
+            font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 10px;
+            letter-spacing: 0.18em; text-transform: uppercase; padding: 5px 12px; border-radius: 100px;
         }
-
-        /* Branch number on image bottom-left */
         .card-num {
-            position: absolute;
-            bottom: 14px; left: 16px;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.4rem;
-            color: rgba(255,255,255,0.15);
-            line-height: 1;
-            z-index: 2;
-            pointer-events: none;
+            position: absolute; bottom: 14px; left: 16px; z-index: 2;
+            font-family: 'Bebas Neue', sans-serif; font-size: 2.6rem;
+            color: rgba(255,255,255,0.12); line-height: 1; pointer-events: none;
         }
 
-        .card-body {
-            padding: 28px 28px 24px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
+        .card-body { padding: 26px 26px 22px; flex: 1; display: flex; flex-direction: column; }
+        .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem;
+            line-height: 1; letter-spacing: 0.03em; color: var(--text); margin-bottom: 12px; }
 
-        .card-title {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 800;
-            font-size: 1.65rem;
-            line-height: 1.05;
-            text-transform: uppercase;
-            letter-spacing: 0.01em;
-            color: var(--black);
-            margin-bottom: 8px;
-        }
+        .card-info { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .card-info-row { display: flex; align-items: flex-start; gap: 10px;
+            font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+        .card-info-row i { color: var(--red); width: 14px; text-align: center;
+            margin-top: 2px; flex-shrink: 0; font-size: 11px; }
 
-        .card-pastor {
-            font-family: 'Barlow', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: var(--gray-text);
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            margin-bottom: 22px;
-            line-height: 1.4;
-        }
-        .card-pastor i { color: var(--red); margin-top: 2px; flex-shrink: 0; font-size: 0.75rem; }
+        .card-divider { height: 1px; background: var(--border); margin-bottom: 18px; }
 
-        .divider {
-            height: 1px;
-            background: var(--gray-light);
-            margin-bottom: 20px;
-        }
-
-        .card-details {
-            display: flex;
-            flex-direction: column;
-            gap: 13px;
-            margin-bottom: 26px;
-            flex: 1;
-        }
-        .detail-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            font-size: 0.85rem;
-            color: #4a4540;
-            line-height: 1.5;
-        }
-        .detail-row i {
-            color: var(--red);
-            width: 16px;
-            text-align: center;
-            margin-top: 2px;
-            flex-shrink: 0;
-            font-size: 0.8rem;
-        }
+        .card-details { display: flex; flex-direction: column; gap: 11px; flex: 1; margin-bottom: 22px; }
+        .detail-row { display: flex; align-items: flex-start; gap: 12px;
+            font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+        .detail-row i { color: var(--text-muted); width: 14px; text-align: center;
+            margin-top: 2px; flex-shrink: 0; font-size: 11px; }
 
         .card-cta {
-            display: block;
-            text-align: center;
-            background: var(--black);
-            color: white;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 700;
-            font-size: 0.78rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            text-decoration: none;
-            padding: 14px;
-            border-radius: 12px;
-            transition: background 0.25s, transform 0.18s, letter-spacing 0.25s;
+            display: block; text-align: center;
+            background: var(--bg-card2); color: var(--text); border: 1px solid var(--border);
+            font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 12px;
+            letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none;
+            padding: 13px; border-radius: 12px; transition: all 0.22s;
         }
-        .card-cta:hover {
-            background: var(--red);
-            transform: scale(1.02);
-            letter-spacing: 0.24em;
-        }
+        .card-cta:hover { background: var(--red); border-color: var(--red); color: #fff;
+            letter-spacing: 0.2em; transform: translateY(-1px); }
 
-        /* ── CTA SECTION ── */
+        /* CTA SECTION */
         .cta-section {
-            background: var(--black);
-            padding: 80px 32px;
-            position: relative;
-            overflow: hidden;
+            background: var(--bg-card); border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 80px 24px; position: relative; overflow: hidden;
         }
         .cta-section::before {
-            content: 'FIRE';
-            position: absolute;
-            right: -20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(10rem, 22vw, 22rem);
-            color: rgba(255,255,255,0.03);
-            line-height: 1;
-            pointer-events: none;
+            content: 'FIRE'; position: absolute; right: -20px; top: 50%; transform: translateY(-50%);
+            font-family: 'Bebas Neue', sans-serif; font-size: clamp(10rem, 22vw, 22rem);
+            color: rgba(255,255,255,0.02); line-height: 1; pointer-events: none;
         }
-        .cta-inner {
-            max-width: 700px;
-            margin: 0 auto;
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
+        .cta-inner { max-width: 700px; margin: 0 auto; text-align: center; position: relative; z-index: 2; }
         .cta-eyebrow {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 700;
-            font-size: 0.7rem;
-            letter-spacing: 0.32em;
-            text-transform: uppercase;
-            color: var(--red-bright);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+            color: var(--red); margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: center; gap: 14px;
         }
-        .cta-eyebrow::before,
-        .cta-eyebrow::after {
-            content: '';
-            display: block;
-            width: 30px;
-            height: 1px;
-            background: var(--red-bright);
-        }
-        .cta-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(2.8rem, 7vw, 5.5rem);
-            line-height: 0.9;
-            letter-spacing: 0.03em;
-            color: white;
-            margin-bottom: 24px;
-        }
-        .cta-title span { color: var(--red-bright); display: block; }
-        .cta-quote {
-            font-family: 'Barlow', sans-serif;
-            font-weight: 300;
-            font-size: 1.05rem;
-            color: rgba(255,255,255,0.55);
-            margin-bottom: 40px;
-            line-height: 1.7;
-            font-style: italic;
-        }
+        .cta-eyebrow::before, .cta-eyebrow::after { content: ''; display: block; width: 30px; height: 1px; background: var(--red); }
+        .cta-title { font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.8rem, 7vw, 5.5rem); line-height: 0.9; letter-spacing: 0.03em;
+            color: var(--text); margin-bottom: 24px; }
+        .cta-title span { color: var(--red); display: block; }
+        .cta-quote { font-size: 15px; color: var(--text-dim); font-weight: 300; font-style: italic;
+            margin-bottom: 40px; line-height: 1.7; }
         .cta-btn {
-            display: inline-block;
-            background: var(--red);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 700;
-            font-size: 0.85rem;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            padding: 18px 48px;
-            border-radius: 100px;
-            transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
-            box-shadow: 0 0 0 0 rgba(192,0,10,0);
+            display: inline-block; background: var(--red); color: #fff; border: none; cursor: pointer;
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 13px;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            padding: 16px 48px; border-radius: 100px; transition: all 0.22s;
         }
-        .cta-btn:hover {
-            background: white;
-            color: var(--black);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(192,0,10,0.35);
-        }
+        .cta-btn:hover { background: #fff; color: var(--bg); transform: translateY(-3px);
+            box-shadow: 0 12px 30px var(--red-glow); }
 
-        /* ── FOOTER ── */
-        footer {
-            padding: 36px 32px;
-            border-top: 1px solid rgba(0,0,0,0.08);
-            background: var(--off-white);
-        }
-        .footer-inner {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-        }
-        .footer-line {
-            width: 30px; height: 1px;
-            background: var(--gray-mid);
-        }
-        .footer-text {
-            font-family: 'Barlow Condensed', sans-serif;
-            font-weight: 600;
-            font-size: 0.68rem;
-            letter-spacing: 0.28em;
-            text-transform: uppercase;
-            color: var(--gray-text);
-        }
+        /* FOOTER */
+        footer { padding: 32px 24px; text-align: center; }
+        .footer-inner { display: flex; align-items: center; justify-content: center; gap: 16px; }
+        .footer-line { width: 30px; height: 1px; background: var(--border); }
+        .footer-text { font-size: 11px; font-weight: 700; letter-spacing: 0.22em;
+            text-transform: uppercase; color: var(--text-muted); }
 
-        /* ── SCROLL ANIMATION ── */
-        .fade-up {
-            opacity: 0;
-            transform: translateY(28px);
-            transition: opacity 0.55s ease, transform 0.55s ease;
-        }
-        .fade-up.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        /* SCROLL ANIMATION */
+        .fade-up { opacity: 0; transform: translateY(28px); transition: opacity 0.55s ease, transform 0.55s ease; }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
 
         @media (max-width: 600px) {
-            .header-inner { padding: 70px 24px 64px; }
-            main { padding: 60px 16px; }
+            .hero-inner { padding: 60px 20px 52px; }
+            main { padding: 60px 16px 60px; }
             .branches-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-bg">
-            <img src="media/building3.jpeg" alt="background">
-        </div>
-        <div class="header-inner">
-            <div class="header-eyebrow">Find a global home near you</div>
-            <h1 class="header-title">
-                Our
-                <span>Locations</span>
-            </h1>
-        </div>
-    </header>
+<nav>
+    <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i></a>
+    <div class="nav-brand"><span class="icon"><i class="fas fa-map-marker-alt"></i></span> Branches</div>
+    <div class="nav-logo"><img src="media/logo1.png" alt="COC" onerror="this.style.display='none'"></div>
+</nav>
 
-    <div class="search-wrap">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Search by city or country...">
-            <button class="search-btn">Search</button>
+<div class="hero">
+    <div class="hero-img"><img src="media/building3.jpeg" alt="background"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+        <div class="hero-eyebrow">Find a global home near you</div>
+        <h1 class="hero-title">Our<span>Locations</span></h1>
+    </div>
+</div>
+
+<div class="search-wrap">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="branchSearch" placeholder="Search by city, area, or pastor…" oninput="filterBranches()">
+        <button class="search-btn" onclick="filterBranches()">Search</button>
+    </div>
+</div>
+
+<main>
+    <div class="section-label">All branches &amp; outposts</div>
+    <div class="branches-grid" id="branchesGrid">
+
+        <div class="branch-card fade-up" data-search="champion cathedral benin city au road uselu beatrice ugboya">
+            <div class="card-image">
+                <img src="media/building3.jpeg" alt="Champion Cathedral">
+                <div class="card-badge">Global HQ</div>
+                <div class="card-num">01</div>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">Champion Cathedral</h3>
+                <div class="card-info">
+                    <div class="card-info-row"><i class="fas fa-user-tie"></i><span>Lead Pastor: Reverend Beatrice Ugboya</span></div>
+                    <div class="card-info-row"><i class="fas fa-phone"></i><span>+234 903 026 8356</span></div>
+                </div>
+                <div class="card-divider"></div>
+                <div class="card-details">
+                    <div class="detail-row"><i class="fas fa-map-marker-alt"></i><span>City of Champions, Au Road, by Auchi Bypass, Uselu N'Ahor, Benin City.</span></div>
+                    <div class="detail-row"><i class="fas fa-clock"></i><span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span></div>
+                </div>
+                <a href="https://maps.google.com" target="_blank" class="card-cta"><i class="fas fa-directions" style="margin-right:6px;"></i>Get Directions</a>
+            </div>
         </div>
+
+        <div class="branch-card fade-up" data-search="noah's ark benin city idokpa auchi road itohan owobu">
+            <div class="card-image">
+                <img src="media/building3.jpeg" alt="Noah's Ark">
+                <div class="card-num">02</div>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">Noah's Ark</h3>
+                <div class="card-info">
+                    <div class="card-info-row"><i class="fas fa-user-tie"></i><span>Lead Pastor: Reverend Itohan Owobu</span></div>
+                    <div class="card-info-row"><i class="fas fa-phone"></i><span>+234 803 456 7890</span></div>
+                </div>
+                <div class="card-divider"></div>
+                <div class="card-details">
+                    <div class="detail-row"><i class="fas fa-map-marker-alt"></i><span>By Ascon Fuel Station, Idokpa, Benin Auchi Road, Benin City.</span></div>
+                    <div class="detail-row"><i class="fas fa-clock"></i><span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span></div>
+                </div>
+                <a href="https://maps.google.com" target="_blank" class="card-cta"><i class="fas fa-directions" style="margin-right:6px;"></i>Get Directions</a>
+            </div>
+        </div>
+
+        <div class="branch-card fade-up" data-search="bethel house benin city idunmwungha divine grace road emmanuel uwadia">
+            <div class="card-image">
+                <img src="media/building3.jpeg" alt="Bethel House">
+                <div class="card-num">03</div>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">Bethel House</h3>
+                <div class="card-info">
+                    <div class="card-info-row"><i class="fas fa-user-tie"></i><span>Lead Pastor: Pastor Emmanuel Uwadia</span></div>
+                    <div class="card-info-row"><i class="fas fa-phone"></i><span>+234 806 647 4383</span></div>
+                </div>
+                <div class="card-divider"></div>
+                <div class="card-details">
+                    <div class="detail-row"><i class="fas fa-map-marker-alt"></i><span>Divine Baptist Church Road, Off Divine Grace Road, Idunmwungha, Benin City.</span></div>
+                    <div class="detail-row"><i class="fas fa-clock"></i><span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span></div>
+                </div>
+                <a href="https://maps.google.com" target="_blank" class="card-cta"><i class="fas fa-directions" style="margin-right:6px;"></i>Get Directions</a>
+            </div>
+        </div>
+
+        <div class="branch-card fade-up" data-search="grace mercy benin city upper mission extension joyce ndidi">
+            <div class="card-image">
+                <img src="media/building3.jpeg" alt="Grace and Mercy">
+                <div class="card-num">04</div>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">Grace and Mercy</h3>
+                <div class="card-info">
+                    <div class="card-info-row"><i class="fas fa-user-tie"></i><span>Resident Pastor: Reverend Joyce Ndidi</span></div>
+                    <div class="card-info-row"><i class="fas fa-phone"></i><span>+234 815 408 2991</span></div>
+                </div>
+                <div class="card-divider"></div>
+                <div class="card-details">
+                    <div class="detail-row"><i class="fas fa-map-marker-alt"></i><span>Ivie Obasuyi Street, Idunmwuoni Road, Upper Mission Extension, Benin City.</span></div>
+                    <div class="detail-row"><i class="fas fa-clock"></i><span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span></div>
+                </div>
+                <a href="#" class="card-cta"><i class="fas fa-directions" style="margin-right:6px;"></i>Get Directions</a>
+            </div>
+        </div>
+
+        <div class="branch-card fade-up" data-search="tabernacle david benin city urora movic motors god'stime edo">
+            <div class="card-image">
+                <img src="media/building3.jpeg" alt="Tabernacle of David">
+                <div class="card-num">05</div>
+            </div>
+            <div class="card-body">
+                <h3 class="card-title">Tabernacle of David</h3>
+                <div class="card-info">
+                    <div class="card-info-row"><i class="fas fa-user-tie"></i><span>Resident Pastor: Reverend God'stime Edo</span></div>
+                    <div class="card-info-row"><i class="fas fa-phone"></i><span>+234 815 636 9636</span></div>
+                </div>
+                <div class="card-divider"></div>
+                <div class="card-details">
+                    <div class="detail-row"><i class="fas fa-map-marker-alt"></i><span>Dr. Abba One Quarter's, By Movic Motors, Urora, Benin City.</span></div>
+                    <div class="detail-row"><i class="fas fa-clock"></i><span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span></div>
+                </div>
+                <a href="#" class="card-cta"><i class="fas fa-directions" style="margin-right:6px;"></i>Get Directions</a>
+            </div>
+        </div>
+
     </div>
 
-    <main>
-        <div class="section-label">All branches &amp; outposts</div>
+    <div id="noResults" style="display:none;text-align:center;padding:60px 20px;">
+        <div style="font-size:2.5rem;color:rgba(200,16,46,0.2);margin-bottom:16px;"><i class="fas fa-map-marked-alt"></i></div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:1.2rem;color:var(--text);margin-bottom:8px;">No branches found</div>
+        <div style="font-size:13px;color:var(--text-muted);">Try searching by city, area or pastor name.</div>
+    </div>
+</main>
 
-        <div class="branches-grid">
+<section class="cta-section">
+    <div class="cta-inner">
+        <div class="cta-eyebrow">Join us online</div>
+        <h2 class="cta-title">Can't find a branch<span>near you?</span></h2>
+        <p class="cta-quote">"Join thousands of people online worldwide and experience the fire of God from anywhere in the world."</p>
+        <button class="cta-btn">Join Online</button>
+    </div>
+</section>
 
-            <!-- Card 1 -->
-            <div class="branch-card fade-up">
-                <div class="card-image">
-                    <img src="media/building3.jpeg" alt="Champion Cathedral">
-                    <div class="card-badge">Global HQ</div>
-                    <div class="card-num">01</div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title">Champion Cathedral</h3>
-                    <p class="card-pastor">
-                        <i class="fas fa-user-tie"></i>
-                        Lead Pastor: Reverend Beatrice Ugboya
-                    </p>
-                        </p>     <p class="card-pastor">
-                        
-                        <i class="fas fa-phone"></i>
-                        <span>+234 903 026 8356</span>
-                    </p>
-                    <div class="divider"></div>
-                    <div class="card-details">
-                        <div class="detail-row">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>City of Champions, Au Road, by Auchi Bypass, Uselu N'Ahor, Benin City.</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="fas fa-clock"></i>
-                            <span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span>
-                        </div>
-                    </div>
-                    <a href="https://maps.google.com" target="_blank" class="card-cta">Get Directions</a>
-                </div>
-            </div>
+<footer>
+    <div class="footer-inner">
+        <div class="footer-line"></div>
+        <p class="footer-text">© 2026 COC. All Rights Reserved.</p>
+        <div class="footer-line"></div>
+    </div>
+</footer>
 
-            <!-- Card 2 -->
-            <div class="branch-card fade-up">
-                <div class="card-image">
-                    <img src="media/building3.jpeg" alt="Noah's Ark">
-                  
-                    <div class="card-num">02</div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title">Noah's Ark</h3>
-                    <p class="card-pastor">
-                        <i class="fas fa-user-tie"></i>
-                        Lead Pastor: Reverend Itohan Owobu <br>
-                       
-                    </p>
-                         <p class="card-pastor">
-                        
-                        <i class="fas fa-phone"></i>
-                        <span>+234 803 456 7890</span>
-                    </p>
-                    <div class="divider"></div>
-                    <div class="card-details">
-                        <div class="detail-row">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>By Ascon Fuel Station, Idokpa, Benin Auchi Road, Benin City.</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="fas fa-clock"></i>
-                            <span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span>
-                        </div>
-                    </div>
-                    <a href="https://maps.google.com" target="_blank" class="card-cta">Get Directions</a>
-                </div>
-            </div>
+<script>
+    function filterBranches() {
+        const term = document.getElementById('branchSearch').value.trim().toLowerCase();
+        const cards = document.querySelectorAll('.branch-card');
+        let visible = 0;
+        cards.forEach(card => {
+            const haystack = (card.dataset.search || '') + ' ' + card.textContent.toLowerCase();
+            const show = !term || haystack.includes(term);
+            card.style.display = show ? '' : 'none';
+            if (show) visible++;
+        });
+        document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
+    }
 
-            <!-- Card 3 -->
-            <div class="branch-card fade-up">
-                <div class="card-image">
-                    <img src="media/building3.jpeg" alt="Bethel House">
-                  
-                    <div class="card-num">03</div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title">Bethel House</h3>
-                    <p class="card-pastor">
-                        <i class="fas fa-user-tie"></i>
-                        Lead Pastor: Pastor Emmanuel Uwadia
-                    </p>
-                        </p>     <p class="card-pastor">
-                        
-                        <i class="fas fa-phone"></i>
-                        <span>+234 806 647 4383</span>
-                    </p>
-                    <div class="divider"></div>
-                    <div class="card-details">
-                        <div class="detail-row">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Divine Baptist Church Road, Off Divine Grace Road, Idunmwungha, Benin City.</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="fas fa-clock"></i>
-                            <span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span>
-                        </div>
-                    </div>
-                    <a href="https://maps.google.com" target="_blank" class="card-cta">Get Directions</a>
-                </div>
-            </div>
-
-            <!-- Card 4 -->
-            <div class="branch-card fade-up">
-                <div class="card-image">
-                    <img src="media/building3.jpeg" alt="Grace and Mercy">
-                    <div class="card-num">04</div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title">Grace and Mercy</h3>
-                    <p class="card-pastor">
-                        <i class="fas fa-user-tie"></i>
-                        Resident Pastor: Reverend Joyce Ndidi
-                    </p>
-                        </p>     <p class="card-pastor">
-                        
-                        <i class="fas fa-phone"></i>
-                        <span>+234 815 408 2991</span>
-                    </p>
-                    <div class="divider"></div>
-                    <div class="card-details">
-                        <div class="detail-row">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Ivie Obasuyi Street, Idunmwuoni Road, Upper Mission Extension, Benin City, Nigeria.</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="fas fa-clock"></i>
-                            <span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span>
-                        </div>
-                    </div>
-                    <a href="#" class="card-cta">Get Directions</a>
-                </div>
-            </div>
-
-            <!-- Card 5 -->
-            <div class="branch-card fade-up">
-                <div class="card-image">
-                    <img src="media/building3.jpeg" alt="Tabernacle of David">
-                    <div class="card-num">05</div>
-                </div>
-                <div class="card-body">
-                    <h3 class="card-title">Tabernacle of David</h3>
-                    <p class="card-pastor">
-                        <i class="fas fa-user-tie"></i>
-                        Resident Pastor: Reverend God'stime Edo
-                    </p>     <p class="card-pastor">
-                        
-                        <i class="fas fa-phone"></i>
-                        <span>+234 815 636 9636</span>
-                    </p>
-                    <div class="divider"></div>
-                    <div class="card-details">
-                        <div class="detail-row">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Dr. Abba One Quarter's, By Movic Motors, Urora, Benin City, Nigeria.</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="fas fa-clock"></i>
-                            <span>Sundays: 8:00 AM &nbsp;|&nbsp; Monday: 5:00 PM</span>
-                        </div>
-                    </div>
-                    <a href="#" class="card-cta">Get Directions</a>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <section class="cta-section">
-        <div class="cta-inner">
-            <div class="cta-eyebrow">Join us online</div>
-            <h2 class="cta-title">
-                Can't find a branch
-                <span>near you?</span>
-            </h2>
-            <p class="cta-quote">"Join thousands of people online worldwide and experience the fire of God from anywhere in the world."</p>
-            <button class="cta-btn">Join Online</button>
-        </div>
-    </section>
-
-    <footer>
-        <div class="footer-inner">
-            <div class="footer-line"></div>
-            <p class="footer-text">© 2026 COC. All Rights Reserved.</p>
-            <div class="footer-line"></div>
-        </div>
-    </footer>
-
-    <script>
-        // Staggered scroll-triggered fade-up
-        const cards = document.querySelectorAll('.fade-up');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, i) => {
-                if (entry.isIntersecting) {
-                    const el = entry.target;
-                    const delay = Array.from(cards).indexOf(el) % 3 * 100;
-                    setTimeout(() => el.classList.add('visible'), delay);
-                    observer.unobserve(el);
-                }
-            });
-        }, { threshold: 0.12 });
-        cards.forEach(c => observer.observe(c));
-    </script>
-
+    // Scroll animations
+    const cards = document.querySelectorAll('.fade-up');
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                const delay = Array.from(cards).indexOf(el) % 3 * 100;
+                setTimeout(() => el.classList.add('visible'), delay);
+                observer.unobserve(el);
+            }
+        });
+    }, { threshold: 0.1 });
+    cards.forEach(c => observer.observe(c));
+</script>
 </body>
 </html>

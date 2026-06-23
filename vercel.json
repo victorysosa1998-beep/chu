@@ -4,5 +4,21 @@
       "memory": 128,
       "maxDuration": 15
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/scripts/(.*)", "destination": "/scripts/$1" },
+    { "source": "/media/(.*)",   "destination": "/media/$1"   },
+    { "source": "/sw.js",        "destination": "/sw.js"       },
+    { "source": "/(.*)\\.html",  "destination": "/$1.html"     },
+    { "source": "/(.*)",         "destination": "/index.html"  }
+  ],
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    }
+  ]
 }

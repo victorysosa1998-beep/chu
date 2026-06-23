@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scripture of the Day | City of Champions</title>
+    <link rel="icon" type="image/png" href="media/logo1.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@1,300;1,400&family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --ember: #c8102e;
+            --ember-dim: rgba(200,16,46,0.15);
+            --gold: #f0a500;
+            --gold-dim: rgba(240,165,0,0.15);
+            --surface: #111114;
+            --card: #18181c;
+            --card-border: rgba(255,255,255,0.07);
+            --text: #f0f0f4;
+            --muted: #6b6b7a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0b;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* NAV */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(10,10,11,0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+        }
+        nav a {
+            color: var(--ember); font-family: 'Outfit', sans-serif;
+            font-weight: 700; font-size: 13px; letter-spacing: 0.05em;
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: var(--gold); }
+        .nav-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px; letter-spacing: 0.1em;
+            color: var(--text);
+        }
+        .nav-logo { height: 36px; object-fit: contain; }
+
+        /* HERO */
+        .hero {
+            position: relative; overflow: hidden;
+            padding: 72px 24px 64px;
+            text-align: center;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 50% 0%, rgba(200,16,46,0.18) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 80% 60%, rgba(240,165,0,0.08) 0%, transparent 60%);
+        }
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--ember-dim); border: 1px solid rgba(200,16,46,0.3);
+            color: var(--ember); padding: 6px 16px; border-radius: 100px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; margin-bottom: 20px;
+            position: relative;
+        }
+        .hero h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(42px, 8vw, 72px);
+            letter-spacing: 0.04em; line-height: 1;
+            color: var(--text); position: relative; margin-bottom: 16px;
+        }
+        .hero h1 span { color: var(--ember); }
+        .hero p {
+            color: var(--muted); font-size: 16px; font-weight: 300;
+            max-width: 480px; margin: 0 auto; position: relative;
+        }
+
+        /* MAIN */
+        main { max-width: 800px; margin: 0 auto; padding: 0 20px 80px; }
+
+        /* VERSE CARD */
+        .verse-card {
+            background: linear-gradient(145deg, #1a0a10 0%, #120810 100%);
+            border: 1px solid rgba(200,16,46,0.25);
+            border-radius: 20px;
+            padding: 48px 40px;
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative; overflow: hidden;
+        }
+        .verse-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ember), transparent);
+        }
+        .verse-card::after {
+            content: '\f518';
+            font-family: 'Font Awesome 6 Free'; font-weight: 900;
+            position: absolute; bottom: -20px; right: -10px;
+            font-size: 120px; color: rgba(200,16,46,0.05);
+            pointer-events: none;
+        }
+        .verse-label {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: var(--ember); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 28px;
+        }
+        .verse-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic; font-weight: 300;
+            font-size: clamp(22px, 3.5vw, 30px);
+            line-height: 1.6; color: #fff;
+            margin-bottom: 20px;
+        }
+        .verse-ref {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 20px; letter-spacing: 0.1em;
+            color: var(--gold);
+        }
+        .verse-actions {
+            display: flex; gap: 12px; justify-content: center;
+            flex-wrap: wrap; margin-top: 28px;
+        }
+        .btn-primary {
+            background: var(--ember); color: #fff;
+            border: none; padding: 10px 24px; border-radius: 100px;
+            font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13px;
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover { background: #a00c24; transform: translateY(-1px); }
+        .btn-ghost {
+            background: transparent; color: var(--text);
+            border: 1px solid var(--card-border); padding: 10px 24px; border-radius: 100px;
+            font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 13px;
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-ghost:hover { border-color: var(--ember); color: var(--ember); }
+        .btn-ghost.done { border-color: #22c55e; color: #22c55e; }
+        #readStatus { color: var(--muted); font-size: 12px; margin-top: 12px; }
+
+        /* SECTION CARD */
+        .section-card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 28px 32px;
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+        }
+        .section-card:hover { border-color: rgba(200,16,46,0.2); }
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px; font-weight: 700;
+            color: var(--text); margin-bottom: 16px;
+            display: flex; align-items: center; gap-10px;
+        }
+        .section-title i { color: var(--ember); margin-right: 10px; }
+
+        /* REFLECTION */
+        .reflection-text {
+            color: rgba(240,240,244,0.75); font-size: 14px; line-height: 1.8;
+            margin-bottom: 16px;
+        }
+        .prayer-box {
+            background: rgba(200,16,46,0.08);
+            border: 1px solid rgba(200,16,46,0.2);
+            border-radius: 12px; padding: 16px 20px;
+        }
+        .prayer-box p {
+            color: rgba(240,240,244,0.85); font-style: italic;
+            font-size: 14px; line-height: 1.7;
+        }
+
+        /* REACTIONS */
+        .reactions-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .reaction-btn {
+            background: rgba(255,255,255,0.04);
+            border: 1.5px solid var(--card-border);
+            color: var(--text); padding: 10px 18px; border-radius: 100px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .reaction-btn:hover, .reaction-btn.active {
+            background: var(--ember-dim);
+            border-color: var(--ember);
+        }
+        .reaction-btn .count { color: var(--muted); font-size: 13px; }
+
+        /* COMMENTS */
+        .comment-input-row { display: flex; gap: 10px; margin-top: 20px; }
+        .comment-input {
+            flex: 1; background: rgba(255,255,255,0.04);
+            border: 1.5px solid var(--card-border);
+            border-radius: 12px; padding: 12px 16px;
+            color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px;
+            outline: none; transition: border-color 0.2s;
+        }
+        .comment-input:focus { border-color: var(--ember); }
+        .comment-input::placeholder { color: var(--muted); }
+        .btn-send {
+            background: var(--ember); color: #fff; border: none;
+            width: 46px; border-radius: 12px; cursor: pointer;
+            font-size: 16px; transition: background 0.2s; flex-shrink: 0;
+        }
+        .btn-send:hover { background: #a00c24; }
+
+        .comment-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+        .comment-item:hover { border-color: rgba(200,16,46,0.2); }
+        .comment-meta { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
+        .comment-name { font-weight: 600; font-size: 13px; color: var(--text); }
+        .comment-time { color: var(--muted); font-size: 12px; }
+        .comment-text { color: rgba(240,240,244,0.8); font-size: 14px; line-height: 1.6; }
+        #commentSection .empty-state {
+            color: var(--muted); font-size: 14px; text-align: center; padding: 20px 0;
+        }
+
+        /* ARCHIVE */
+        .archive-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px; border-radius: 10px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            cursor: default;
+        }
+        .archive-item:hover { background: rgba(255,255,255,0.03); border-left-color: var(--ember); }
+        .archive-item.today { border-left-color: var(--ember); background: var(--ember-dim); }
+        .archive-book { font-size: 14px; color: var(--text); font-weight: 500; }
+        .archive-ref { font-size: 12px; color: var(--muted); margin-top: 2px; }
+        .today-badge {
+            font-size: 11px; background: var(--ember); color: #fff;
+            padding: 3px 10px; border-radius: 100px; font-weight: 700; white-space: nowrap;
+        }
+        .archive-scroll { max-height: 380px; overflow-y: auto; padding-right: 4px; }
+        .archive-scroll::-webkit-scrollbar { width: 4px; }
+        .archive-scroll::-webkit-scrollbar-track { background: transparent; }
+        .archive-scroll::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 4px; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-up { animation: fadeUp 0.5s ease both; }
+        .fade-up:nth-child(2) { animation-delay: 0.1s; }
+        .fade-up:nth-child(3) { animation-delay: 0.2s; }
+        .fade-up:nth-child(4) { animation-delay: 0.3s; }
+        .fade-up:nth-child(5) { animation-delay: 0.4s; }
+
+        @media (max-width: 600px) {
+            .verse-card { padding: 32px 20px; }
+            .section-card { padding: 22px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html"><i class="fas fa-arrow-left"></i></a>
+    <span class="nav-title">City of Champions</span>
+    <img src="media/logos.png" alt="COC" class="nav-logo" onerror="this.style.display='none'">
+</nav>
+
+<section class="hero">
+    <div class="hero-eyebrow"><i class="fas fa-book-open"></i> Daily Word</div>
+    <h1>Scripture <span>of the Day</span></h1>
+    <p>Meditate on God's Word daily. Read, reflect, and share with the community.</p>
+</section>
+
+<main>
+
+    <!-- Today's Verse -->
+    <div class="verse-card fade-up">
+        <div class="verse-label"><i class="fas fa-book-open"></i> Today's Scripture</div>
+        <p class="verse-text" id="todayVerse">Loading scripture…</p>
+        <p class="verse-ref" id="todayReference">—</p>
+        <div class="verse-actions">
+            <button class="btn-primary" onclick="shareScripture()"><i class="fas fa-share-alt"></i> Share</button>
+            <button class="btn-ghost" onclick="markRead()" id="markReadBtn"><i class="fas fa-check"></i> Mark Read</button>
+        </div>
+        <div id="readStatus"></div>
+    </div>
+
+    <!-- Reflection & Prayer -->
+    <div class="section-card fade-up">
+        <div class="section-title"><i class="fas fa-heart"></i> Reflection & Prayer</div>
+        <p class="reflection-text" id="todayReflection">Loading reflection…</p>
+        <div class="prayer-box">
+            <p id="todayPrayer">Loading prayer…</p>
+        </div>
+    </div>
+
+    <!-- Reactions -->
+    <div class="section-card fade-up">
+        <div class="section-title"><i class="fas fa-fire"></i> React to Today's Word</div>
+        <div class="reactions-row">
+            <button class="reaction-btn" onclick="reactToScripture('❤️')">❤️ <span class="count" id="react-heart">0</span></button>
+            <button class="reaction-btn" onclick="reactToScripture('🙏')">🙏 <span class="count" id="react-pray">0</span></button>
+            <button class="reaction-btn" onclick="reactToScripture('🔥')">🔥 <span class="count" id="react-fire">0</span></button>
+            <button class="reaction-btn" onclick="reactToScripture('👏')">👏 <span class="count" id="react-clap">0</span></button>
+            <button class="reaction-btn" onclick="reactToScripture('😭')">😭 <span class="count" id="react-tears">0</span></button>
+        </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="section-card fade-up">
+        <div class="section-title"><i class="fas fa-comments"></i> Community Reflections</div>
+        <div id="commentSection">
+            <div class="empty-state">No comments yet — be the first to share your thoughts!</div>
+        </div>
+        <div class="comment-input-row">
+            <input class="comment-input" id="commentInput" type="text" placeholder="Share your reflection on this scripture…">
+            <button class="btn-send" onclick="addComment()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Archive -->
+    <div class="section-card fade-up">
+        <div class="section-title"><i class="fas fa-scroll"></i> Scripture Archive</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Past scriptures from the last 30 days.</p>
+        <div class="archive-scroll" id="archiveContainer"></div>
+    </div>
+
+</main>
+
+<script src="/scripts/coc-user.js"></script>
+<script src="/scripts/coc-scripture.js"></script>
+
+<script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+        getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
+        onSnapshot, query, orderBy, increment, serverTimestamp, getDoc, setDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey:            "AIzaSyB2gU2QrpRnIevjhLqd1kTj-xsjiWBHGqQ",
+        authDomain:        "joincoc.firebaseapp.com",
+        projectId:         "joincoc",
+        storageBucket:     "joincoc.firebasestorage.app",
+        messagingSenderId: "322343274719",
+        appId:             "1:322343274719:web:689229a5dd1ca422c9c16a"
+    };
+
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    const SCRIPTURE_DATA = [
+        { verse: '"Trust in the Lord with all your heart and lean not on your own understanding."', reference: 'Proverbs 3:5', reflection: 'God invites us to trust Him completely, even when you don\'t understand His ways. He is faithful and His plans are perfect.', prayer: 'Lord, help me to trust You more deeply today. Let Your Word guide my steps.' },
+        { verse: '"I can do all things through Christ who strengthens me."', reference: 'Philippians 4:13', reflection: 'Your strength comes from Christ, not your own abilities. When you feel weak, His power is made perfect in you.', prayer: 'Father, thank You for Your constant presence. Fill me with Your peace.' },
+        { verse: '"The Lord is my shepherd; I shall not want."', reference: 'Psalm 23:1', reflection: 'With God as your shepherd, you have everything you need. He leads, guides, and provides for you.', prayer: 'Lord, I surrender my fears to You. Give me courage and strength.' },
+        { verse: '"Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go."', reference: 'Joshua 1:9', reflection: 'God\'s presence is with you always — you don\'t need to fear. He goes before you and fights for you.', prayer: 'Heavenly Father, open my eyes to see Your goodness today.' },
+        { verse: '"And we know that in all things God works for the good of those who love him, who have been called according to his purpose."', reference: 'Romans 8:28', reflection: 'Even difficult circumstances are part of God\'s good plan for your life. He is working all things for your good.', prayer: 'Lord, guide my heart to love others as You have loved me.' },
+        { verse: '"The Lord is my light and my salvation — whom shall I fear?"', reference: 'Psalm 27:1', reflection: 'God\'s light dispels all darkness. You have nothing to fear when He is your protector.', prayer: 'Father, thank You for being my light and salvation. I trust in You.' },
+        { verse: '"For I know the plans I have for you," declares the Lord, "plans to prosper you and not to harm you, plans to give you hope and a future."', reference: 'Jeremiah 29:11', reflection: 'God holds your future in His hands. His plans for you are filled with hope and purpose.', prayer: 'Lord, I trust Your plans over my own. Lead me in Your perfect way.' },
+        { verse: '"Ask and it will be given to you; seek and you will find; knock and the door will be opened to you."', reference: 'Matthew 7:7', reflection: 'God is approachable and responds to those who seek Him. Come to Him boldly in prayer.', prayer: 'Father, I come to You boldly today. Hear my prayer and answer in Your perfect timing.' },
+        { verse: '"Come to me, all you who are weary and burdened, and I will give you rest."', reference: 'Matthew 11:28', reflection: 'Jesus offers rest to all who are tired and burdened. His yoke is easy and His burden is light.', prayer: 'Lord Jesus, I lay my burdens at Your feet today. Grant me Your perfect rest.' },
+        { verse: '"The name of the Lord is a fortified tower; the righteous run to it and are safe."', reference: 'Proverbs 18:10', reflection: 'In times of trouble, God\'s name is your refuge and strength. Run to Him in prayer.', prayer: 'Father, You are my strong tower. I run to You in times of trouble.' }
+    ];
+
+    function getTodayIndex() {
+        const start = new Date('2024-01-01');
+        const today = new Date();
+        const diff  = Math.floor((today - start) / 86400000);
+        return diff % SCRIPTURE_DATA.length;
+    }
+
+    const todayIdx    = getTodayIndex();
+    const todayData   = SCRIPTURE_DATA[todayIdx];
+    const todayKey    = new Date().toISOString().split('T')[0];
+    const scriptureRef = doc(db, 'scriptures', todayKey);
+    const commentsRef  = collection(db, 'scriptures', todayKey, 'comments');
+
+    function renderTodayScripture() {
+        document.getElementById('todayVerse').textContent     = todayData.verse;
+        document.getElementById('todayReference').textContent = '— ' + todayData.reference;
+        document.getElementById('todayReflection').textContent = todayData.reflection;
+        document.getElementById('todayPrayer').textContent    = todayData.prayer;
+
+        const readKey = 'coc_scripture_read_' + todayKey;
+        if (localStorage.getItem(readKey)) {
+            const btn = document.getElementById('markReadBtn');
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> Read Today';
+            btn.classList.add('done');
+            document.getElementById('readStatus').textContent = '✓ Marked as read today';
+        }
+    }
+
+    window.markRead = function() {
+        const readKey = 'coc_scripture_read_' + todayKey;
+        localStorage.setItem(readKey, '1');
+        const btn = document.getElementById('markReadBtn');
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> Read Today';
+        btn.classList.add('done');
+        document.getElementById('readStatus').textContent = '✓ Marked as read today';
+        if (window.COCUser) window.COCUser.recordVisit();
+    };
+
+    window.shareScripture = function() {
+        const text = `${todayData.verse}\n— ${todayData.reference}\n\nRead more at joincoc.com 🔥`;
+        if (navigator.share) {
+            navigator.share({ title: 'Scripture of the Day', text });
+        } else {
+            navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!')).catch(() => {});
+        }
+    };
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.textContent = msg;
+        Object.assign(t.style, {
+            position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)',
+            background:'var(--ember)', color:'#fff', padding:'10px 20px',
+            borderRadius:'100px', fontFamily:'Outfit,sans-serif', fontWeight:'700',
+            fontSize:'13px', zIndex:'9999', pointerEvents:'none'
+        });
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2500);
+    }
+
+    let myReactions = {};
+    function loadMyReactions() {
+        try { myReactions = JSON.parse(localStorage.getItem('coc_reactions_' + todayKey) || '{}'); } catch { myReactions = {}; }
+    }
+    function saveMyReactions() {
+        try { localStorage.setItem('coc_reactions_' + todayKey, JSON.stringify(myReactions)); } catch {}
+    }
+    function reactionMap(e) {
+        return { '❤️':'heart','🙏':'pray','🔥':'fire','👏':'clap','😭':'tears' }[e] || 'heart';
+    }
+
+    window.reactToScripture = async function(reaction) {
+        if (myReactions[reaction]) return;
+        myReactions[reaction] = true;
+        saveMyReactions();
+        const el = document.getElementById('react-' + reactionMap(reaction));
+        if (el) el.textContent = parseInt(el.textContent || 0) + 1;
+        document.querySelectorAll('.reaction-btn').forEach(btn => {
+            if (btn.textContent.includes(reaction)) btn.classList.add('active');
+        });
+        if (window.COCUser) window.COCUser.recordPrayer();
+        try {
+            await setDoc(scriptureRef, { ['react_' + reactionMap(reaction)]: increment(1) }, { merge: true });
+        } catch(e) { console.error(e); }
+    };
+
+    window.addComment = async function() {
+        const input = document.getElementById('commentInput');
+        const text  = input.value.trim();
+        if (!text) return;
+        const user = window.COCUser ? window.COCUser.getUser() : null;
+        const name = user?.displayName || 'Anonymous';
+        input.value = '';
+        try {
+            await addDoc(commentsRef, { name, text, createdAt: serverTimestamp() });
+            if (window.COCUser) window.COCUser.recordComment();
+        } catch(e) { console.error(e); }
+    };
+
+    function esc(s) { return s?.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') || ''; }
+    function timeAgo(ms) {
+        const s = Math.floor((Date.now() - ms) / 1000);
+        if (s < 60) return 'just now';
+        if (s < 3600) return `${Math.floor(s/60)}m ago`;
+        if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+        return `${Math.floor(s/86400)}d ago`;
+    }
+
+    function renderComments(docs) {
+        const c = document.getElementById('commentSection');
+        if (!docs || !docs.length) {
+            c.innerHTML = '<div class="empty-state">No comments yet — be the first to share your thoughts!</div>';
+            return;
+        }
+        c.innerHTML = docs.map(d => `
+            <div class="comment-item">
+                <div class="comment-meta">
+                    <span class="comment-name">${esc(d.name)}</span>
+                    <span class="comment-time">${d.createdAt ? timeAgo(d.createdAt.toMillis?.() ?? d.createdAt) : 'just now'}</span>
+                </div>
+                <p class="comment-text">${esc(d.text)}</p>
+            </div>
+        `).join('');
+    }
+
+    function renderArchive() {
+        const container = document.getElementById('archiveContainer');
+        container.innerHTML = SCRIPTURE_DATA.map((s, idx) => {
+            const daysAgo = (idx - todayIdx + SCRIPTURE_DATA.length) % SCRIPTURE_DATA.length;
+            const isToday = daysAgo === 0;
+            const date    = new Date();
+            date.setDate(date.getDate() - daysAgo);
+            const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            return `
+                <div class="archive-item ${isToday ? 'today' : ''}">
+                    <div>
+                        <div class="archive-book">${s.verse.substring(0,65)}${s.verse.length>65?'…':''}</div>
+                        <div class="archive-ref">${s.reference} · ${dateStr}</div>
+                    </div>
+                    ${isToday ? '<span class="today-badge">Today</span>' : ''}
+                </div>
+            `;
+        }).join('');
+    }
+
+    document.getElementById('commentInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') window.addComment();
+    });
+
+    function init() {
+        loadMyReactions();
+        renderTodayScripture();
+        renderArchive();
+
+        Object.keys(myReactions).forEach(reaction => {
+            if (myReactions[reaction]) {
+                document.querySelectorAll('.reaction-btn').forEach(btn => {
+                    if (btn.textContent.includes(reaction)) btn.classList.add('active');
+                });
+            }
+        });
+
+        onSnapshot(scriptureRef, snap => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            ['heart','pray','fire','clap','tears'].forEach(k => {
+                const el = document.getElementById('react-' + k);
+                if (el) el.textContent = data['react_' + k] || 0;
+            });
+        }, err => console.warn(err));
+
+        const q = query(commentsRef, orderBy('createdAt', 'desc'));
+        onSnapshot(q, snap => {
+            renderComments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        }, err => console.warn(err));
+
+        if (window.COCUser) {
+            const user = window.COCUser.getUser();
+            if (user?.displayName) window.COCUser.recordVisit();
+        }
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Reading Plans | City of Champions</title>
+    <link rel="icon" type="image/png" href="media/logo1.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --ember: #c8102e;
+            --ember-dim: rgba(200,16,46,0.15);
+            --gold: #f0a500;
+            --gold-dim: rgba(240,165,0,0.15);
+            --surface: #0a0a0b;
+            --card: #18181c;
+            --card-border: rgba(255,255,255,0.07);
+            --text: #f0f0f4;
+            --muted: #6b6b7a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--surface);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* NAV */
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(10,10,11,0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 0 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            height: 60px;
+        }
+        nav a {
+            color: var(--ember); font-family: 'Outfit', sans-serif;
+            font-weight: 700; font-size: 13px; letter-spacing: 0.05em;
+            text-decoration: none; display: flex; align-items: center; gap: 8px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: var(--gold); }
+        .nav-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.1em; }
+        .nav-logo { height: 36px; object-fit: contain; }
+
+        /* HERO */
+        .hero {
+            position: relative; overflow: hidden;
+            padding: 72px 24px 64px; text-align: center;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 50% 0%, rgba(200,16,46,0.18) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 20% 80%, rgba(240,165,0,0.08) 0%, transparent 60%);
+        }
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--ember-dim); border: 1px solid rgba(200,16,46,0.3);
+            color: var(--ember); padding: 6px 16px; border-radius: 100px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; margin-bottom: 20px; position: relative;
+        }
+        .hero h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(42px, 8vw, 72px);
+            letter-spacing: 0.04em; line-height: 1;
+            color: var(--text); position: relative; margin-bottom: 16px;
+        }
+        .hero h1 span { color: var(--ember); }
+        .hero p { color: var(--muted); font-size: 16px; font-weight: 300; max-width: 480px; margin: 0 auto; position: relative; }
+
+        /* PLAN PICKER */
+        main { max-width: 900px; margin: 0 auto; padding: 0 20px 80px; }
+
+        .plans-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+            margin-bottom: 32px;
+        }
+        @media (max-width: 640px) { .plans-grid { grid-template-columns: 1fr; } }
+
+        .plan-pick-card {
+            background: var(--card);
+            border: 1.5px solid var(--card-border);
+            border-radius: 16px; padding: 28px 20px; text-align: center;
+            cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
+        }
+        .plan-pick-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, var(--ember-dim), transparent);
+            opacity: 0; transition: opacity 0.25s;
+        }
+        .plan-pick-card:hover { border-color: var(--ember); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(200,16,46,0.15); }
+        .plan-pick-card:hover::before { opacity: 1; }
+        .plan-pick-card.active { border-color: var(--ember); box-shadow: 0 0 0 1px var(--ember); }
+        .plan-icon {
+            width: 56px; height: 56px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; margin: 0 auto 14px; position: relative;
+        }
+        .plan-icon.red { background: rgba(200,16,46,0.15); }
+        .plan-icon.blue { background: rgba(59,130,246,0.15); }
+        .plan-icon.green { background: rgba(34,197,94,0.15); }
+        .plan-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+        .plan-desc { color: var(--muted); font-size: 12px; line-height: 1.5; margin-bottom: 12px; }
+        .plan-badge {
+            display: inline-block; font-size: 10px; font-weight: 700;
+            padding: 3px 10px; border-radius: 100px; letter-spacing: 0.05em;
+        }
+        .plan-badge.red { background: var(--ember-dim); color: var(--ember); }
+        .plan-badge.blue { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .plan-badge.green { background: rgba(34,197,94,0.12); color: #4ade80; }
+
+        /* ACTIVE PLAN DISPLAY */
+        .plan-display { display: none; }
+        .plan-display.visible { display: block; animation: fadeUp 0.4s ease; }
+
+        .plan-header-card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px; padding: 28px 32px; margin-bottom: 20px;
+            position: relative; overflow: hidden;
+        }
+        .plan-header-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ember), var(--gold), transparent);
+        }
+        .plan-header-top {
+            display: flex; align-items: flex-start;
+            justify-content: space-between; gap: 16px; margin-bottom: 20px;
+        }
+        .plan-header-info h2 {
+            font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+            letter-spacing: 0.05em; margin-bottom: 4px;
+        }
+        .plan-header-info p { color: var(--muted); font-size: 14px; }
+        .plan-stats { text-align: right; flex-shrink: 0; }
+        .plan-stats .big { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--ember); line-height: 1; }
+        .plan-stats .label { color: var(--muted); font-size: 11px; letter-spacing: 0.05em; margin-bottom: 6px; }
+        .plan-stats .streak { font-size: 13px; color: var(--gold); font-weight: 600; }
+
+        /* PROGRESS BAR */
+        .progress-track {
+            height: 8px; background: rgba(255,255,255,0.06);
+            border-radius: 100px; overflow: hidden; margin-bottom: 8px;
+        }
+        .progress-fill {
+            height: 100%; border-radius: 100px;
+            background: linear-gradient(90deg, var(--ember), var(--gold));
+            transition: width 0.6s ease;
+        }
+        .progress-label { color: var(--muted); font-size: 12px; }
+
+        /* PLAN ACTIONS */
+        .plan-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+        .btn-sm {
+            background: transparent; color: var(--muted);
+            border: 1px solid var(--card-border); padding: 7px 16px;
+            border-radius: 100px; font-size: 12px; font-weight: 600;
+            cursor: pointer; font-family: 'Outfit', sans-serif;
+            transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-sm:hover { color: var(--ember); border-color: var(--ember); }
+
+        /* DAYS GRID */
+        .days-section-title {
+            font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700;
+            color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        @media (max-width: 480px) { .days-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .day-card {
+            background: rgba(255,255,255,0.03);
+            border: 1.5px solid var(--card-border);
+            border-radius: 12px; padding: 14px 12px; text-align: center;
+            cursor: pointer; transition: all 0.2s; position: relative;
+        }
+        .day-card:hover { border-color: rgba(200,16,46,0.3); background: rgba(200,16,46,0.05); }
+        .day-card.completed {
+            background: rgba(34,197,94,0.06);
+            border-color: rgba(34,197,94,0.3);
+        }
+        .day-card.current {
+            background: var(--ember-dim);
+            border-color: var(--ember);
+            box-shadow: 0 0 16px rgba(200,16,46,0.15);
+        }
+        .day-num { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 6px; }
+        .day-book { font-size: 12px; font-weight: 500; color: var(--text); line-height: 1.4; margin-bottom: 8px; min-height: 32px; display: flex; align-items: center; justify-content: center; }
+        .day-status { font-size: 16px; }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center; padding: 60px 24px; color: var(--muted);
+        }
+        .empty-state i { font-size: 48px; margin-bottom: 16px; display: block; color: rgba(200,16,46,0.3); }
+        .empty-state p { font-size: 16px; font-weight: 300; }
+
+        /* CELEBRATION MODAL */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px); z-index: 999;
+            display: none; align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: var(--card); border: 1px solid var(--card-border);
+            border-radius: 20px; padding: 40px 32px; max-width: 400px;
+            text-align: center; animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1);
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        .modal-icon { font-size: 56px; margin-bottom: 16px; }
+        .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--gold); margin-bottom: 8px; }
+        .modal-msg { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+        .btn-modal { background: var(--ember); color: #fff; border: none; padding: 12px 32px; border-radius: 100px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+        .btn-modal:hover { background: #a00c24; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: var(--ember); color: #fff; padding: 10px 22px;
+            border-radius: 100px; font-family: 'Outfit', sans-serif; font-weight: 700;
+            font-size: 13px; z-index: 9999; pointer-events: none;
+            animation: toastIn 0.3s ease;
+        }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html"><i class="fas fa-arrow-left"></i></a>
+    <span class="nav-title">City of Champions</span>
+    <img src="media/logos.png" alt="COC" class="nav-logo" onerror="this.style.display='none'">
+</nav>
+
+<section class="hero">
+    <div class="hero-eyebrow"><i class="fas fa-book-bible"></i> Reading Plans</div>
+    <h1>Bible <span>Reading Plans</span></h1>
+    <p>Read through the Bible systematically and grow deeper in your faith every day.</p>
+</section>
+
+<main>
+
+    <!-- Plan Picker -->
+    <div class="plans-grid">
+        <div class="plan-pick-card" onclick="selectPlan('90_days')" id="pick-90_days">
+            <div class="plan-icon red"><i class="fas fa-bible" style="color:var(--ember)"></i></div>
+            <div class="plan-name">90-Day Bible</div>
+            <div class="plan-desc">Read the entire Bible in 90 days</div>
+            <span class="plan-badge red">Most Popular</span>
+        </div>
+        <div class="plan-pick-card" onclick="selectPlan('new_testament')" id="pick-new_testament">
+            <div class="plan-icon blue"><i class="fas fa-cross" style="color:#60a5fa"></i></div>
+            <div class="plan-name">New Testament</div>
+            <div class="plan-desc">Read the New Testament in 30 days</div>
+            <span class="plan-badge blue">30 Days</span>
+        </div>
+        <div class="plan-pick-card" onclick="selectPlan('psalms')" id="pick-psalms">
+            <div class="plan-icon green"><i class="fas fa-music" style="color:#4ade80"></i></div>
+            <div class="plan-name">Psalms & Proverbs</div>
+            <div class="plan-desc">Wisdom and praise in 31 days</div>
+            <span class="plan-badge green">31 Days</span>
+        </div>
+    </div>
+
+    <!-- Active Plan -->
+    <div class="plan-display" id="planDisplay">
+        <div class="empty-state">
+            <i class="fas fa-book-open"></i>
+            <p>Select a reading plan above to get started!</p>
+        </div>
+    </div>
+
+</main>
+
+<!-- Celebration Modal -->
+<div class="modal-overlay" id="celebModal" onclick="closeCelebModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-icon">🎉</div>
+        <div class="modal-title" id="celebTitle">Plan Complete!</div>
+        <p class="modal-msg" id="celebMsg">You've completed this reading plan. God is faithful!</p>
+        <button class="btn-modal" onclick="closeCelebModal()">Praise the Lord! 🙌</button>
+    </div>
+</div>
+
+<script src="/scripts/coc-user.js"></script>
+<script src="/scripts/coc-points.js"></script>
+<script src="/scripts/coc-streak.js"></script>
+
+<script>
+    const PLANS = {
+        '90_days': {
+            title: '90-Day Bible Plan',
+            icon: 'fas fa-bible',
+            iconColor: 'var(--ember)',
+            description: 'Read through the entire Bible in 90 days.',
+            totalDays: 90,
+            days: []
+        },
+        'new_testament': {
+            title: 'New Testament in 30 Days',
+            icon: 'fas fa-cross',
+            iconColor: '#60a5fa',
+            description: 'Read the entire New Testament in 30 days.',
+            totalDays: 30,
+            days: []
+        },
+        'psalms': {
+            title: 'Psalms & Proverbs',
+            icon: 'fas fa-music',
+            iconColor: '#4ade80',
+            description: 'Read a Psalm and a Proverb each day for 31 days.',
+            totalDays: 31,
+            days: []
+        }
+    };
+
+    const BOOKS = {
+        '90_days': [
+            'Genesis 1-3','Genesis 4-7','Genesis 8-11','Genesis 12-15','Genesis 16-19',
+            'Genesis 20-23','Genesis 24-26','Genesis 27-29','Genesis 30-32','Genesis 33-35',
+            'Genesis 36-38','Genesis 39-41','Genesis 42-44','Genesis 45-47','Genesis 48-50',
+            'Exodus 1-3','Exodus 4-6','Exodus 7-9','Exodus 10-12','Exodus 13-15',
+            'Exodus 16-18','Exodus 19-21','Exodus 22-24','Exodus 25-27','Exodus 28-30',
+            'Exodus 31-33','Exodus 34-36','Exodus 37-39','Exodus 40','Leviticus 1-3',
+            'Leviticus 4-6','Leviticus 7-9','Leviticus 10-12','Leviticus 13-15','Leviticus 16-18',
+            'Leviticus 19-21','Leviticus 22-24','Leviticus 25-27','Numbers 1-3','Numbers 4-6',
+            'Numbers 7-9','Numbers 10-12','Numbers 13-15','Numbers 16-18','Numbers 19-21',
+            'Numbers 22-24','Numbers 25-27','Numbers 28-30','Numbers 31-33','Numbers 34-36',
+            'Deuteronomy 1-3','Deuteronomy 4-6','Deuteronomy 7-9','Deuteronomy 10-12',
+            'Deuteronomy 13-15','Deuteronomy 16-18','Deuteronomy 19-21','Deuteronomy 22-24',
+            'Deuteronomy 25-27','Deuteronomy 28-30','Deuteronomy 31-34','Joshua 1-3',
+            'Joshua 4-6','Joshua 7-9','Joshua 10-12','Joshua 13-15','Joshua 16-18',
+            'Joshua 19-21','Joshua 22-24','Judges 1-3','Judges 4-6','Judges 7-9',
+            'Judges 10-12','Judges 13-15','Judges 16-18','Judges 19-21','Ruth 1-4',
+            '1 Samuel 1-3','1 Samuel 4-6','1 Samuel 7-9','1 Samuel 10-12','1 Samuel 13-15',
+            '1 Samuel 16-18','1 Samuel 19-21','1 Samuel 22-24','1 Samuel 25-27','1 Samuel 28-31',
+            '2 Samuel 1-3','2 Samuel 4-6','2 Samuel 7-9','2 Samuel 10-12','2 Samuel 13-15'
+        ],
+        'new_testament': [
+            'Matthew 1-4','Matthew 5-7','Matthew 8-10','Matthew 11-13','Matthew 14-16',
+            'Matthew 17-19','Matthew 20-22','Matthew 23-25','Matthew 26-28','Mark 1-3',
+            'Mark 4-6','Mark 7-9','Mark 10-12','Mark 13-16','Luke 1-3',
+            'Luke 4-6','Luke 7-9','Luke 10-12','Luke 13-15','Luke 16-18',
+            'Luke 19-21','Luke 22-24','John 1-3','John 4-6','John 7-9',
+            'John 10-12','John 13-15','John 16-18','John 19-21','Acts 1-4'
+        ],
+        'psalms': [
+            'Psalm 1, Proverbs 1','Psalm 2, Proverbs 2','Psalm 3, Proverbs 3',
+            'Psalm 4, Proverbs 4','Psalm 5, Proverbs 5','Psalm 6, Proverbs 6',
+            'Psalm 7, Proverbs 7','Psalm 8, Proverbs 8','Psalm 9, Proverbs 9',
+            'Psalm 10, Proverbs 10','Psalm 11, Proverbs 11','Psalm 12, Proverbs 12',
+            'Psalm 13, Proverbs 13','Psalm 14, Proverbs 14','Psalm 15, Proverbs 15',
+            'Psalm 16, Proverbs 16','Psalm 17, Proverbs 17','Psalm 18, Proverbs 18',
+            'Psalm 19, Proverbs 19','Psalm 20, Proverbs 20','Psalm 21, Proverbs 21',
+            'Psalm 22, Proverbs 22','Psalm 23, Proverbs 23','Psalm 24, Proverbs 24',
+            'Psalm 25, Proverbs 25','Psalm 26, Proverbs 26','Psalm 27, Proverbs 27',
+            'Psalm 28, Proverbs 28','Psalm 29, Proverbs 29','Psalm 30, Proverbs 30',
+            'Psalm 31, Proverbs 31'
+        ]
+    };
+
+    function generatePlanDays(planId) {
+        const plan = PLANS[planId];
+        const planBooks = BOOKS[planId] || [];
+        plan.days = planBooks.map((book, i) => ({ day: i + 1, book, completed: false }));
+        while (plan.days.length < plan.totalDays) {
+            const i = plan.days.length;
+            plan.days.push({ day: i + 1, book: "Meditate on God's Word", completed: false });
+        }
+    }
+
+    let activePlan = null;
+    let progressData = {};
+
+    function loadProgress(planId) {
+        try {
+            const saved = JSON.parse(localStorage.getItem('coc_bible_plan_progress') || '{}');
+            progressData = saved[planId] || {};
+        } catch { progressData = {}; }
+    }
+
+    function saveProgress(planId) {
+        try {
+            const saved = JSON.parse(localStorage.getItem('coc_bible_plan_progress') || '{}');
+            saved[planId] = progressData;
+            localStorage.setItem('coc_bible_plan_progress', JSON.stringify(saved));
+        } catch {}
+    }
+
+    function getStreakData() {
+        try { return JSON.parse(localStorage.getItem('coc_streak_reading_plan') || '{"count":0}'); }
+        catch { return { count: 0 }; }
+    }
+
+    function selectPlan(planId) {
+        activePlan = planId;
+        document.querySelectorAll('.plan-pick-card').forEach(c => c.classList.remove('active'));
+        document.getElementById('pick-' + planId)?.classList.add('active');
+        if (PLANS[planId].days.length === 0) generatePlanDays(planId);
+        loadProgress(planId);
+        renderPlan(planId);
+    }
+
+    function renderPlan(planId) {
+        const plan = PLANS[planId];
+        const completed = plan.days.filter(d => d.completed || progressData[d.day]).length;
+        const total = plan.totalDays;
+        const percent = Math.round((completed / total) * 100);
+        const streak = getStreakData();
+        const currentIdx = plan.days.findIndex(d => !d.completed && !progressData[d.day]);
+
+        const display = document.getElementById('planDisplay');
+        display.className = 'plan-display visible';
+        display.innerHTML = `
+            <div class="plan-header-card">
+                <div class="plan-header-top">
+                    <div class="plan-header-info">
+                        <h2><i class="${plan.icon}" style="color:${plan.iconColor};margin-right:10px"></i>${plan.title}</h2>
+                        <p>${plan.description}</p>
+                    </div>
+                    <div class="plan-stats">
+                        <div class="big">${completed}<span style="font-size:18px;color:var(--muted)">/${total}</span></div>
+                        <div class="label">DAYS COMPLETE</div>
+                        <div class="streak"><i class="fas fa-fire" style="color:var(--gold)"></i> ${streak.count || 0} day streak</div>
+                    </div>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" style="width:${percent}%"></div>
+                </div>
+                <div class="progress-label">${percent}% complete</div>
+                <div class="plan-actions">
+                    <button class="btn-sm" onclick="resetPlan('${planId}')"><i class="fas fa-rotate-left"></i> Reset Progress</button>
+                    <button class="btn-sm" onclick="sharePlan('${planId}')"><i class="fas fa-share-alt"></i> Share</button>
+                </div>
+            </div>
+
+            <div class="days-section-title">Reading Schedule</div>
+            <div class="days-grid">
+                ${plan.days.map((day, idx) => {
+                    const isDone = day.completed || !!progressData[day.day];
+                    const isCurrent = idx === currentIdx && !isDone;
+                    return `
+                        <div class="day-card ${isDone ? 'completed' : ''} ${isCurrent ? 'current' : ''}"
+                             onclick="toggleDay('${planId}', ${day.day})">
+                            <div class="day-num">DAY ${day.day}</div>
+                            <div class="day-book">${day.book}</div>
+                            <div class="day-status">
+                                ${isDone
+                                    ? '<i class="fas fa-circle-check" style="color:#4ade80"></i>'
+                                    : isCurrent
+                                    ? '<i class="fas fa-book-open" style="color:var(--ember)"></i>'
+                                    : '<i class="far fa-circle" style="color:var(--card-border)"></i>'}
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    function toggleDay(planId, day) {
+        const plan = PLANS[planId];
+        if (!plan) return;
+        const dayData = plan.days.find(d => d.day === day);
+        if (!dayData) return;
+
+        const prevDays = plan.days.filter(d => d.day < day);
+        const allPrevDone = prevDays.every(d => d.completed || progressData[d.day]);
+
+        if (!allPrevDone && !dayData.completed && !progressData[day]) {
+            showToast('Complete previous days first!');
+            return;
+        }
+
+        if (dayData.completed || progressData[day]) {
+            const lastDone = plan.days.filter(d => d.completed || progressData[d.day]).pop();
+            if (lastDone && lastDone.day !== day) {
+                showToast('You can only uncheck the most recent day.');
+                return;
+            }
+            delete progressData[day];
+            dayData.completed = false;
+        } else {
+            progressData[day] = true;
+            dayData.completed = true;
+            if (window.COCPoints) window.COCPoints.earnPoints('reading_plan_day');
+            if (window.COCStreak) window.COCStreak.updateStreak('reading_plan');
+
+            const allDone = plan.days.every(d => d.completed || progressData[d.day]);
+            if (allDone) {
+                if (window.COCPoints) window.COCPoints.earnPoints('challenge_complete', { challenge: plan.title });
+                document.getElementById('celebTitle').textContent = plan.title + ' Complete!';
+                document.getElementById('celebMsg').textContent = `You've finished the ${plan.title}. God is faithful and so are you!`;
+                document.getElementById('celebModal').classList.add('open');
+            }
+        }
+
+        saveProgress(planId);
+        renderPlan(planId);
+    }
+
+    function resetPlan(planId) {
+        if (!confirm('Reset all progress for this plan?')) return;
+        progressData = {};
+        const plan = PLANS[planId];
+        if (plan) plan.days.forEach(d => d.completed = false);
+        saveProgress(planId);
+        if (window.COCStreak) window.COCStreak.resetStreak('reading_plan');
+        renderPlan(planId);
+        showToast('Progress reset.');
+    }
+
+    function sharePlan(planId) {
+        const plan = PLANS[planId];
+        const completed = plan.days.filter(d => d.completed || progressData[d.day]).length;
+        const text = `📚 I'm reading the "${plan.title}" on COC! ${completed}/${plan.days.length} days done. Join me at joincoc.com 🔥`;
+        if (navigator.share) {
+            navigator.share({ title: 'Bible Reading Plan', text });
+        } else {
+            navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!')).catch(() => {});
+        }
+    }
+
+    function closeCelebModal() {
+        document.getElementById('celebModal').classList.remove('open');
+    }
+
+    function showToast(msg) {
+        const t = document.createElement('div');
+        t.className = 'toast'; t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2500);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        Object.keys(PLANS).forEach(key => {
+            if (PLANS[key].days.length === 0) generatePlanDays(key);
+        });
+        if (window.COCUser) {
+            const user = window.COCUser.getUser();
+            if (user?.displayName) window.COCUser.recordVisit();
+        }
+    });
+</script>
+
+</body>
+</html>
