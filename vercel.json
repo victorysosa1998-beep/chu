@@ -3,8 +3,22 @@
     "api/chat.js": {
       "memory": 128,
       "maxDuration": 15
+    },
+    "api/subscribe.js": {
+      "memory": 128,
+      "maxDuration": 10
+    },
+    "api/push-scripture.js": {
+      "memory": 256,
+      "maxDuration": 30
     }
   },
+  "crons": [
+    {
+      "path": "/api/push-scripture",
+      "schedule": "0 5 * * *"
+    }
+  ],
   "rewrites": [
     { "source": "/scripts/(.*)", "destination": "/scripts/$1" },
     { "source": "/media/(.*)",   "destination": "/media/$1"   },

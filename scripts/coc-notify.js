@@ -204,19 +204,26 @@
         );
     }
 
-    // Register service worker
-    // NOTE: registering /sw.js here is necessary but not sufficient for real
-    // push notifications. True push (the kind that arrives even when no tab
-    // is open) needs: a service worker with a `push` event handler, a Push
-    // subscription (PushManager.subscribe with VAPID keys), and a server
-    // that stores that subscription and sends pushes to it at the right
-    // time. None of that exists yet — scheduleDailyScripture() and
-    // scheduleServiceReminders() below only use setTimeout, which means the
-    // "subscription" only delivers while this exact browser tab is sitting
-    // open at 6:00 AM / service time. Close the tab and nothing fires. This
-    // is fine as an on-page reminder, but it is not a real push subscription
-    // yet — that would require a small backend (e.g. a Vercel cron + web-push
-    // library) sending to stored subscriptions.
+    // ── VAPID public key (paste your generated public key here) ──
+    // Generate a key pair once by running this in Node.js:
+    //   const webpush = require('web-push');
+    //   console.log(webpush.generateVAPIDKeys());
+    // Paste the publicKey value below AND add both keys to Vercel env vars.
+    const VAPID_PUBLIC_KEY = 'BEWTqsL41igMPL6K8WXn7sbHT0QPTlg6Doo5SfDLdBk_KtBKv71Qczqk2YWY__C1Zr_8xrS1DzGhg3Wj4cBJuYU';
+
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const raw     = atob(base64);
+        return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+    }
+
+    /**
+     * Register the service worker and create a real PushSubscription that
+     * works even when the browser tab is closed. The subscription endpoint
+     * is saved to Firestore via /api/subscribe so the Vercel cron job can
+     * deliver notifications at 6 AM daily.
+     */
     async function registerServiceWorker() {
         if (!('serviceWorker' in navigator)) {
             console.warn('Service workers not supported');
@@ -226,9 +233,32 @@
         try {
             const registration = await navigator.serviceWorker.register('/sw.js');
             console.log('Service Worker registered:', registration);
+
+            // Only proceed with push subscription if permission is granted
+            if (Notification.permission !== 'granted') return registration;
+
+            // Check if already subscribed
+            let subscription = await registration.pushManager.getSubscription();
+
+            if (!subscription) {
+                // Create a new push subscription
+                subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                });
+            }
+
+            // Save subscription to server (Firestore via /api/subscribe)
+            await fetch('/api/subscribe', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ subscription })
+            });
+
+            console.log('Push subscription saved to server');
             return registration;
         } catch (error) {
-            console.error('Service Worker registration failed:', error);
+            console.error('Service Worker / push subscription failed:', error);
             return false;
         }
     }
@@ -312,6 +342,9 @@
 
             if (result.success) {
                 showWelcomeNotification('Friend');
+                // Now that permission is granted, create the real push
+                // subscription and save it to the server so 6 AM cron works.
+                registerServiceWorker();
                 const container = document.getElementById('notifPrompt');
                 if (container) container.style.display = 'none';
             } else if (result.reason === 'denied') {
