@@ -175,13 +175,37 @@
             display: flex; align-items: center; gap: 6px; transition: all 0.2s;
         }
         .like-btn:hover { border-color: #f43f5e; color: #f43f5e; }
-        .like-btn.reacted { background: rgba(244,63,94,0.1); border-color: #f43f5e; color: #f43f5e; }
+        .like-btn.reacted { background: rgba(244,63,94,0.15); border-color: #f43f5e; color: #f43f5e; }
+        .like-btn.reacted i { color: #f43f5e; }
+        .like-btn i { transition: color 0.2s; }
         .delete-btn {
             background: transparent; border: none; color: var(--muted);
             font-size: 12px; cursor: pointer; padding: 6px 10px;
             border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 5px;
         }
         .delete-btn:hover { color: var(--ember); background: var(--ember-dim); }
+        .pin-btn {
+            background: transparent; border: none; color: var(--muted);
+            font-size: 12px; cursor: pointer; padding: 6px 10px;
+            border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; gap: 5px;
+        }
+        .pin-btn:hover { color: var(--gold); background: var(--gold-dim); }
+        .pin-btn.pinned { color: var(--gold); }
+        .pin-indicator {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; font-weight: 700; color: var(--gold);
+            background: var(--gold-dim); border: 1px solid rgba(240,165,0,0.25);
+            padding: 2px 8px; border-radius: 100px; margin-left: 6px;
+        }
+        .pinned-section {
+            background: rgba(240,165,0,0.05); border: 1px solid rgba(240,165,0,0.2);
+            border-radius: 16px; padding: 16px 22px; margin-bottom: 20px;
+        }
+        .pinned-section-title {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--gold); margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
 
         .comment-btn {
             background: rgba(255,255,255,0.04); border: 1.5px solid var(--card-border);
@@ -355,7 +379,7 @@
 <script type="module">
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, updateDoc, doc, increment, deleteDoc, query, orderBy, getDocs }
+    import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, updateDoc, doc, increment, deleteDoc, query, orderBy, getDocs, getDoc, setDoc }
         from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -373,23 +397,18 @@
     const colRef = collection(db, 'communityFeed');
 
     const ADMIN_UID = 'tAqH3t6DX4OxHadWurRcBFBhmQA3';
-    const EDIT_WINDOW_MS = 2 * 60 * 1000; // posts can only be edited within 2 minutes of posting
+    const EDIT_WINDOW_MS = 2 * 60 * 1000;
     let currentUser = null;
     let allPosts    = [];
     let postType    = 'testimony';
     let toastTimer  = null;
-
-    // Editing state
     let editingPostId  = null;
     let editDraftText  = '';
+    const expandedComments = new Set();
+    const commentsCache    = new Map();
+    const commentDrafts    = new Map();
+    const likedPosts       = new Set(JSON.parse(localStorage.getItem('coc_liked_posts') || '[]'));
 
-    // Comments state
-    const expandedComments = new Set();   // postIds whose comment thread is open
-    const commentsCache    = new Map();   // postId -> array of fetched comments
-    const commentDrafts    = new Map();   // postId -> in-progress comment text
-
-    // Lightweight per-browser identity used to know "your own post" for edit permissions.
-    // This is a client-side convenience, not real authentication — see note below.
     function getLocalUserId() {
         let id = localStorage.getItem('coc_local_uid');
         if (!id) {
@@ -406,13 +425,20 @@
     }
 
     function canEdit(post) {
-        if (!post || !post.creatorId || post.creatorId !== getLocalUserId()) return false;
+        if (!post) return false;
+        const myId   = getLocalUserId();
+        const myName = (() => { try { return window.COCUser?.getUser?.()?.displayName || null; } catch { return null; } })();
+        // Match by creatorId OR by display name for posts that pre-date creatorId storage
+        const isOwner = (post.creatorId && post.creatorId === myId)
+                     || (!post.creatorId && !!myName && post.name === myName);
+        if (!isOwner) return false;
         const created = post.createdAt?.toMillis ? post.createdAt.toMillis() : (post.createdAt ? new Date(post.createdAt).getTime() : null);
         if (!created) return false;
         return (Date.now() - created) < EDIT_WINDOW_MS;
     }
 
     onAuthStateChanged(auth, user => {
+        currentUser = user;
         if (user && user.uid === ADMIN_UID) {
             document.body.classList.add('is-admin');
             sessionStorage.setItem('coc_admin', 'true');
@@ -420,6 +446,7 @@
             document.body.classList.remove('is-admin');
             sessionStorage.removeItem('coc_admin');
         }
+        if (allPosts.length) renderFeed(allPosts);
     });
 
     // Toast
@@ -432,7 +459,6 @@
     }
     window.hideToast = function() { document.getElementById('toast').classList.remove('show'); };
 
-    // Post type
     window.setPostType = function(type) {
         postType = type;
         document.querySelectorAll('.post-type-btn').forEach(btn => {
@@ -440,14 +466,14 @@
         });
     };
 
-    // Submit post
     window.submitPost = async function() {
         const content = document.getElementById('postContent').value.trim();
         if (!content) { showToast('⚠️ Oops', 'Write something before posting.'); return; }
 
+        // Resolve display name — COCUser scripts are defer-loaded so guard defensively
         let name = 'Friend';
         try {
-            const user = window.COCUser?.getUser();
+            const user = window.COCUser?.getUser?.();
             if (user?.displayName) name = user.displayName;
         } catch {}
 
@@ -456,13 +482,19 @@
         btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Posting…';
 
         try {
-            await addDoc(colRef, { type: postType, name, content, likes: 0, commentCount: 0, creatorId: getLocalUserId(), createdAt: serverTimestamp() });
+            await addDoc(colRef, {
+                type: postType, name, content,
+                likes: 0, commentCount: 0,
+                creatorId: getLocalUserId(),
+                pinned: false, pinnedBy: null,
+                createdAt: serverTimestamp()
+            });
             document.getElementById('postContent').value = '';
             document.getElementById('charCount').textContent = '0 / 500';
             showToast('🔥 Posted!', 'Your post is now live in the community feed.');
             if (window.COCUser) window.COCUser.recordPost();
         } catch(err) {
-            console.error(err);
+            console.error('submitPost error:', err);
             showToast('⚠️ Error', 'Could not post. Please try again.');
         }
 
@@ -470,14 +502,19 @@
         btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post';
     };
 
-    // Like
+    // Like — shows red heart, persists per browser
     window.reactToPost = async function(postId, btn) {
-        if (btn.classList.contains('reacted')) return;
+        if (likedPosts.has(postId)) return;
+        likedPosts.add(postId);
+        localStorage.setItem('coc_liked_posts', JSON.stringify([...likedPosts]));
         btn.classList.add('reacted');
+        const icon = btn.querySelector('i');
+        if (icon) { icon.className = 'fas fa-heart'; icon.style.color = '#f43f5e'; }
         const span = btn.querySelector('.like-count');
         if (span) span.textContent = parseInt(span.textContent || 0) + 1;
         try {
             await updateDoc(doc(db, 'communityFeed', postId), { likes: increment(1) });
+            if (window.COCUser) window.COCUser.recordPrayer();
         } catch(err) { console.error(err); }
     };
 
@@ -489,11 +526,40 @@
             showToast('🗑️ Deleted', 'Post has been removed.');
         } catch(err) {
             console.error(err);
-            showToast('⚠️ Error', 'Could not delete. Make sure you are signed in as admin.');
+            showToast('⚠️ Error', 'Could not delete post.');
         }
     };
 
-    // Edit (post creator only, within the 2-minute window)
+    // Pin / unpin — only post owner or admin can pin; only pinner/admin can unpin
+    window.togglePin = async function(postId) {
+        const post = allPosts.find(p => p.id === postId);
+        if (!post) return;
+        const isAdmin = document.body.classList.contains('is-admin');
+        const isOwner = post.creatorId === getLocalUserId();
+        const isPinner = post.pinnedBy === getLocalUserId();
+
+        if (post.pinned) {
+            // Unpin — only pinner or admin
+            if (!isPinner && !isAdmin) {
+                showToast('🔒 Not allowed', 'Only the person who pinned this can unpin it.');
+                return;
+            }
+            await updateDoc(doc(db, 'communityFeed', postId), { pinned: false, pinnedBy: null, pinnedAt: null });
+            showToast('📌 Unpinned', 'Post removed from pinned messages.');
+        } else {
+            // Pin — only owner or admin
+            if (!isOwner && !isAdmin) {
+                showToast('🔒 Not allowed', 'Only the post author can pin their own post.');
+                return;
+            }
+            await updateDoc(doc(db, 'communityFeed', postId), {
+                pinned: true, pinnedBy: getLocalUserId(), pinnedAt: serverTimestamp()
+            });
+            showToast('📌 Pinned!', 'Post is now pinned to the top.');
+        }
+    };
+
+    // Edit
     window.startEdit = function(postId) {
         const post = allPosts.find(p => p.id === postId);
         if (!post) return;
@@ -535,7 +601,7 @@
         renderFeed(allPosts);
     };
 
-    // Comments
+    // Comments — fully functional
     window.toggleComments = function(postId, btn) {
         const section = document.getElementById(`comments-${postId}`);
         if (!section) return;
@@ -558,11 +624,15 @@
         const content = textarea ? textarea.value.trim() : '';
         if (!content) return;
 
+        // Resolve name defensively
         let name = 'Friend';
         try {
-            const user = window.COCUser?.getUser();
+            const user = window.COCUser?.getUser?.();
             if (user?.displayName) name = user.displayName;
         } catch {}
+
+        const sendBtn = textarea ? textarea.nextElementSibling : null;
+        if (sendBtn) sendBtn.disabled = true;
 
         try {
             await addDoc(collection(db, 'communityFeed', postId, 'comments'), {
@@ -571,10 +641,16 @@
             await updateDoc(doc(db, 'communityFeed', postId), { commentCount: increment(1) });
             commentDrafts.delete(postId);
             if (textarea) textarea.value = '';
+            if (window.COCUser) window.COCUser.recordComment();
             await loadComments(postId);
+            // Update comment count badge in the button
+            const countEl = document.querySelector(`#feedContainer button.comment-btn[onclick*="'${postId}'"] .comment-count`);
+            if (countEl) countEl.textContent = parseInt(countEl.textContent || 0) + 1;
         } catch(err) {
-            console.error(err);
-            showToast('⚠️ Error', 'Could not post comment.');
+            console.error('submitComment error:', err);
+            showToast('⚠️ Error', 'Could not post comment. Please try again.');
+        } finally {
+            if (sendBtn) sendBtn.disabled = false;
         }
     };
 
@@ -597,7 +673,7 @@
         const listEl = document.getElementById(`commentsList-${postId}`);
         if (!listEl) return;
         if (!comments.length) {
-            listEl.innerHTML = '<div class="comments-empty">No comments yet — be the first to reply.</div>';
+            listEl.innerHTML = '<div class="comments-empty">No comments yet — be the first to reply! 👇</div>';
             return;
         }
         listEl.innerHTML = comments.map(c => `
@@ -614,7 +690,6 @@
         `).join('');
     }
 
-    // Helpers
     const BADGE = {
         testimony:    ['badge-testimony',     '<i class="fas fa-star"></i> Testimony'],
         prayer:       ['badge-prayer',        '<i class="fas fa-hands-praying"></i> Prayer Request'],
@@ -635,7 +710,6 @@
     function renderFeed(posts) {
         const container = document.getElementById('feedContainer');
 
-        // Preserve any text the user is mid-typing before we wipe the DOM
         expandedComments.forEach(postId => {
             const ta = document.getElementById(`commentInput-${postId}`);
             if (ta) commentDrafts.set(postId, ta.value);
@@ -653,68 +727,32 @@
                 </div>`;
             return;
         }
+
         const isAdmin = document.body.classList.contains('is-admin');
-        container.innerHTML = posts.map(post => {
-            const [badgeClass, badgeLabel] = BADGE[post.type] || ['badge-testimony', post.type];
-            const initial = post.name ? post.name.charAt(0).toUpperCase() : '?';
-            const inEditMode = editingPostId === post.id && canEdit(post);
+        const myId    = getLocalUserId();
 
-            const contentHTML = inEditMode ? `
-                <div class="edit-box">
-                    <textarea class="edit-textarea" id="editArea-${post.id}" maxlength="500">${escapeHTML(post.content)}</textarea>
-                    <div class="edit-actions">
-                        <button class="btn-save-edit" onclick="saveEdit('${post.id}')">Save</button>
-                        <button class="btn-cancel-edit" onclick="cancelEdit()">Cancel</button>
-                    </div>
-                </div>
-            ` : `<p class="feed-content">${post.content}</p>`;
+        // Separate pinned & normal
+        const pinned = posts.filter(p => p.pinned);
+        const normal = posts.filter(p => !p.pinned);
 
-            const editBtnHTML = (!inEditMode && canEdit(post))
-                ? `<button class="edit-btn" onclick="startEdit('${post.id}')"><i class="fas fa-pen"></i> Edit</button>`
-                : '';
+        let html = '';
 
-            const editedTagHTML = post.editedAt ? `<span class="feed-edited">(edited)</span>` : '';
+        // Pinned section
+        if (pinned.length) {
+            html += `<div class="pinned-section">
+                <div class="pinned-section-title"><i class="fas fa-thumbtack"></i> Pinned Messages</div>
+                ${pinned.map(post => renderPostCard(post, isAdmin, myId)).join('')}
+            </div>`;
+        }
 
-            return `
-                <div class="feed-item" data-type="${post.type || 'testimony'}">
-                    <div class="feed-top">
-                        <div class="avatar">${initial}</div>
-                        <div class="feed-meta">
-                            <div class="feed-meta-top">
-                                <span class="feed-name">${post.name || 'Anonymous'}</span>
-                                <span class="feed-badge ${badgeClass}">${badgeLabel}</span>
-                                <span class="feed-time">${timeAgo(post.createdAt)}</span>
-                                ${editedTagHTML}
-                            </div>
-                            ${contentHTML}
-                            <div class="feed-actions">
-                                <button class="like-btn" onclick="reactToPost('${post.id}', this)">
-                                    <i class="fas fa-heart"></i> <span class="like-count">${post.likes || 0}</span>
-                                </button>
-                                <button class="comment-btn" onclick="toggleComments('${post.id}', this)">
-                                    <i class="fas fa-comment"></i> <span class="comment-count">${post.commentCount || 0}</span>
-                                </button>
-                                ${editBtnHTML}
-                                ${isAdmin ? `<button class="delete-btn" onclick="deletePost('${post.id}')"><i class="fas fa-trash-alt"></i> Delete</button>` : ''}
-                            </div>
-                            <div class="comments-section" id="comments-${post.id}">
-                                <div class="comments-list" id="commentsList-${post.id}"></div>
-                                <div class="comment-compose">
-                                    <textarea class="comment-textarea" id="commentInput-${post.id}" rows="1" maxlength="300" placeholder="Write a comment…"></textarea>
-                                    <button class="btn-comment-send" onclick="submitComment('${post.id}')"><i class="fas fa-paper-plane"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        // Normal posts
+        html += normal.map(post => renderPostCard(post, isAdmin, myId)).join('');
+        container.innerHTML = html;
 
-        // Re-open comment threads that were already expanded, restoring any cached
-        // comments and draft text the user hadn't sent yet.
+        // Re-open comment threads & restore drafts
         expandedComments.forEach(postId => {
             const section = document.getElementById(`comments-${postId}`);
-            const btn = container.querySelector(`.comment-btn[onclick^="toggleComments('${postId}'"]`);
+            const btn = container.querySelector(`button[onclick="toggleComments('${postId}', this)"]`);
             if (section) section.classList.add('open');
             if (btn) btn.classList.add('open');
             const cached = commentsCache.get(postId);
@@ -724,11 +762,93 @@
             if (ta && commentDrafts.has(postId)) ta.value = commentDrafts.get(postId);
         });
 
-        // Restore in-progress edit text
         if (editingPostId) {
             const ta = document.getElementById(`editArea-${editingPostId}`);
             if (ta && editDraftText) ta.value = editDraftText;
         }
+    }
+
+    function renderPostCard(post, isAdmin, myId) {
+        const [badgeClass, badgeLabel] = BADGE[post.type] || ['badge-testimony', post.type];
+        const initial = post.name ? post.name.charAt(0).toUpperCase() : '?';
+        const inEditMode = editingPostId === post.id && canEdit(post);
+        const isLiked = likedPosts.has(post.id);
+
+        // isOwner: match by creatorId first; fall back to display-name match so that
+        // posts created before creatorId was stored still show the Pin button.
+        const myName = (() => { try { return window.COCUser?.getUser?.()?.displayName || null; } catch { return null; } })();
+        const isOwner  = (post.creatorId && post.creatorId === myId)
+                      || (!post.creatorId && !!myName && post.name === myName);
+        const isPinner = (post.pinnedBy && post.pinnedBy === myId)
+                      || (!post.pinnedBy && post.pinned && isOwner);
+        const canPin   = isOwner || isAdmin;
+        const canUnpin = isPinner || isAdmin;
+
+        const contentHTML = inEditMode ? `
+            <div class="edit-box">
+                <textarea class="edit-textarea" id="editArea-${post.id}" maxlength="500">${escapeHTML(post.content)}</textarea>
+                <div class="edit-actions">
+                    <button class="btn-save-edit" onclick="saveEdit('${post.id}')">Save</button>
+                    <button class="btn-cancel-edit" onclick="cancelEdit()">Cancel</button>
+                </div>
+            </div>
+        ` : `<p class="feed-content">${escapeHTML(post.content || '')}</p>`;
+
+        const editBtnHTML = (!inEditMode && canEdit(post))
+            ? `<button class="edit-btn" onclick="startEdit('${post.id}')"><i class="fas fa-pen"></i> Edit</button>`
+            : '';
+
+        // If pinned: show Unpin button only to the pinner or admin
+        // If not pinned: show Pin button only to the post owner or admin
+        const pinBtnHTML = post.pinned
+            ? (canUnpin
+                ? `<button class="pin-btn pinned" onclick="togglePin('${post.id}')"><i class="fas fa-thumbtack"></i> Unpin</button>`
+                : '')
+            : (canPin
+                ? `<button class="pin-btn" onclick="togglePin('${post.id}')"><i class="fas fa-thumbtack"></i> Pin</button>`
+                : '');
+
+        const editedTagHTML = post.editedAt ? `<span class="feed-edited">(edited)</span>` : '';
+        const pinnedTagHTML = post.pinned ? `<span class="pin-indicator"><i class="fas fa-thumbtack"></i> Pinned</span>` : '';
+
+        return `
+            <div class="feed-item" data-type="${post.type || 'testimony'}">
+                <div class="feed-top">
+                    <div class="avatar">${initial}</div>
+                    <div class="feed-meta">
+                        <div class="feed-meta-top">
+                            <span class="feed-name">${escapeHTML(post.name || 'Anonymous')}</span>
+                            <span class="feed-badge ${badgeClass}">${badgeLabel}</span>
+                            <span class="feed-time">${timeAgo(post.createdAt)}</span>
+                            ${editedTagHTML}${pinnedTagHTML}
+                        </div>
+                        ${contentHTML}
+                        <div class="feed-actions">
+                            <button class="like-btn ${isLiked ? 'reacted' : ''}" onclick="reactToPost('${post.id}', this)">
+                                <i class="fas fa-heart" style="${isLiked ? 'color:#f43f5e' : ''}"></i>
+                                <span class="like-count">${post.likes || 0}</span>
+                            </button>
+                            <button class="comment-btn" onclick="toggleComments('${post.id}', this)">
+                                <i class="fas fa-comment"></i>
+                                <span class="comment-count">${post.commentCount || 0}</span>
+                            </button>
+                            ${pinBtnHTML}
+                            ${editBtnHTML}
+                            ${isAdmin ? `<button class="delete-btn" onclick="deletePost('${post.id}')"><i class="fas fa-trash-alt"></i> Delete</button>` : ''}
+                        </div>
+                        <div class="comments-section" id="comments-${post.id}">
+                            <div class="comments-list" id="commentsList-${post.id}">
+                                <div class="comments-loading">Loading…</div>
+                            </div>
+                            <div class="comment-compose">
+                                <textarea class="comment-textarea" id="commentInput-${post.id}" rows="1" maxlength="300" placeholder="Write a comment…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment('${post.id}');}"></textarea>
+                                <button class="btn-comment-send" onclick="submitComment('${post.id}')"><i class="fas fa-paper-plane"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     // Char count
@@ -745,17 +865,27 @@
             if (user?.displayName) window.COCUser.recordVisit();
         }
         try {
-            onSnapshot(colRef, snap => {
-                allPosts = snap.docs
-                    .map(d => ({ id: d.id, ...d.data() }))
-                    .sort((a, b) => (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0));
+            const q = query(colRef, orderBy('createdAt', 'desc'));
+            onSnapshot(q, snap => {
+                allPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                // Sort: pinned first, then by date
+                allPosts.sort((a, b) => {
+                    if (a.pinned && !b.pinned) return -1;
+                    if (!a.pinned && b.pinned) return 1;
+                    return (b.createdAt?.toMillis?.() ?? 0) - (a.createdAt?.toMillis?.() ?? 0);
+                });
                 renderFeed(allPosts);
             }, err => {
-                console.error('Feed error:', err);
-                renderFeed([]);
+                console.error('Feed snapshot error:', err);
+                const container = document.getElementById('feedContainer');
+                if (container) container.innerHTML = `
+                    <div class="feed-empty">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Could not load the community feed. Please refresh to try again.</p>
+                    </div>`;
             });
         } catch(err) {
-            console.error(err);
+            console.error('initFeed error:', err);
             renderFeed([]);
         }
     }

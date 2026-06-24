@@ -1026,7 +1026,11 @@
     <script src="/scripts/coc-streak.js"></script>
 
     <script type="module">
-    import { getScriptureOfDay } from '/scripts/coc-scripture-firebase.js';
+    // openBibleModal is defined immediately so onclick works even before Firebase loads
+    let _getScriptureOfDay = null;
+    import('/scripts/coc-scripture-firebase.js')
+        .then(mod => { _getScriptureOfDay = mod.getScriptureOfDay; })
+        .catch(err => console.warn('Firebase scripture module failed to load:', err));
 
     /* ======================================================
        CHALLENGE DATA
@@ -1334,8 +1338,18 @@
         if (e) e.preventDefault();
 
         try {
-            // Get today's scripture from Firebase
-            const reading = await getScriptureOfDay();
+            // Get today's scripture from Firebase (with fallback if unavailable)
+            let reading;
+            if (_getScriptureOfDay) {
+                reading = await _getScriptureOfDay();
+            } else {
+                reading = {
+                    reference: 'Lamentations 3:23',
+                    verse: 'They are new every morning; great is your faithfulness.',
+                    reflection: "God's mercies are new every morning. Great is His faithfulness.",
+                    prayer: 'Lord, thank You for new mercies every morning. Great is Your faithfulness.'
+                };
+            }
 
             // Format for the reader
             const formattedReading = {
@@ -1468,13 +1482,23 @@
             const el = document.getElementById('bibleScrollArea');
             const scrolled = el.scrollTop;
             const total = el.scrollHeight - el.clientHeight;
-            if (total <= 0) return;
+            // If content fits on screen without scrolling, auto-satisfy scroll condition
+            if (total <= 0) {
+                readerState.scrollPercent = 100;
+                document.getElementById('scrollVal').textContent = '100%';
+                document.getElementById('scrollProgressBar').style.width = '100%';
+                checkReadingComplete();
+                return;
+            }
             const pct = Math.min(100, Math.round((scrolled / total) * 100));
             readerState.scrollPercent = pct;
             document.getElementById('scrollVal').textContent = pct + '%';
             document.getElementById('scrollProgressBar').style.width = pct + '%';
             checkReadingComplete();
         }
+
+        // Check immediately in case content already fits on screen
+        onScroll();
 
         area.addEventListener('scroll', onScroll, { passive: true });
         area.addEventListener('click', onActivity);
@@ -1486,48 +1510,27 @@
     function checkReadingComplete() {
         if (readerState.completed) return;
         const timeOk = readerState.activeSeconds >= readerState.requiredSeconds;
-        const scrollOk = readerState.scrollPercent >= 80;
         const visibleOk = document.visibilityState !== 'hidden';
 
         const statusEl = document.getElementById('statReadStatus');
 
-        if (timeOk && scrollOk && visibleOk) {
+        if (timeOk && visibleOk) {
             readerState.completed = true;
             stopReadingTimer();
             document.getElementById('readStatusText').textContent = 'Reading complete!';
             statusEl.className = 'reading-stat active';
-            document.getElementById('reflectionSection').style.display = 'block';
-            showToast('✅ Reading verified! Write your reflection to complete the day.');
+
+            // Award points immediately — no reflection required
+            const today = new Date().toISOString().split('T')[0];
+            window.COCChallenges.increment('daily_scripture_week', today);
+
+            showToast('🔥 Day complete! Keep going!');
+            setTimeout(() => closeBibleModal(), 1800);
         } else {
-            const missing = [];
-            if (!timeOk) missing.push(`${readerState.requiredSeconds - readerState.activeSeconds}s left`);
-            if (!scrollOk) missing.push(`scroll ${80 - readerState.scrollPercent}% more`);
-            if (missing.length > 0) {
-                document.getElementById('readStatusText').textContent = missing.join(' · ');
-            }
+            const remaining = readerState.requiredSeconds - readerState.activeSeconds;
+            document.getElementById('readStatusText').textContent = `${remaining}s left`;
         }
     }
-
-    document.getElementById('reflectionText').addEventListener('input', function() {
-        const len = this.value.trim().length;
-        const countEl = document.getElementById('reflectionCharCount');
-        countEl.textContent = `${len} / 30 min`;
-        countEl.className = 'reflection-chars' + (len >= 30 ? ' good' : '');
-        document.getElementById('completeReadingBtn').disabled = len < 30;
-    });
-
-    window.finishReading = function() {
-        if (!readerState.completed) return;
-        const reflection = document.getElementById('reflectionText').value.trim();
-        if (reflection.length < 30) return;
-
-        // Use today's date as the unique action ID
-        const today = new Date().toISOString().split('T')[0];
-        window.COCChallenges.increment('daily_scripture_week', today);
-
-        closeBibleModal();
-        showToast('🔥 Day complete! Keep going!');
-    };
 
     /* ======================================================
        SCROLL REVEAL

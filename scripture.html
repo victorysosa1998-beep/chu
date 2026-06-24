@@ -238,8 +238,57 @@
             padding: 12px 16px; border-radius: 10px;
             border-left: 3px solid transparent;
             transition: all 0.2s;
-            cursor: default;
+            cursor: pointer;
         }
+        .archive-modal-overlay {
+            position: fixed; inset: 0; z-index: 1000;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .archive-modal-overlay.show { opacity: 1; pointer-events: all; }
+        .archive-modal-box {
+            background: #18181c; border: 1px solid rgba(200,16,46,0.3);
+            border-radius: 20px; padding: 36px 32px; max-width: 560px; width: 100%;
+            position: relative;
+        }
+        .archive-modal-close {
+            position: absolute; top: 16px; right: 16px;
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5); width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 13px; transition: all 0.2s;
+        }
+        .archive-modal-close:hover { color: #fff; background: rgba(200,16,46,0.3); }
+        .archive-modal-ref {
+            font-family: "Bebas Neue", sans-serif; font-size: 1.3rem;
+            letter-spacing: 0.1em; color: var(--gold); margin-bottom: 16px;
+        }
+        .archive-modal-verse {
+            font-family: "Cormorant Garamond", serif; font-style: italic;
+            font-size: clamp(18px,3vw,24px); line-height: 1.65; color: #fff;
+            margin-bottom: 16px;
+        }
+        .archive-modal-reflection {
+            font-size: 13px; color: rgba(240,240,244,0.65); line-height: 1.7; margin-bottom: 14px;
+        }
+        .archive-modal-prayer {
+            background: rgba(200,16,46,0.08); border: 1px solid rgba(200,16,46,0.2);
+            border-radius: 10px; padding: 12px 16px;
+            font-size: 13px; font-style: italic; color: rgba(240,240,244,0.75); line-height: 1.6;
+        }
+        .archive-modal-share {
+            display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px;
+        }
+        .archive-modal-share button {
+            background: var(--ember); color: #fff; border: none; padding: 9px 18px;
+            border-radius: 100px; font-size: 12px; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; gap: 7px; font-family: "Outfit", sans-serif;
+            transition: background 0.2s;
+        }
+        .archive-modal-share button:hover { background: #a00c24; }
+        .archive-modal-share button.wa { background: #25D366; }
+        .archive-modal-share button.wa:hover { background: #1da851; }
         .archive-item:hover { background: rgba(255,255,255,0.03); border-left-color: var(--ember); }
         .archive-item.today { border-left-color: var(--ember); background: var(--ember-dim); }
         .archive-book { font-size: 14px; color: var(--text); font-weight: 500; }
@@ -285,21 +334,23 @@
 
 <main>
 
-    <!-- Today's Verse -->
+        <!-- Today's Verse -->
     <div class="verse-card fade-up">
         <div class="verse-label"><i class="fas fa-book-open"></i> Today's Scripture</div>
         <p class="verse-text" id="todayVerse">Loading scripture…</p>
-        <p class="verse-ref" id="todayReference">—</p>
+        <p class="verse-ref" id="todayReference"></p>
         <div class="verse-actions">
+            <button class="btn-ghost" id="markReadBtn" onclick="markRead()"><i class="fas fa-check"></i> Mark as Read</button>
             <button class="btn-primary" onclick="shareScripture()"><i class="fas fa-share-alt"></i> Share</button>
-            <button class="btn-ghost" onclick="markRead()" id="markReadBtn"><i class="fas fa-check"></i> Mark Read</button>
+            <button class="btn-primary" style="background:#25D366;" onclick="whatsappShareScripture()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+            <button class="btn-ghost" onclick="downloadScriptureImage()"><i class="fas fa-download"></i> Download</button>
         </div>
         <div id="readStatus"></div>
     </div>
 
-    <!-- Reflection & Prayer -->
+    <!-- Reflection -->
     <div class="section-card fade-up">
-        <div class="section-title"><i class="fas fa-heart"></i> Reflection & Prayer</div>
+        <div class="section-title"><i class="fas fa-lightbulb"></i> Reflection</div>
         <p class="reflection-text" id="todayReflection">Loading reflection…</p>
         <div class="prayer-box">
             <p id="todayPrayer">Loading prayer…</p>
@@ -308,7 +359,7 @@
 
     <!-- Reactions -->
     <div class="section-card fade-up">
-        <div class="section-title"><i class="fas fa-fire"></i> React to Today's Word</div>
+        <div class="section-title"><i class="fas fa-heart"></i> React</div>
         <div class="reactions-row">
             <button class="reaction-btn" onclick="reactToScripture('❤️')">❤️ <span class="count" id="react-heart">0</span></button>
             <button class="reaction-btn" onclick="reactToScripture('🙏')">🙏 <span class="count" id="react-pray">0</span></button>
@@ -320,34 +371,32 @@
 
     <!-- Comments -->
     <div class="section-card fade-up">
-        <div class="section-title"><i class="fas fa-comments"></i> Community Reflections</div>
+        <div class="section-title"><i class="fas fa-comments"></i> Comments</div>
         <div id="commentSection">
             <div class="empty-state">No comments yet — be the first to share your thoughts!</div>
         </div>
         <div class="comment-input-row">
-            <input class="comment-input" id="commentInput" type="text" placeholder="Share your reflection on this scripture…">
+            <input type="text" class="comment-input" id="commentInput" placeholder="Share your thoughts...">
             <button class="btn-send" onclick="addComment()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <!-- Archive -->
     <div class="section-card fade-up">
-        <div class="section-title"><i class="fas fa-scroll"></i> Scripture Archive</div>
-        <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Past scriptures from the last 30 days.</p>
-        <div class="archive-scroll" id="archiveContainer"></div>
+        <div class="section-title"><i class="fas fa-archive"></i> Archive</div>
+        <div class="archive-scroll" id="archiveContainer">
+            <div style="color:var(--muted);font-size:13px;padding:8px 0;">Loading archive…</div>
+        </div>
     </div>
 
 </main>
-
-<script src="/scripts/coc-user.js"></script>
-<script src="/scripts/coc-scripture.js"></script>
 
 <script type="module">
     import { getScriptureOfDay, getAllScriptures } from '/scripts/coc-scripture-firebase.js';
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
-        getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
-        onSnapshot, query, orderBy, increment, serverTimestamp, getDoc, setDoc
+        getFirestore, collection, doc, addDoc, updateDoc,
+        onSnapshot, query, orderBy, increment, serverTimestamp, setDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -365,15 +414,33 @@
     const scriptureRef = doc(db, 'scriptures', todayKey);
     const commentsRef = collection(db, 'scriptures', todayKey, 'comments');
 
-    // Store all scriptures for archive
-    let allScriptures = [];
+    let allArchiveScriptures = [];
+    let currentArchiveScripture = null;
+    let currentTodayScripture = null;
+
+    // coc-scripture-share.js is a classic (non-module) script that sets
+    // window.COCScriptureShare. Load it once, on demand.
+    let _sharePromise = null;
+    function loadShareLib() {
+        if (window.COCScriptureShare) return Promise.resolve(window.COCScriptureShare);
+        if (_sharePromise) return _sharePromise;
+        _sharePromise = new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = '/scripts/coc-scripture-share.js';
+            s.onload = () => window.COCScriptureShare ? resolve(window.COCScriptureShare) : reject(new Error('COCScriptureShare missing'));
+            s.onerror = () => reject(new Error('Failed to load coc-scripture-share.js'));
+            document.head.appendChild(s);
+        });
+        return _sharePromise;
+    }
 
     async function renderTodayScripture() {
         const todayData = await getScriptureOfDay();
-        
+        currentTodayScripture = todayData;
+
         document.getElementById('todayVerse').textContent = todayData.verse;
         document.getElementById('todayReference').textContent = '— ' + todayData.reference;
-        document.getElementById('todayReflection').textContent = todayData.reflection || 'Reflect on God\'s Word today.';
+        document.getElementById('todayReflection').textContent = todayData.reflection || "Reflect on God's Word today.";
         document.getElementById('todayPrayer').textContent = todayData.prayer || 'Lord, speak to me through Your Word today.';
 
         const readKey = 'coc_scripture_read_' + todayKey;
@@ -392,17 +459,49 @@
         btn.innerHTML = '<i class="fas fa-check-circle"></i> Read Today';
         btn.classList.add('done');
         document.getElementById('readStatus').textContent = '✓ Marked as read today';
-        if (window.COCUser) window.COCUser.recordVisit();
+        if (window.COCUser) {
+            window.COCUser.recordScriptureRead();
+            window.COCUser.recordVisit();
+        }
     };
 
-    window.shareScripture = function() {
-        const verse = document.getElementById('todayVerse').textContent;
-        const ref = document.getElementById('todayReference').textContent;
-        const text = `${verse}\n${ref}\n\nRead more at joincoc.com 🔥`;
-        if (navigator.share) {
-            navigator.share({ title: 'Scripture of the Day', text });
-        } else {
-            navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!')).catch(() => {});
+    window.shareScripture = async function() {
+        if (!currentTodayScripture) return;
+        try {
+            const share = await loadShareLib();
+            await share.shareAsText(currentTodayScripture);
+        } catch (e) {
+            console.error(e);
+            // fallback: plain text share/clipboard
+            const text = `${currentTodayScripture.verse}\n— ${currentTodayScripture.reference}\n\nRead more at joincoc.com 🔥`;
+            if (navigator.share) {
+                navigator.share({ title: 'Scripture of the Day — COC', text });
+            } else {
+                navigator.clipboard.writeText(text).then(() => showToast('📋 Copied to clipboard!')).catch(() => prompt('Copy this:', text));
+            }
+        }
+    };
+
+    // WhatsApp share for today's scripture — shares the branded image, not just text
+    window.whatsappShareScripture = async function() {
+        if (!currentTodayScripture) return;
+        try {
+            const share = await loadShareLib();
+            await share.shareImageWhatsApp(currentTodayScripture);
+        } catch (e) {
+            console.error(e);
+            showToast('⚠️ Could not create image. Please try again.');
+        }
+    };
+
+    window.downloadScriptureImage = async function() {
+        if (!currentTodayScripture) return;
+        try {
+            const share = await loadShareLib();
+            await share.downloadImage(currentTodayScripture);
+        } catch (e) {
+            console.error(e);
+            showToast('⚠️ Could not download image. Please try again.');
         }
     };
 
@@ -451,11 +550,21 @@
         if (!text) return;
         const user = window.COCUser ? window.COCUser.getUser() : null;
         const name = user?.displayName || 'Anonymous';
+
+        const btn = document.querySelector('.btn-send');
+        if (btn) btn.disabled = true;
         input.value = '';
+
         try {
             await addDoc(commentsRef, { name, text, createdAt: serverTimestamp() });
             if (window.COCUser) window.COCUser.recordComment();
-        } catch(e) { console.error(e); }
+        } catch(e) {
+            console.error(e);
+            showToast('⚠️ Could not post comment.');
+            input.value = text;
+        } finally {
+            if (btn) btn.disabled = false;
+        }
     };
 
     function esc(s) { return s?.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') || ''; }
@@ -484,38 +593,100 @@
         `).join('');
     }
 
-    function renderArchive() {
+    async function renderArchive() {
         const container = document.getElementById('archiveContainer');
-        // Use the fallback scriptures for archive
-        // In production, this would come from Firebase
-        const tempVerses = [
-            { verse: '"Trust in the Lord with all your heart..."', reference: 'Proverbs 3:5' },
-            { verse: '"I can do all things through Christ..."', reference: 'Philippians 4:13' },
-            { verse: '"The Lord is my shepherd..."', reference: 'Psalm 23:1' },
-            { verse: '"Be strong and courageous..."', reference: 'Joshua 1:9' },
-            { verse: '"And we know that in all things..."', reference: 'Romans 8:28' },
-        ];
-        
-        container.innerHTML = tempVerses.map((s, idx) => {
-            const isToday = idx === 0;
+        container.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Loading archive…</div>';
+
+        try {
+            allArchiveScriptures = await getAllScriptures();
+        } catch(e) {
+            allArchiveScriptures = [];
+        }
+
+        if (!allArchiveScriptures.length) {
+            container.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">No archive available yet.</div>';
+            return;
+        }
+
+        // Show last 30 days, each with actual date offset
+        const items = [];
+        for (let i = 0; i < Math.min(30, allArchiveScriptures.length); i++) {
             const date = new Date();
-            date.setDate(date.getDate() - idx);
+            date.setDate(date.getDate() - i);
             const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            return `
-                <div class="archive-item ${isToday ? 'today' : ''}">
-                    <div>
-                        <div class="archive-book">${s.verse.substring(0,50)}${s.verse.length>50?'…':''}</div>
-                        <div class="archive-ref">${s.reference} · ${dateStr}</div>
-                    </div>
-                    ${isToday ? '<span class="today-badge">Today</span>' : ''}
+            // Use day-of-year index for the scripture on that day
+            const startOfYear = new Date(date.getFullYear(), 0, 0);
+            const diff2 = date - startOfYear;
+            const dayOfYear = Math.floor(diff2 / (1000 * 60 * 60 * 24));
+            const idx = dayOfYear % allArchiveScriptures.length;
+            const s = allArchiveScriptures[idx];
+            items.push({ s, dateStr, isToday: i === 0, idx });
+        }
+
+        container.innerHTML = items.map(({ s, dateStr, isToday, idx }) => `
+            <div class="archive-item ${isToday ? 'today' : ''}" onclick="openArchiveScripture(${idx})">
+                <div>
+                    <div class="archive-book">${esc(s.verse ? s.verse.substring(0,55) + (s.verse.length>55?'…':'') : '')}</div>
+                    <div class="archive-ref">${esc(s.reference || '')} · ${dateStr}</div>
                 </div>
-            `;
-        }).join('');
+                ${isToday ? '<span class="today-badge">Today</span>' : '<span style="font-size:11px;color:var(--muted);white-space:nowrap;"><i class="fas fa-eye"></i> Read</span>'}
+            </div>
+        `).join('');
     }
 
-    document.getElementById('commentInput').addEventListener('keydown', e => {
-        if (e.key === 'Enter') window.addComment();
-    });
+    window.openArchiveScripture = function(idx) {
+        if (!allArchiveScriptures[idx]) return;
+        currentArchiveScripture = allArchiveScriptures[idx];
+        const s = currentArchiveScripture;
+        document.getElementById('archiveModalRef').textContent = s.reference || '';
+        document.getElementById('archiveModalVerse').textContent = s.verse || '';
+        document.getElementById('archiveModalReflection').textContent = s.reflection || '';
+        document.getElementById('archiveModalPrayer').textContent = s.prayer ? '🙏 ' + s.prayer : '';
+        document.getElementById('archiveModal').classList.add('show');
+    };
+
+    window.closeArchiveModal = function() {
+        document.getElementById('archiveModal').classList.remove('show');
+    };
+
+    window.shareArchiveScripture = async function() {
+        if (!currentArchiveScripture) return;
+        try {
+            const share = await loadShareLib();
+            await share.shareAsText(currentArchiveScripture);
+        } catch (e) {
+            console.error(e);
+            const s = currentArchiveScripture;
+            const text = `${s.verse}\n— ${s.reference}\n\nRead more at joincoc.com 🔥`;
+            if (navigator.share) {
+                navigator.share({ title: 'Scripture — COC', text });
+            } else {
+                navigator.clipboard.writeText(text).then(() => showToast('📋 Copied!')).catch(() => prompt('Copy:', text));
+            }
+        }
+    };
+
+    window.whatsappArchiveScripture = async function() {
+        if (!currentArchiveScripture) return;
+        try {
+            const share = await loadShareLib();
+            await share.shareImageWhatsApp(currentArchiveScripture);
+        } catch (e) {
+            console.error(e);
+            showToast('⚠️ Could not create image. Please try again.');
+        }
+    };
+
+    window.downloadArchiveScriptureImage = async function() {
+        if (!currentArchiveScripture) return;
+        try {
+            const share = await loadShareLib();
+            await share.downloadImage(currentArchiveScripture);
+        } catch (e) {
+            console.error(e);
+            showToast('⚠️ Could not download image. Please try again.');
+        }
+    };
 
     function init() {
         loadMyReactions();
@@ -530,6 +701,14 @@
             }
         });
 
+        document.getElementById('archiveModal').addEventListener('click', function(e) {
+            if (e.target === this) closeArchiveModal();
+        });
+
+        document.getElementById('commentInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') window.addComment();
+        });
+
         onSnapshot(scriptureRef, snap => {
             if (!snap.exists()) return;
             const data = snap.data();
@@ -539,7 +718,7 @@
             });
         }, err => console.warn(err));
 
-        const q = query(commentsRef, orderBy('createdAt', 'desc'));
+        const q = query(commentsRef, orderBy('createdAt', 'asc'));
         onSnapshot(q, snap => {
             renderComments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
         }, err => console.warn(err));
@@ -553,6 +732,22 @@
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
 </script>
+
+<!-- Archive Modal -->
+<div class="archive-modal-overlay" id="archiveModal">
+    <div class="archive-modal-box">
+        <button class="archive-modal-close" onclick="closeArchiveModal()"><i class="fas fa-times"></i></button>
+        <div class="archive-modal-ref" id="archiveModalRef"></div>
+        <p class="archive-modal-verse" id="archiveModalVerse"></p>
+        <p class="archive-modal-reflection" id="archiveModalReflection"></p>
+        <div class="archive-modal-prayer" id="archiveModalPrayer"></div>
+        <div class="archive-modal-share">
+            <button onclick="shareArchiveScripture()"><i class="fas fa-share-alt"></i> Share</button>
+            <button class="wa" onclick="whatsappArchiveScripture()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+            <button onclick="downloadArchiveScriptureImage()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);"><i class="fas fa-download"></i> Download</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

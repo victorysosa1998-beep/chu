@@ -29,6 +29,9 @@
         }
 
         if (Notification.permission === 'granted') {
+            const prefs = loadPrefs();
+            prefs.subscribed = true;
+            savePrefs(prefs);
             return { success: true, permission: 'granted' };
         }
 
@@ -88,9 +91,14 @@
         );
     }
 
-    function showDailyScripture() {
-        const scripture = window.COCScripture ? window.COCScripture.getScriptureOfDay() : null;
-        if (!scripture) return false;
+    async function showDailyScripture() {
+        // BUGFIX: getScriptureOfDay() is async (it dynamically imports the
+        // Firebase module), so this must be awaited — otherwise `scripture`
+        // was a pending Promise, the `if (!scripture)` guard never caught it
+        // (a Promise is always truthy), and the notification body rendered
+        // literally as "undefined — undefined".
+        const scripture = window.COCScripture ? await window.COCScripture.getScriptureOfDay() : null;
+        if (!scripture || !scripture.verse) return false;
 
         return showNotification(
             '📖 Scripture of the Day',
@@ -197,6 +205,18 @@
     }
 
     // Register service worker
+    // NOTE: registering /sw.js here is necessary but not sufficient for real
+    // push notifications. True push (the kind that arrives even when no tab
+    // is open) needs: a service worker with a `push` event handler, a Push
+    // subscription (PushManager.subscribe with VAPID keys), and a server
+    // that stores that subscription and sends pushes to it at the right
+    // time. None of that exists yet — scheduleDailyScripture() and
+    // scheduleServiceReminders() below only use setTimeout, which means the
+    // "subscription" only delivers while this exact browser tab is sitting
+    // open at 6:00 AM / service time. Close the tab and nothing fires. This
+    // is fine as an on-page reminder, but it is not a real push subscription
+    // yet — that would require a small backend (e.g. a Vercel cron + web-push
+    // library) sending to stored subscriptions.
     async function registerServiceWorker() {
         if (!('serviceWorker' in navigator)) {
             console.warn('Service workers not supported');
@@ -276,16 +296,28 @@
     }
 
     function enableNotifications() {
-        const prefs = loadPrefs();
-        prefs.subscribed = true;
-        prefs.lastAsked = new Date().toISOString();
-        savePrefs(prefs);
-
         requestPermission().then(result => {
+            const prefs = loadPrefs();
+            // BUGFIX: previously this set subscribed = true *before* asking
+            // the browser for permission, then requestPermission() only
+            // updated prefs in one of its branches. If the person denied
+            // the prompt, isSubscribed() kept returning true even though
+            // Notification.permission was 'denied', so the schedulers
+            // thought the person was getting daily scriptures/reminders
+            // when nothing could actually be delivered. Subscribed status
+            // now always mirrors what the browser actually granted.
+            prefs.subscribed = result.success === true;
+            prefs.lastAsked = new Date().toISOString();
+            savePrefs(prefs);
+
             if (result.success) {
                 showWelcomeNotification('Friend');
                 const container = document.getElementById('notifPrompt');
                 if (container) container.style.display = 'none';
+            } else if (result.reason === 'denied') {
+                alert('Notifications are blocked for this site. Enable them in your browser\'s site settings (the lock/info icon next to the address bar) to receive daily scriptures and service reminders.');
+            } else if (result.reason === 'unsupported') {
+                alert('Your browser does not support push notifications.');
             } else {
                 alert('Please allow notifications in your browser settings to receive updates.');
             }

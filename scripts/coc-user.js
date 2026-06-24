@@ -20,7 +20,7 @@
         testimony_submit: 25,
         sermon_view: 10,
         comment_post: 5,
-        friend_invite: 30,
+        friend_invite: 50,   // Highest point action — invite earns most
         reading_plan_day: 15,
         challenge_join: 10,
         challenge_complete: 50
@@ -36,7 +36,9 @@
         { id: 'community_builder', label: '🤝 Community Builder', desc: 'Posted 10 community items', check: u => (u.posts || 0) >= 10 },
         { id: 'encourager', label: '💛 Encourager', desc: 'Commented on 15 posts', check: u => (u.comments || 0) >= 15 },
         { id: 'centurion', label: '💯 Centurion', desc: 'Earned 100 points', check: u => u.points >= 100 },
-        { id: 'champion', label: '🔥 Champion', desc: 'Earned 500 points', check: u => u.points >= 500 }
+        { id: 'champion', label: '🔥 Champion', desc: 'Earned 500 points', check: u => u.points >= 500 },
+        { id: 'soul_winner', label: '🌟 Soul Winner', desc: 'Won 5 souls for Christ', check: u => (u.soulsWon || 0) >= 5 },
+        { id: 'great_commission', label: '🕊️ Great Commission', desc: 'Invited 10+ people to church', check: u => (u.inviteCount || 0) >= 10 }
     ];
 
     function defaultUser() {
@@ -251,6 +253,42 @@
             user.points += POINTS.comment_post;
             this.checkBadges(user);
             saveUser(user);
+        },
+
+        recordInvite() {
+            let user = loadUser();
+            if (!user) return;
+            user.inviteCount = (user.inviteCount || 0) + 1;
+            user.points += POINTS.friend_invite; // highest-value action
+            this.checkBadges(user);
+            saveUser(user);
+            syncLeaderboard(user);
+            return user;
+        },
+
+        recordSoulWon() {
+            let user = loadUser();
+            if (!user) return;
+            user.soulsWon = (user.soulsWon || 0) + 1;
+            user.points += POINTS.friend_invite;
+            this.checkBadges(user);
+            saveUser(user);
+            syncLeaderboard(user);
+            return user;
+        },
+
+        // When someone taps "like" on your shared streak/invite link
+        recordStreakLike(likerId) {
+            let user = loadUser();
+            if (!user) return;
+            if (!user.inviteStreakLikes) user.inviteStreakLikes = [];
+            if (user.inviteStreakLikes.includes(likerId)) return; // no double counting
+            user.inviteStreakLikes.push(likerId);
+            user.points += POINTS.friend_invite; // confirmed invite = highest points
+            this.checkBadges(user);
+            saveUser(user);
+            syncLeaderboard(user);
+            return user;
         },
 
         recordChallengeComplete() {

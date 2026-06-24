@@ -116,6 +116,8 @@
         .field select:focus, .field input:focus, .field textarea:focus { border-color: var(--red); }
         .field input::placeholder, .field textarea::placeholder { color: var(--text-muted); }
         .field select option { background: var(--bg-card); color: var(--text); }
+        .field-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+
         .submit-btn {
             width: 100%; background: var(--red); color: #fff; font-weight: 700;
             font-family: 'Outfit', sans-serif; padding: 14px; border-radius: 12px; border: none;
@@ -172,6 +174,83 @@
         .t-reacted-label { font-size: 12px; color: var(--text-muted); }
         .empty-msg { text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 14px; }
 
+        /* VIDEO BADGE */
+        .t-video-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(200,16,46,0.12); border: 1px solid rgba(200,16,46,0.25);
+            color: var(--red); font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+            text-transform: uppercase; padding: 3px 10px; border-radius: 100px; margin-bottom: 8px;
+        }
+
+        /* VIDEO PLAYER (same pattern as audio-sermons) */
+        .yt-frame-holder { width: 1px; height: 1px; overflow: hidden; position: absolute; pointer-events: none; }
+        .yt-frame-holder iframe { width: 1px; height: 1px; }
+
+        .v-player-ui {
+            background: var(--bg-card2); border: 1px solid var(--border);
+            border-radius: 14px; overflow: hidden; transition: border-color 0.3s; margin-bottom: 16px;
+        }
+        .v-player-ui.active { border-color: rgba(200,16,46,0.4); }
+
+        /* Thumbnail row */
+        .v-thumb-row {
+            position: relative; width: 100%; aspect-ratio: 16/9; background: #000;
+            cursor: pointer; overflow: hidden;
+        }
+        .v-thumb-row img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.3s; }
+        .v-thumb-row .v-play-overlay {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.35); transition: background 0.2s;
+        }
+        .v-thumb-row:hover .v-play-overlay { background: rgba(0,0,0,0.5); }
+        .v-play-circle {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: #fff; box-shadow: 0 6px 24px rgba(200,16,46,0.5);
+            transition: transform 0.15s;
+        }
+        .v-thumb-row:hover .v-play-circle { transform: scale(1.1); }
+
+        /* Waveform */
+        .v-waveform { display: flex; align-items: center; gap: 2.5px; height: 28px; padding: 0 16px;
+            border-bottom: 1px solid var(--border); }
+        .vb { width: 3px; border-radius: 3px; background: rgba(200,16,46,0.18);
+              transform: scaleY(0.3); transform-origin: center; transition: background 0.3s; flex-shrink: 0; }
+        .v-player-ui.active .vb { background: var(--red); }
+        .v-player-ui.active .vb.go { animation: vb var(--d,0.7s) ease-in-out infinite alternate; }
+        @keyframes vb { from{transform:scaleY(0.2)} to{transform:scaleY(1)} }
+
+        /* Controls */
+        .v-controls { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+        .v-ctrl-btn { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 15px; box-shadow: 0 4px 16px var(--red-glow); transition: all 0.15s; }
+        .v-ctrl-btn:hover { transform: scale(1.1); box-shadow: 0 6px 24px var(--red-glow); }
+        .v-ctrl-btn:active { transform: scale(0.95); }
+        .v-info { flex: 1; min-width: 0; }
+        .v-status { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+        .v-status.live { color: var(--red); }
+        .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red);
+            display: none; animation: blink 1.1s infinite; }
+        .v-status.live .live-dot { display: inline-block; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+        .v-time { font-size: 11px; color: var(--text-dim); margin-top: 3px; font-variant-numeric: tabular-nums; }
+
+        /* Seekbar */
+        .v-seekbar-wrap { padding: 0 16px 14px; }
+        .v-seekbar-track { position: relative; width: 100%; height: 4px; background: rgba(255,255,255,0.07);
+            border-radius: 100px; cursor: pointer; transition: height 0.15s; }
+        .v-seekbar-track:hover { height: 6px; }
+        .v-seekbar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--red), var(--gold));
+            border-radius: 100px; pointer-events: none; transition: width 0.6s linear; }
+        .v-seekbar-thumb { position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%;
+            background: #fff; box-shadow: 0 0 0 2px var(--red); transform: translateY(-50%);
+            opacity: 0; transition: opacity 0.2s; pointer-events: none; left: 0; }
+        .v-seekbar-track:hover .v-seekbar-thumb { opacity: 1; }
+
         /* SKELETON */
         .skeleton-row { height: 14px; background: rgba(255,255,255,0.05); border-radius: 6px; margin-bottom: 10px; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -199,7 +278,6 @@
         </div>
     </nav>
 
-    <!-- Custom Toast Notification -->
     <div id="coc-toast">
         <div class="coc-toast-icon">🔥</div>
         <div class="coc-toast-body">
@@ -225,6 +303,7 @@
                 <p class="sub">Let the world hear what God has done for you.</p>
 
                 <form id="testimonyForm">
+
                     <div class="field">
                         <label>Category</label>
                         <select id="userCategory">
@@ -236,16 +315,19 @@
                             <option value="other">📌 Other</option>
                         </select>
                     </div>
+
                     <div class="field">
                         <label>Full Name</label>
                         <input type="text" id="userName" required placeholder="Enter your name">
                     </div>
+
                     <div class="field">
                         <label>Your Story</label>
-                        <textarea id="userTestimony" required rows="5" placeholder="What is your testimony?"></textarea>
+                        <textarea id="userTestimony" rows="5" placeholder="What is your testimony?"></textarea>
                     </div>
+
                     <button type="submit" id="submitBtn" class="submit-btn">
-                        <span>SHARE TESTIMONY</span>
+                        <span id="submitBtnLabel">SHARE TESTIMONY</span>
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </form>
@@ -278,7 +360,12 @@
         </div>
     </main>
 
+    <!-- ═══════════════════════════════════════
+         NON-MODULE SCRIPTS (globals needed by
+         inline onclick handlers)
+    ═══════════════════════════════════════ -->
     <script>
+        /* ── TOAST ── */
         let cocToastTimer = null;
         function cocShowToast() {
             const toast = document.getElementById('coc-toast');
@@ -311,8 +398,160 @@
                 location.reload();
             }
         }
+
+        /* ══════════════════════════════════════
+           VIDEO PLAYER  (mirrors audio-sermons)
+        ══════════════════════════════════════ */
+        window.onYouTubeIframeAPIReady = function() { /* signals readiness via YT object */ };
+        (function() {
+            const s = document.createElement('script');
+            s.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(s);
+        })();
+
+        function ytReady() { return typeof YT !== 'undefined' && YT.Player; }
+
+        const vtPlayers  = {};   // vtPlayers[vid] = { player, state }
+        let   vtActiveId = null;
+        let   vtTick     = null;
+
+        const VWH = [28,18,32,14,30,22,10,26,16,30,20,12,28,18,24];
+        const VWD = [.65,.9,.7,1.1,.8,.6,1.0,.75,.85,.7,1.2,.9,.6,.8,1.0];
+        function vWaveBars() {
+            return VWH.map((h,i) => `<div class="vb" style="height:${h}px;--d:${VWD[i]}s"></div>`).join('');
+        }
+
+        window.vHandlePlay = function(vid, ytId) {
+            if (!ytReady()) { alert('Player is still loading, please try again.'); return; }
+
+            // Pause any other active player
+            if (vtActiveId && vtActiveId !== vid) {
+                const other = vtPlayers[vtActiveId];
+                if (other && other.player && typeof other.player.pauseVideo === 'function') {
+                    other.player.pauseVideo();
+                }
+                vApplyUI(vtActiveId, 'paused');
+                vtActiveId = null;
+            }
+
+            const entry = vtPlayers[vid];
+            if (!entry) {
+                vApplyUI(vid, 'loading');
+                vCreatePlayer(vid, ytId);
+            } else {
+                const s = entry.player.getPlayerState();
+                if (s === YT.PlayerState.PLAYING) {
+                    entry.player.pauseVideo();
+                } else {
+                    entry.player.playVideo();
+                }
+            }
+        };
+
+        window.vHandleSeek = function(vid, e) {
+            const entry = vtPlayers[vid];
+            if (!entry || typeof entry.player.getDuration !== 'function') return;
+            const track = e.currentTarget;
+            const pct = Math.max(0, Math.min(1, (e.clientX - track.getBoundingClientRect().left) / track.offsetWidth));
+            entry.player.seekTo(pct * entry.player.getDuration(), true);
+        };
+
+        function vCreatePlayer(vid, ytId) {
+            const holder = document.getElementById('vfh-' + vid);
+            if (!holder) return;
+            const div = document.createElement('div');
+            div.id = 'vyp-' + vid;
+            holder.appendChild(div);
+            const player = new YT.Player('vyp-' + vid, {
+                width: '1', height: '1',
+                videoId: ytId,
+                playerVars: { autoplay: 1, rel: 0, modestbranding: 1, playsinline: 1, enablejsapi: 1 },
+                events: {
+                    onReady(e)       { e.target.playVideo(); },
+                    onStateChange(e) { vOnState(vid, e.data); }
+                }
+            });
+            vtPlayers[vid] = { player, ytId, state: 'loading' };
+        }
+
+        function vOnState(vid, data) {
+            const P = YT.PlayerState;
+            const entry = vtPlayers[vid];
+            if (!entry) return;
+            if      (data === P.PLAYING)   { entry.state = 'playing'; vApplyUI(vid, 'playing');  vStartTick(); }
+            else if (data === P.PAUSED)    { entry.state = 'paused';  vApplyUI(vid, 'paused');   }
+            else if (data === P.ENDED)     { entry.state = 'ended';   vApplyUI(vid, 'ended');    vStopTick(); }
+            else if (data === P.BUFFERING) { entry.state = 'loading'; vApplyUI(vid, 'loading');  }
+        }
+
+        function vApplyUI(vid, state) {
+            const btn    = document.getElementById('vcb-' + vid);
+            const ui     = document.getElementById('vui-' + vid);
+            const status = document.getElementById('vst-' + vid);
+            const thumb  = document.getElementById('vth-row-' + vid);
+            if (!btn) return;
+
+            // Clear active state on all video players
+            document.querySelectorAll('.v-player-ui').forEach(u => u.classList.remove('active'));
+            document.querySelectorAll('.vb').forEach(b => b.classList.remove('go'));
+            document.querySelectorAll('.v-status').forEach(s => s.classList.remove('live'));
+
+            if (state === 'playing') {
+                btn.innerHTML = '<i class="fas fa-pause"></i>';
+                status.innerHTML = '<span class="live-dot"></span> Now Playing';
+                status.classList.add('live');
+                ui && ui.classList.add('active');
+                ui && ui.querySelectorAll('.vb').forEach(b => b.classList.add('go'));
+                if (thumb) thumb.style.display = 'none';
+                vtActiveId = vid;
+            } else if (state === 'paused') {
+                btn.innerHTML = '<i class="fas fa-play"></i>';
+                status.innerHTML = '<i class="fas fa-pause" style="font-size:8px;opacity:.6"></i>&nbsp; Paused';
+                vtActiveId = null;
+            } else if (state === 'loading') {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                status.innerHTML = 'Loading…';
+                if (thumb) thumb.style.display = 'none';
+            } else if (state === 'ended') {
+                btn.innerHTML = '<i class="fas fa-redo" style="font-size:13px"></i>';
+                status.innerHTML = 'Finished';
+                vtActiveId = null;
+                vUpdateBar(vid, 100);
+            } else {
+                btn.innerHTML = '<i class="fas fa-play"></i>';
+                status.innerHTML = 'Tap to play';
+            }
+        }
+
+        function vStartTick() {
+            if (vtTick) return;
+            vtTick = setInterval(() => {
+                if (!vtActiveId) return;
+                const e = vtPlayers[vtActiveId];
+                if (!e || typeof e.player.getCurrentTime !== 'function') return;
+                const cur = e.player.getCurrentTime() || 0;
+                const dur = e.player.getDuration()    || 0;
+                vUpdateBar(vtActiveId, dur > 0 ? (cur/dur)*100 : 0, cur, dur);
+            }, 700);
+        }
+        function vStopTick() { clearInterval(vtTick); vtTick = null; }
+
+        function vUpdateBar(vid, pct, cur, dur) {
+            const fill  = document.getElementById('vsf-' + vid);
+            const thumb = document.getElementById('vsth-' + vid);
+            const time  = document.getElementById('vtm-' + vid);
+            if (fill)  fill.style.width = pct + '%';
+            if (thumb) thumb.style.left = pct + '%';
+            if (time && cur !== undefined) {
+                const fmt = s => { s=Math.floor(s); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+                time.textContent = fmt(cur) + (dur ? ' / ' + fmt(dur) : '');
+            }
+        }
     </script>
 
+    <!-- ═══════════════════════════════════════
+         FIREBASE MODULE
+    ═══════════════════════════════════════ -->
     <script type="module">
         import { initializeApp }          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAnalytics }           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
@@ -337,9 +576,40 @@
         const db     = getFirestore(app);
         const colRef = collection(db, 'testimonies');
 
+        /* ═══════════════════════════════════════════════════════
+           VIDEO TESTIMONIES — added directly in code
+           ───────────────────────────────────────────────────────
+           When you upload a new testimony video to YouTube, add
+           an entry here with its video ID. It will show up in the
+           feed automatically, mixed in with the written testimonies,
+           sorted by date, filterable by category, and reactable —
+           exactly like a normal testimony.
+
+           Fields:
+             id        - unique string, must start with "static-"
+                         (e.g. "static-2", "static-3", ...)
+             name      - person's name
+             category  - healing | provision | deliverance | salvation | restoration | other
+             content   - optional short description (can be "")
+             youtubeId - the video ID from the YouTube URL
+                         e.g. youtube.com/watch?v=bU9zGxLEJWI -> "bU9zGxLEJWI"
+             date      - "YYYY-MM-DD", used only to order it in the feed
+
+           To remove one, just delete its object from this array.
+           ═══════════════════════════════════════════════════════ */
+        const VIDEO_TESTIMONIES = [
+            // {
+            //     id:        'static-1',
+            //     name:      'Sister Grace',
+            //     category:  'healing',
+            //     content:   'God healed me completely after the doctors gave up.',
+            //     youtubeId: 'bU9zGxLEJWI',
+            //     date:      '2026-06-20'
+            // },
+        ];
+
         const ADMIN_UID = 'tAqH3t6DX4OxHadWurRcBFBhmQA3';
 
-        // Watch Firebase Auth state — show admin UI only if UID matches
         onAuthStateChanged(auth, user => {
             if (user && user.uid === ADMIN_UID) {
                 sessionStorage.setItem('coc_admin', 'true');
@@ -354,7 +624,6 @@
             }
         });
 
-        // Expose logout so inline onclick can reach it
         window.cocAdminLogout = async function() {
             if (!confirm('Sign out of admin mode?')) return;
             await signOut(auth);
@@ -373,11 +642,13 @@
             try {
                 await addDoc(colRef, {
                     name:      document.getElementById('userName').value.trim(),
+                    type:      'text',
                     content:   document.getElementById('userTestimony').value.trim(),
                     category:  document.getElementById('userCategory').value,
                     fireCount: 0,
                     createdAt: serverTimestamp()
                 });
+
                 document.getElementById('testimonyForm').reset();
                 cocShowToast();
             } catch (err) {
@@ -386,17 +657,16 @@
             }
 
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<span>SHARE TESTIMONY</span> <i class="fas fa-paper-plane"></i>';
+            submitBtn.innerHTML = '<span id="submitBtnLabel">SHARE TESTIMONY</span> <i class="fas fa-paper-plane"></i>';
         });
 
         /* ── REAL-TIME FEED ── */
         const q = query(colRef, orderBy('createdAt', 'desc'));
 
         let allTestimonies = [];
-        let currentFilter = 'all';
-        const reactedSet = new Set(JSON.parse(sessionStorage.getItem('coc_reacted') || '[]'));
+        let currentFilter  = 'all';
+        const reactedSet   = new Set(JSON.parse(sessionStorage.getItem('coc_reacted') || '[]'));
 
-        // Filter chip logic
         document.getElementById('filterChips').addEventListener('click', e => {
             const chip = e.target.closest('.filter-chip');
             if (!chip) return;
@@ -409,10 +679,62 @@
         const CAT_CLASS = { healing:'cat-healing', provision:'cat-provision', deliverance:'cat-deliverance', salvation:'cat-salvation', restoration:'cat-restoration', other:'cat-other' };
         const CAT_LABEL = { healing:'Healing', provision:'Provision', deliverance:'Deliverance', salvation:'Salvation', restoration:'Restoration', other:'Other' };
 
+        function esc(s) { return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function vPlayerHTML(vid, ytId) {
+            return `
+                <div class="yt-frame-holder" id="vfh-${vid}"></div>
+                <div class="v-player-ui" id="vui-${vid}">
+                    <div class="v-thumb-row" id="vth-row-${vid}" onclick="vHandlePlay('${vid}','${ytId}')">
+                        <img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" alt="Video thumbnail" loading="lazy">
+                        <div class="v-play-overlay"><div class="v-play-circle"><i class="fas fa-play"></i></div></div>
+                    </div>
+                    <div class="v-waveform">${vWaveBars()}</div>
+                    <div class="v-controls">
+                        <button class="v-ctrl-btn" id="vcb-${vid}" onclick="vHandlePlay('${vid}','${ytId}')">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="v-info">
+                            <div class="v-status" id="vst-${vid}">Tap to play</div>
+                            <div class="v-time"  id="vtm-${vid}">0:00</div>
+                        </div>
+                    </div>
+                    <div class="v-seekbar-wrap">
+                        <div class="v-seekbar-track" onclick="vHandleSeek('${vid}',event)">
+                            <div class="v-seekbar-fill"  id="vsf-${vid}"></div>
+                            <div class="v-seekbar-thumb" id="vsth-${vid}"></div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function getCombinedEntries() {
+            const videoEntries = VIDEO_TESTIMONIES.map(v => ({
+                id: v.id,
+                data: {
+                    name:      v.name,
+                    type:      'video',
+                    youtubeId: v.youtubeId,
+                    content:   v.content || '',
+                    category:  v.category || 'other',
+                    fireCount: v.fireCount || 0,
+                    createdAt: { toDate: () => new Date(v.date) }
+                }
+            }));
+            return [...allTestimonies, ...videoEntries].sort((a, b) => {
+                const da = a.data.createdAt && a.data.createdAt.toDate ? a.data.createdAt.toDate() : new Date(0);
+                const db_ = b.data.createdAt && b.data.createdAt.toDate ? b.data.createdAt.toDate() : new Date(0);
+                return db_ - da;
+            });
+        }
+
         function renderTestimonies() {
-            const list = document.getElementById('testimoniesList');
+            const list       = document.getElementById('testimoniesList');
             const countBadge = document.getElementById('count');
-            const filtered = currentFilter === 'all' ? allTestimonies : allTestimonies.filter(t => (t.data.category || 'other') === currentFilter);
+            const combined   = getCombinedEntries();
+            const filtered   = currentFilter === 'all'
+                ? combined
+                : combined.filter(t => (t.data.category || 'other') === currentFilter);
 
             if (filtered.length === 0) {
                 list.innerHTML = '<p class="empty-msg">No testimonies yet in this category.</p>';
@@ -421,34 +743,41 @@
             }
 
             let html = '';
-            filtered.forEach(({ id: docId, data }) => {
+            filtered.forEach(({ id: docId, data }, idx) => {
                 const date = data.createdAt
                     ? data.createdAt.toDate().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
                     : 'Just now';
-                const safeName    = data.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                const safeContent = data.content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                const cat         = data.category || 'other';
-                const catClass    = CAT_CLASS[cat] || 'cat-other';
-                const catLabel    = CAT_LABEL[cat] || 'Other';
-                const fireCount   = data.fireCount || 0;
-                const hasReacted  = reactedSet.has(docId);
+                const cat       = data.category || 'other';
+                const catClass  = CAT_CLASS[cat] || 'cat-other';
+                const catLabel  = CAT_LABEL[cat] || 'Other';
+                const fireCount = data.fireCount || 0;
+                const hasReacted = reactedSet.has(docId);
+                const isVideo   = data.type === 'video' && data.youtubeId;
+                const isStatic  = docId.startsWith('static-');
+                const vid       = 'v' + idx;
+
+                const bodyHTML = isVideo
+                    ? `<span class="t-video-badge"><i class="fab fa-youtube"></i> Video Testimony</span>
+                       ${data.content ? `<p class="t-content" style="margin-bottom:12px;">"${esc(data.content)}"</p>` : ''}
+                       ${vPlayerHTML(vid, esc(data.youtubeId))}`
+                    : `<p class="t-content">"${esc(data.content)}"</p>`;
 
                 html += `
                     <div class="testimony-card" id="tc-${docId}">
                         <div class="t-top">
                             <div>
                                 <span class="cat-chip ${catClass}">${catLabel}</span>
-                                <div class="t-name">${safeName}</div>
+                                <div class="t-name">${esc(data.name)}</div>
                                 <div class="t-date">${date}</div>
                             </div>
                             <div style="display:flex;align-items:center;gap:10px;">
-                                <button class="admin-delete-btn" onclick="deleteTestimony('${docId}')">
+                                ${!isStatic ? `<button class="admin-delete-btn" onclick="deleteTestimony('${docId}')">
                                     <i class="fas fa-trash-alt"></i> Delete
-                                </button>
-                                <div class="t-quote-icon"><i class="fas fa-quote-right"></i></div>
+                                </button>` : ''}
+                                ${!isVideo ? '<div class="t-quote-icon"><i class="fas fa-quote-right"></i></div>' : ''}
                             </div>
                         </div>
-                        <p class="t-content">"${safeContent}"</p>
+                        ${bodyHTML}
                         <div class="t-bottom">
                             <button class="reaction-btn ${hasReacted ? 'reacted' : ''}" onclick="reactToTestimony('${docId}', this)" ${hasReacted ? 'disabled' : ''}>
                                 🔥 <span id="fire-${docId}">${fireCount}</span>
@@ -462,6 +791,8 @@
             countBadge.innerText = `${filtered.length} ${filtered.length === 1 ? 'STORY' : 'STORIES'}`;
         }
 
+        renderTestimonies(); // show any code-based videos immediately, before Firestore responds
+
         onSnapshot(q, (snapshot) => {
             allTestimonies = snapshot.docs.map(d => ({ id: d.id, data: d.data() }));
             renderTestimonies();
@@ -471,7 +802,7 @@
                 '<p class="empty-msg">Could not load testimonies. Please refresh.</p>';
         });
 
-        /* ── REACT (Fire emoji) ── */
+        /* ── REACT ── */
         window.reactToTestimony = async function(docId, btn) {
             if (reactedSet.has(docId)) return;
             reactedSet.add(docId);
@@ -480,13 +811,14 @@
             btn.disabled = true;
             const el = document.getElementById('fire-' + docId);
             if (el) el.textContent = parseInt(el.textContent || 0) + 1;
+            if (docId.startsWith('static-')) return; // code-based video — count is local-only
             try {
                 const { updateDoc, doc, increment } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
                 await updateDoc(doc(db, 'testimonies', docId), { fireCount: increment(1) });
             } catch(e) { console.error(e); }
         };
 
-        /* ── DELETE (Firebase Auth required by Firestore rules) ── */
+        /* ── DELETE ── */
         window.deleteTestimony = async function(docId) {
             if (!confirm('Delete this testimony? This cannot be undone.')) return;
             try {
