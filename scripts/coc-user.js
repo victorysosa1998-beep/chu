@@ -10,6 +10,15 @@
     const FEED_KEY = 'coc_activity_feed';
     const NOTIF_KEY = 'coc_notification_prefs';
 
+    const FIREBASE_CFG = {
+        apiKey: 'AIzaSyB2gU2QrpRnIevjhLqd1kTj-xsjiWBHGqQ',
+        authDomain: 'joincoc.firebaseapp.com',
+        projectId: 'joincoc',
+        storageBucket: 'joincoc.firebasestorage.app',
+        messagingSenderId: '322343274719',
+        appId: '1:322343274719:web:689229a5dd1ca422c9c16a'
+    };
+
     // Points configuration
     const POINTS = {
         daily_visit: 5,
@@ -98,6 +107,27 @@
         } catch {}
     }
 
+    // Push an event to Firestore communityFeed so ALL users see it in real time
+    function pushFirestoreFeed(payload) {
+        try {
+            Promise.all([
+                import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
+                import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
+            ]).then(([{ initializeApp, getApps, getApp }, { getFirestore, collection, addDoc, serverTimestamp }]) => {
+                const app = getApps().length ? getApp() : initializeApp(FIREBASE_CFG);
+                const db  = getFirestore(app);
+                addDoc(collection(db, 'communityFeed'), {
+                    likes: 0,
+                    commentCount: 0,
+                    pinned: false,
+                    pinnedBy: null,
+                    ...payload,
+                    createdAt: serverTimestamp()
+                }).catch(() => {});
+            }).catch(() => {});
+        } catch {}
+    }
+
     // Sync current user's score to Firestore leaderboard collection
     function syncLeaderboard(user) {
         if (!user || !user.displayName) return;
@@ -106,15 +136,7 @@
                 import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
                 import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
             ]).then(([{ initializeApp, getApps, getApp }, { getFirestore, doc, setDoc }]) => {
-                const cfg = {
-                    apiKey: 'AIzaSyB2gU2QrpRnIevjhLqd1kTj-xsjiWBHGqQ',
-                    authDomain: 'joincoc.firebaseapp.com',
-                    projectId: 'joincoc',
-                    storageBucket: 'joincoc.firebasestorage.app',
-                    messagingSenderId: '322343274719',
-                    appId: '1:322343274719:web:689229a5dd1ca422c9c16a'
-                };
-                const app = getApps().length ? getApp() : initializeApp(cfg);
+                const app = getApps().length ? getApp() : initializeApp(FIREBASE_CFG);
                 const db  = getFirestore(app);
                 setDoc(doc(db, 'leaderboard', user.id), {
                     name:      user.displayName,
@@ -140,7 +162,18 @@
             user.displayName = displayName.trim() || 'Friend';
             user.role = role;
             saveUser(user);
+
+            // Local feed (for this device's widget)
             pushFeed({ type: 'join', name: user.displayName });
+
+            // ✅ FIX: Push join event to Firestore so every user sees it
+            pushFirestoreFeed({
+                type: 'join',
+                name: user.displayName,
+                content: `${user.displayName} just joined the COC family! 🎉`,
+                creatorId: user.id
+            });
+
             return user;
         },
 
@@ -166,6 +199,14 @@
                 const newBadges = this.checkBadges(user);
                 if (newBadges.length > 0) {
                     pushFeed({ type: 'badge', name: user.displayName, badge: newBadges[0].label });
+                    // ✅ Also push badge earn to Firestore
+                    pushFirestoreFeed({
+                        type: 'badge',
+                        name: user.displayName,
+                        content: `${user.displayName} earned the ${newBadges[0].label} badge!`,
+                        badge: newBadges[0].label,
+                        creatorId: user.id
+                    });
                 }
 
                 saveUser(user);
@@ -185,7 +226,17 @@
                 this.checkBadges(user);
                 saveUser(user);
                 syncLeaderboard(user);
+
+                // Local feed
                 pushFeed({ type: 'scripture', name: user.displayName });
+
+                // ✅ Also push to Firestore
+                pushFirestoreFeed({
+                    type: 'scripture',
+                    name: user.displayName,
+                    content: `${user.displayName} read today's scripture 📖`,
+                    creatorId: user.id
+                });
             }
         },
 
@@ -200,6 +251,12 @@
                 user.perfectStreak = (user.perfectStreak || 0) + 1;
                 user.points += POINTS.quiz_perfect;
                 pushFeed({ type: 'quiz_perfect', name: user.displayName });
+                pushFirestoreFeed({
+                    type: 'quiz_perfect',
+                    name: user.displayName,
+                    content: `${user.displayName} scored 100% on today's quiz! 🧠`,
+                    creatorId: user.id
+                });
             } else {
                 user.perfectStreak = 0;
             }
@@ -226,7 +283,14 @@
             this.checkBadges(user);
             saveUser(user);
             syncLeaderboard(user);
+
             pushFeed({ type: 'testimony', name: user.displayName });
+            pushFirestoreFeed({
+                type: 'testimony',
+                name: user.displayName,
+                content: `${user.displayName} shared a testimony ✨`,
+                creatorId: user.id
+            });
         },
 
         recordSermonView() {

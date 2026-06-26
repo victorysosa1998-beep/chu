@@ -89,9 +89,26 @@ async function getTodaysScripture() {
 }
 
 export default async function handler(req, res) {
-    // Simple secret check so random people can't trigger mass pushes
-    const secret = req.headers['x-cron-secret'] ?? req.query.secret;
-    if (secret !== process.env.CRON_SECRET) {
+    // Vercel Cron automatically sends your CRON_SECRET as an
+    // "Authorization: Bearer <CRON_SECRET>" header — it does NOT send a
+    // custom "x-cron-secret" header or a "?secret=" query param. The old
+    // check here looked for headers Vercel never sends, so it was always
+    // undefined and every real cron invocation was rejected with 401,
+    // silently, every day. That's why no push notifications ever went out
+    // even though the cron itself was firing on schedule.
+    //
+    // We check the standard Authorization header (what Vercel actually
+    // sends) and keep the old header/query checks only as a fallback for
+    // manual/local testing (e.g. curl -H "x-cron-secret: ..." or ?secret=).
+    const expected = process.env.CRON_SECRET;
+    const authHeader = req.headers.authorization || '';
+    const legacySecret = req.headers['x-cron-secret'] ?? req.query.secret;
+
+    const authorized =
+        !!expected &&
+        (authHeader === `Bearer ${expected}` || legacySecret === expected);
+
+    if (!authorized) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 

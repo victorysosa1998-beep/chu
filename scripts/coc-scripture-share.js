@@ -110,11 +110,18 @@
                 width:100%;margin-bottom:60px;position:relative;z-index:1;">
                 <!-- Church badge -->
                 <div style="display:flex;align-items:center;gap:18px;">
-                    <div style="width:56px;height:56px;border-radius:14px;flex-shrink:0;
+                    <div style="width:72px;height:72px;border-radius:50%;flex-shrink:0;
                         background:linear-gradient(135deg,#c8102e,#8b0000);
                         display:flex;align-items:center;justify-content:center;
-                        font-size:14px;font-weight:900;color:#f0c842;
-                        font-family:'Bebas Neue',Arial Narrow,sans-serif;letter-spacing:0.05em;">COC</div>
+                        overflow:hidden;border:2px solid rgba(240,200,66,0.35);">
+                        <img src="/media/logo1.png"
+                             crossorigin="anonymous"
+                             style="width:100%;height:100%;object-fit:contain;"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+                        <span style="display:none;width:100%;height:100%;align-items:center;
+                            justify-content:center;font-size:14px;font-weight:900;color:#f0c842;
+                            font-family:'Bebas Neue',Arial Narrow,sans-serif;letter-spacing:0.05em;">COC</span>
+                    </div>
                     <div>
                         <div style="font-family:'Bebas Neue',Arial Narrow,sans-serif;font-size:20px;
                             color:#f0c842;letter-spacing:0.18em;text-transform:uppercase;line-height:1.2;">
@@ -185,6 +192,15 @@
         const card = buildCard(scripture);
         host.appendChild(card);
 
+        // Wait for the logo image to load (or fail) before capturing
+        const logoImg = card.querySelector('img[src="/media/logo1.png"]');
+        if (logoImg && !logoImg.complete) {
+            await new Promise(resolve => {
+                logoImg.onload  = resolve;
+                logoImg.onerror = resolve;          // still proceed if 404
+                setTimeout(resolve, 3000);          // hard timeout safety net
+            });
+        }
         // one rAF so the browser paints the card before html2canvas reads it
         await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 

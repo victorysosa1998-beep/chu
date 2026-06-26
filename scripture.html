@@ -559,9 +559,12 @@
             await addDoc(commentsRef, { name, text, createdAt: serverTimestamp() });
             if (window.COCUser) window.COCUser.recordComment();
         } catch(e) {
-            console.error(e);
-            showToast('⚠️ Could not post comment.');
-            input.value = text;
+            console.error('addComment error:', e);
+            const msg = e?.code === 'permission-denied'
+                ? '⚠️ Permission denied. Ask admin to update Firestore rules.'
+                : '⚠️ Could not post comment. Please try again.';
+            showToast(msg);
+            input.value = text; // restore text so user doesn't lose it
         } finally {
             if (btn) btn.disabled = false;
         }
@@ -721,7 +724,13 @@
         const q = query(commentsRef, orderBy('createdAt', 'asc'));
         onSnapshot(q, snap => {
             renderComments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-        }, err => console.warn(err));
+        }, err => {
+            console.warn('Comments snapshot error:', err);
+            if (err?.code === 'permission-denied') {
+                const c = document.getElementById('commentSection');
+                if (c) c.innerHTML = '<div class="empty-state" style="color:#c8102e;">⚠️ Comments blocked by Firestore rules. Add <code>match /scriptures/{d}</code> rule to fix.</div>';
+            }
+        });
 
         if (window.COCUser) {
             const user = window.COCUser.getUser();
