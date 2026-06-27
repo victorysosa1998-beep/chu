@@ -182,6 +182,31 @@
         footer a { color: var(--text-muted); text-decoration: none; }
         footer a:hover { color: var(--red); }
 
+        /* ── 3-DOT MENU ── */
+        .card-menu-wrap { position: relative; flex-shrink: 0; }
+        .card-menu-btn {
+            background: none; border: none; color: var(--text-muted); cursor: pointer;
+            padding: 6px 8px; border-radius: 8px; font-size: 16px; line-height: 1;
+            transition: background 0.2s, color 0.2s;
+        }
+        .card-menu-btn:hover { background: rgba(255,255,255,0.07); color: var(--text); }
+        .card-menu-dropdown {
+            display: none; position: absolute; right: 0; top: calc(100% + 4px);
+            background: #1e1e21; border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 12px; padding: 6px; min-width: 190px;
+            z-index: 200; box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+        }
+        .card-menu-dropdown.open { display: block; }
+        .card-menu-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; color: var(--text); text-decoration: none;
+            border-radius: 8px; font-size: 13px; font-family: 'Inter', sans-serif;
+            cursor: pointer; background: none; border: none; width: 100%; text-align: left;
+            transition: background 0.15s;
+        }
+        .card-menu-item:hover { background: rgba(255,255,255,0.07); }
+        .card-menu-item i { width: 15px; text-align: center; flex-shrink: 0; }
+
         @media (max-width: 900px) {
             nav { padding: 0 16px; }
             .hero { padding: 56px 16px 48px; }
@@ -478,6 +503,36 @@ function waveBars() {
 }
 
 /* ════════════════════════════════
+   3-DOT MENU HELPERS
+   ════════════════════════════════ */
+function toggleMenu(id, e) {
+    e.stopPropagation();
+    // Close every other open menu first
+    document.querySelectorAll('.card-menu-dropdown').forEach(m => {
+        if (m.id !== id) m.classList.remove('open');
+    });
+    const menu = document.getElementById(id);
+    if (menu) menu.classList.toggle('open');
+}
+
+function shareSermon(title, ytId) {
+    const url = 'https://youtu.be/' + ytId;
+    const text = '🔥 Listen to "' + title + '" — ' + url + '\n\nCity of Champions International Assembly';
+    if (navigator.share) {
+        navigator.share({ title: title, text: text, url: url }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(text)
+            .then(() => alert('✅ Link copied to clipboard!'))
+            .catch(() => prompt('Copy this link:', url));
+    }
+}
+
+// Close any open menu when clicking anywhere else on the page
+document.addEventListener('click', () => {
+    document.querySelectorAll('.card-menu-dropdown.open').forEach(m => m.classList.remove('open'));
+});
+
+/* ════════════════════════════════
    FILTER / RENDER
    ════════════════════════════════ */
 let currentFilter = 'all';
@@ -558,6 +613,23 @@ function renderAudioSermons() {
                     <div class="audio-series">${esc(catLabel)}</div>
                     <div class="audio-title">${esc(a.title)}</div>
                 </div>
+                ${ytId ? `
+                <div class="card-menu-wrap">
+                    <button class="card-menu-btn" onclick="toggleMenu('cm-${cid}', event)" title="Options">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="card-menu-dropdown" id="cm-${cid}">
+                        <a class="card-menu-item" href="https://www.youtube.com/watch?v=${ytId}" target="_blank" rel="noopener">
+                            <i class="fas fa-download" style="color:var(--red);"></i> Download Audio
+                        </a>
+                        <a class="card-menu-item" href="https://youtu.be/${ytId}" target="_blank" rel="noopener">
+                            <i class="fab fa-youtube" style="color:#ff0000;"></i> Watch on YouTube
+                        </a>
+                        <button class="card-menu-item" onclick="shareSermon('${esc(a.title)}','${ytId}');document.getElementById('cm-${cid}').classList.remove('open');">
+                            <i class="fas fa-share-alt" style="color:var(--gold);"></i> Share
+                        </button>
+                    </div>
+                </div>` : ''}
             </div>
             <div class="audio-body">
                 <div class="audio-meta">

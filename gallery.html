@@ -842,6 +842,19 @@
             <div class="lightbox-caption" id="lightboxCaption"></div>
             <div class="lightbox-counter" id="lightboxCounter"></div>
             <div class="lb-swipe-hint"><i class="fas fa-arrows-left-right" style="font-size:9px"></i> Swipe to navigate</div>
+            <!-- Download + Share actions -->
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap;">
+                <a id="lbDownloadBtn" href="#" download
+                   style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:100px;color:#f0f0f2;font-size:12px;font-weight:700;font-family:'Inter',sans-serif;text-decoration:none;transition:background 0.2s;"
+                   onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">
+                    <i class="fas fa-download" style="color:var(--gold);font-size:11px;"></i> Save Photo
+                </a>
+                <button onclick="shareCurrentPhoto()"
+                   style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(200,16,46,0.15);border:1px solid rgba(200,16,46,0.3);border-radius:100px;color:#f0f0f2;font-size:12px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.2s;"
+                   onmouseover="this.style.background='rgba(200,16,46,0.28)'" onmouseout="this.style.background='rgba(200,16,46,0.15)'">
+                    <i class="fas fa-share-alt" style="color:var(--red);font-size:11px;"></i> Share
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -880,16 +893,25 @@
     }
 
     function renderLightbox(list) {
-        const item = list[currentIndex];
-        const img = item.querySelector('.photo-frame img');
-        const tag = item.querySelector('.gallery-tag').textContent;
-        const caption = item.querySelector('.gallery-caption').textContent;
+        const item    = list[currentIndex];
+        const img     = item.querySelector('.photo-frame img');
+        const tag     = item.querySelector('.gallery-tag')?.textContent?.trim()    || '';
+        const caption = item.querySelector('.gallery-caption')?.textContent?.trim() || '';
+        const src     = img ? img.src : '';
 
-        document.getElementById('lightboxImg').src = img.src;
-        document.getElementById('lightboxImg').alt = caption;
-        document.getElementById('lightboxTag').textContent = tag;
+        document.getElementById('lightboxImg').src       = src;
+        document.getElementById('lightboxImg').alt       = caption || tag;
+        document.getElementById('lightboxTag').textContent     = tag;
         document.getElementById('lightboxCaption').textContent = caption;
         document.getElementById('lightboxCounter').textContent = (currentIndex + 1) + ' / ' + list.length;
+
+        // Update download link
+        const dlBtn = document.getElementById('lbDownloadBtn');
+        if (dlBtn) {
+            dlBtn.href     = src;
+            dlBtn.download = (caption || tag || 'coc-photo') + '.jpg';
+            dlBtn.title    = caption || tag || 'Download photo';
+        }
     }
 
     function navLightbox(dir) {
@@ -901,6 +923,20 @@
     function closeLightbox() {
         document.getElementById('lightbox').classList.remove('show');
         document.body.style.overflow = '';
+    }
+
+    function shareCurrentPhoto() {
+        const img     = document.getElementById('lightboxImg');
+        const caption = document.getElementById('lightboxCaption').textContent.trim();
+        const tag     = document.getElementById('lightboxTag').textContent.trim();
+        const text    = (caption || tag || 'COC Gallery') + ' — City of Champions International Assembly\nhttps://joincoc.com/gallery.html';
+        if (navigator.share) {
+            navigator.share({ title: caption || 'COC Photo', text: text, url: 'https://joincoc.com/gallery.html' }).catch(() => {});
+        } else {
+            navigator.clipboard.writeText(text)
+                .then(() => alert('✅ Link copied!'))
+                .catch(() => prompt('Copy this:', text));
+        }
     }
 
     document.addEventListener('keydown', (e) => {

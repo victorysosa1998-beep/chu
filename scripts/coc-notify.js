@@ -326,33 +326,67 @@
     }
 
     function enableNotifications() {
+        // Immediately show a loading state on the button
+        const container = document.getElementById('notifPrompt');
+        if (container) {
+            const btn = container.querySelector('button');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enabling…';
+            }
+        }
+
         requestPermission().then(result => {
             const prefs = loadPrefs();
-            // BUGFIX: previously this set subscribed = true *before* asking
-            // the browser for permission, then requestPermission() only
-            // updated prefs in one of its branches. If the person denied
-            // the prompt, isSubscribed() kept returning true even though
-            // Notification.permission was 'denied', so the schedulers
-            // thought the person was getting daily scriptures/reminders
-            // when nothing could actually be delivered. Subscribed status
-            // now always mirrors what the browser actually granted.
+            // Subscribed status always mirrors what the browser actually granted —
+            // never assume granted before the promise resolves.
             prefs.subscribed = result.success === true;
             prefs.lastAsked = new Date().toISOString();
             savePrefs(prefs);
 
             if (result.success) {
+                // Fire a welcome notification to confirm it's working
                 showWelcomeNotification('Friend');
-                // Now that permission is granted, create the real push
-                // subscription and save it to the server so 6 AM cron works.
+
+                // Create the real push subscription and register with Firestore
+                // so the 6 AM cron job can deliver daily scriptures.
                 registerServiceWorker();
-                const container = document.getElementById('notifPrompt');
-                if (container) container.style.display = 'none';
+
+                // Show a ✅ confirmation banner, then fade it out after 3.5 s
+                if (container) {
+                    container.innerHTML = `
+                        <div style="background:linear-gradient(135deg,#0a0a0a,#051a05);border:1px solid rgba(34,197,94,0.3);border-radius:16px;padding:16px 24px;display:flex;align-items:center;gap:14px;" id="notifSuccessBanner">
+                            <div style="width:40px;height:40px;border-radius:12px;background:rgba(34,197,94,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">✅</div>
+                            <div>
+                                <div style="color:#4ade80;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;">You're subscribed!</div>
+                                <div style="color:rgba(255,255,255,0.45);font-size:12px;font-family:'Inter',sans-serif;">You'll receive daily scriptures &amp; service reminders.</div>
+                            </div>
+                        </div>`;
+                    // Fade then hide
+                    setTimeout(() => {
+                        const banner = document.getElementById('notifSuccessBanner');
+                        if (banner) {
+                            banner.style.transition = 'opacity 0.6s';
+                            banner.style.opacity = '0';
+                        }
+                        setTimeout(() => { if (container) container.style.display = 'none'; }, 700);
+                    }, 3500);
+                }
             } else if (result.reason === 'denied') {
-                alert('Notifications are blocked for this site. Enable them in your browser\'s site settings (the lock/info icon next to the address bar) to receive daily scriptures and service reminders.');
+                // Restore the subscribe prompt, add a non-blocking hint below it
+                if (container) {
+                    showSubscriptionPrompt('notifPrompt');
+                    const msg = document.createElement('div');
+                    msg.style.cssText = 'margin-top:8px;padding:10px 16px;background:rgba(200,16,46,0.08);border:1px solid rgba(200,16,46,0.2);border-radius:10px;font-size:12px;color:rgba(255,120,120,0.9);font-family:"Inter",sans-serif;line-height:1.5;';
+                    msg.innerHTML = '🔒 Notifications blocked. Tap the 🔒 or ⓘ next to your address bar → Site settings → Notifications → <strong>Allow</strong>, then try again.';
+                    container.appendChild(msg);
+                    setTimeout(() => msg.remove(), 9000);
+                }
             } else if (result.reason === 'unsupported') {
-                alert('Your browser does not support push notifications.');
+                if (container) container.style.display = 'none';
             } else {
-                alert('Please allow notifications in your browser settings to receive updates.');
+                // Generic fallback — restore the prompt
+                if (container) showSubscriptionPrompt('notifPrompt');
             }
         });
     }

@@ -2131,10 +2131,125 @@ TONE: Warm, welcoming, faith-affirming. If unsure, direct to WhatsApp or email. 
                 window.COCScripture.renderScriptureWidget('scriptureWidget');
             }
 
-            // Render feed widget
-            if (window.COCFeed) {
-                window.COCFeed.renderFeedWidget('feedWidget', 5);
-            }
+            // Render feed widget — live from Firestore so ALL browsers/devices see each other
+            (async () => {
+                const container = document.getElementById('feedWidget');
+                if (!container) return;
+
+                // Show a skeleton while Firestore loads
+                container.innerHTML = `
+                    <div style="background:#111113;border-radius:16px;border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
+                        <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
+                            <div>
+                                <span style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;color:#f0f0f2;">🔥 Community Activity</span>
+                                <span style="font-size:10px;color:#c8102e;margin-left:8px;font-weight:700;letter-spacing:0.1em;">LIVE</span>
+                            </div>
+                            <a href="/community.html" style="font-size:11px;color:#c8102e;font-weight:700;text-decoration:none;font-family:'Inter',sans-serif;">View All →</a>
+                        </div>
+                        <div style="padding:20px 16px;text-align:center;color:#5a5a68;font-size:12px;">Loading…</div>
+                    </div>`;
+
+                try {
+                    const FIREBASE_CFG = {
+                        apiKey: 'AIzaSyB2gU2QrpRnIevjhLqd1kTj-xsjiWBHGqQ',
+                        authDomain: 'joincoc.firebaseapp.com',
+                        projectId: 'joincoc',
+                        storageBucket: 'joincoc.firebasestorage.app',
+                        messagingSenderId: '322343274719',
+                        appId: '1:322343274719:web:689229a5dd1ca422c9c16a'
+                    };
+
+                    const [{ initializeApp, getApps, getApp }, { getFirestore, collection, query, orderBy, limit, onSnapshot }] =
+                        await Promise.all([
+                            import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
+                            import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
+                        ]);
+
+                    const app = getApps().length ? getApp() : initializeApp(FIREBASE_CFG);
+                    const db  = getFirestore(app);
+
+                    const q = query(
+                        collection(db, 'communityFeed'),
+                        orderBy('createdAt', 'desc'),
+                        limit(8)
+                    );
+
+                    const TYPE_MAP = {
+                        join:         { icon: '🎉', text: (n)    => `<strong style="color:#f0f0f2">${n}</strong> joined the COC family!` },
+                        badge:        { icon: '🏆', text: (n, d) => `<strong style="color:#f0f0f2">${n}</strong> earned <em>${d.badge || 'a badge'}</em>` },
+                        quiz_perfect: { icon: '🧠', text: (n)    => `<strong style="color:#f0f0f2">${n}</strong> scored 100% on the quiz!` },
+                        testimony:    { icon: '✨', text: (n)    => `<strong style="color:#f0f0f2">${n}</strong> shared a testimony` },
+                        scripture:    { icon: '📖', text: (n)    => `<strong style="color:#f0f0f2">${n}</strong> read today's scripture` },
+                        streak:       { icon: '🔥', text: (n, d) => `<strong style="color:#f0f0f2">${n}</strong> hit a ${d.streak || ''}-day streak` },
+                        post:         { icon: '💬', text: (n)    => `<strong style="color:#f0f0f2">${n}</strong> posted in the community` },
+                        reaction:     { icon: '🙏', text: (n)    => `<strong style="color:#f0f0f2">${n}</strong> reacted to a post` },
+                        challenge:    { icon: '💪', text: (n, d) => `<strong style="color:#f0f0f2">${n}</strong> completed the ${d.challenge || ''} challenge` },
+                    };
+
+                    function timeAgo(ts) {
+                        if (!ts) return '';
+                        const ms = ts.toMillis ? ts.toMillis() : (typeof ts === 'number' ? ts : Date.now());
+                        const diff = Date.now() - ms;
+                        if (diff < 60000)    return 'just now';
+                        if (diff < 3600000)  return Math.floor(diff / 60000) + 'm ago';
+                        if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+                        return Math.floor(diff / 86400000) + 'd ago';
+                    }
+
+                    function buildWidget(snap) {
+                        if (snap.empty) {
+                            container.innerHTML = `
+                                <div style="background:#111113;border-radius:16px;border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
+                                    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
+                                        <div>
+                                            <span style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;color:#f0f0f2;">🔥 Community Activity</span>
+                                            <span style="font-size:10px;color:#c8102e;margin-left:8px;font-weight:700;letter-spacing:0.1em;">LIVE</span>
+                                        </div>
+                                        <a href="/community.html" style="font-size:11px;color:#c8102e;font-weight:700;text-decoration:none;font-family:'Inter',sans-serif;">View All →</a>
+                                    </div>
+                                    <div style="padding:30px 10px;text-align:center;color:#5a5a68;">
+                                        <div style="font-size:1.5rem;margin-bottom:8px;">🌟</div>
+                                        <p style="font-size:13px;font-family:'Inter',sans-serif;">No activity yet. Be the first to start the feed!</p>
+                                    </div>
+                                </div>`;
+                            return;
+                        }
+
+                        const rows = snap.docs.map(doc => {
+                            const d   = doc.data();
+                            const fmt = TYPE_MAP[d.type] || { icon: '📌', text: (n) => `<strong style="color:#f0f0f2">${n}</strong> was active` };
+                            const name = d.name || 'Someone';
+                            return `
+                                <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.04);">
+                                    <span style="font-size:16px;flex-shrink:0;">${fmt.icon}</span>
+                                    <span style="flex:1;font-size:13px;color:#9999a8;line-height:1.4;font-family:'Inter',sans-serif;">${fmt.text(name, d)}</span>
+                                    <span style="font-size:10px;color:#4a4a58;white-space:nowrap;font-family:'Inter',sans-serif;">${timeAgo(d.createdAt)}</span>
+                                </div>`;
+                        }).join('');
+
+                        container.innerHTML = `
+                            <div style="background:#111113;border-radius:16px;border:1px solid rgba(255,255,255,0.07);overflow:hidden;">
+                                <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
+                                    <div>
+                                        <span style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;color:#f0f0f2;">🔥 Community Activity</span>
+                                        <span style="font-size:10px;color:#c8102e;margin-left:8px;font-weight:700;letter-spacing:0.1em;">LIVE</span>
+                                    </div>
+                                    <a href="/community.html" style="font-size:11px;color:#c8102e;font-weight:700;text-decoration:none;font-family:'Inter',sans-serif;">View All →</a>
+                                </div>
+                                <div>${rows}</div>
+                            </div>`;
+                    }
+
+                    // Real-time listener — widget updates instantly when anyone joins from any browser
+                    onSnapshot(q, buildWidget);
+
+                } catch (err) {
+                    console.warn('Live feed failed, falling back to local feed:', err);
+                    if (window.COCFeed) {
+                        window.COCFeed.renderFeedWidget('feedWidget', 5);
+                    }
+                }
+            })();
 
             // Show notification prompt
             if (window.COCNotify) {
