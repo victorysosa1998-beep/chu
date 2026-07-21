@@ -148,7 +148,10 @@
         }
     }
 
-    function recordVisit() {
+    async function recordVisit() {
+        if (window.COCUser && window.COCUser.syncFromCloud) {
+            await window.COCUser.syncFromCloud();
+        }
         const user = window.COCUser.recordVisit();
         if (user) {
             window.location.reload();

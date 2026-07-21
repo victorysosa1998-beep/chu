@@ -107,6 +107,73 @@
         } catch {}
     }
 
+    // Cache the Firebase app/db handle so every sync/pull call doesn't
+    // re-import + re-initialize the SDK from scratch.
+    let _dbPromise = null;
+    function getDb() {
+        if (!_dbPromise) {
+            _dbPromise = Promise.all([
+                import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js'),
+                import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js')
+            ]).then(([{ initializeApp, getApps, getApp }, firestoreMod]) => {
+                const app = getApps().length ? getApp() : initializeApp(FIREBASE_CFG);
+                return { db: firestoreMod.getFirestore(app), firestoreMod };
+            });
+        }
+        return _dbPromise;
+    }
+
+    // Pull the CANONICAL score down from Firestore and reconcile it into
+    // localStorage. This is what was missing: every write path in this file
+    // pushes local -> Firestore (setDoc merge), but nothing ever pulled
+    // Firestore -> local. So an admin edit/delete in the Firestore console
+    // got silently overwritten the next time the user did anything, because
+    // syncLeaderboard() would just re-push the stale localStorage value.
+    //
+    // Call this once, early, on every page load — BEFORE recordVisit() or
+    // any other action that calls syncLeaderboard() — so local state is
+    // corrected first and only THEN re-synced upward.
+    async function syncFromCloud() {
+        const user = loadUser();
+        if (!user || !user.id) return user;
+
+        try {
+            const { db, firestoreMod } = await getDb();
+            const snap = await firestoreMod.getDoc(firestoreMod.doc(db, 'leaderboard', user.id));
+
+            if (snap.exists()) {
+                const remote = snap.data();
+                if (typeof remote.points === 'number') user.points = remote.points;
+                if (typeof remote.streak === 'number') user.streak = remote.streak;
+                if (remote.role) user.role = remote.role;
+                // Leaderboard docs only store a badge COUNT, not the badge
+                // list, so we can't know which specific badges to drop if
+                // the remote count is lower — trim from the end as a
+                // best-effort reconciliation rather than leaving mismatched
+                // badges that no longer match the remote points total.
+                if (typeof remote.badges === 'number' && remote.badges < user.badges.length) {
+                    user.badges = user.badges.slice(0, remote.badges);
+                }
+            } else {
+                // No leaderboard doc for this user id — most likely an
+                // admin deleted it on purpose. Treat that as a real reset
+                // instead of letting the stale local copy win.
+                user.points = 0;
+                user.streak = 0;
+                user.longestStreak = 0;
+                user.badges = [];
+            }
+
+            saveUser(user);
+        } catch (e) {
+            // Offline / blocked / etc — fall back to whatever's local
+            // rather than breaking the page.
+            console.warn('syncFromCloud failed, using local data:', e);
+        }
+
+        return user;
+    }
+
     // Push an event to Firestore communityFeed so ALL users see it in real time
     function pushFirestoreFeed(payload) {
         try {
@@ -156,6 +223,12 @@
 
         getUser: loadUser,
         saveUser: saveUser,
+
+        // Pull the authoritative score/streak/role down from Firestore and
+        // reconcile it into localStorage. Pages should await this once on
+        // load, before calling recordVisit() or anything else that writes
+        // back up — otherwise a stale local value just gets re-pushed.
+        syncFromCloud,
 
         createUser(displayName, role = 'Visitor') {
             const user = defaultUser();

@@ -289,7 +289,7 @@
 
 <script type="module">
     import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, onSnapshot, query, orderBy, limit }
+    import { getFirestore, collection, doc, getDoc, setDoc, onSnapshot, query, orderBy, limit }
         from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -308,10 +308,14 @@
     async function syncUserToFirestore() {
         const user = window.COCUser ? window.COCUser.getUser() : null;
         if (!user || !user.displayName) return;
-        const pts = window.COCPoints ? window.COCPoints.getPoints() : { total: user.points || 0 };
+        // user.points is what COCUser.syncFromCloud() just reconciled against
+        // Firestore (called in init() below, before this runs). COCPoints
+        // tracks a SEPARATE local total that never gets corrected the same
+        // way, so it must not be allowed to override the reconciled value —
+        // that was silently re-introducing stale/deleted scores too.
         try {
             await setDoc(doc(db, 'leaderboard', user.id), {
-                name: user.displayName, points: pts.total || user.points || 0,
+                name: user.displayName, points: user.points || 0,
                 streak: user.streak || 0, badges: user.badges ? user.badges.length : 0,
                 role: user.role || 'Visitor', updatedAt: new Date().toISOString()
             }, { merge: true });
@@ -400,8 +404,15 @@
         }).join('');
     }
 
-    function init() {
-        syncUserToFirestore();
+    async function init() {
+        // Pull the authoritative score down from Firestore into localStorage
+        // FIRST. Only after local state matches Firestore is it safe to push
+        // back up — otherwise a stale localStorage value just overwrites
+        // whatever was corrected/deleted in the Firestore console.
+        if (window.COCUser && window.COCUser.syncFromCloud) {
+            await window.COCUser.syncFromCloud();
+        }
+        await syncUserToFirestore();
         const q = query(collection(db, 'leaderboard'), orderBy('points', 'desc'), limit(50));
         onSnapshot(q, (snapshot) => {
             renderLeaderboard(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
