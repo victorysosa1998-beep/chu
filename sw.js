@@ -3,7 +3,10 @@
  * Deploy at: /sw.js
  */
 
-const CACHE_NAME = 'coc-v2';
+const CACHE_NAME = 'coc-v3';   // bumped from coc-v2 — forces old cached
+                                // scripts (including stale coc-user.js /
+                                // leaderboard.html logic) out of every
+                                // visitor's browser on next load.
 const OFFLINE_URLS = [
     '/',
     '/index.html',
@@ -53,6 +56,32 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    const url = new URL(event.request.url);
+    // Code/markup that changes app behavior (scripts + HTML pages) must
+    // always be fetched fresh first — cache-first on these was exactly why
+    // a fixed coc-user.js kept getting served stale after deployment.
+    // Only fall back to cache if the network is genuinely unavailable.
+    const isCodeOrMarkup = url.pathname.endsWith('.js') || url.pathname.endsWith('.html') || url.pathname === '/';
+
+    if (isCodeOrMarkup) {
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    if (response && response.status === 200) {
+                        const clone = response.clone();
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.put(event.request, clone))
+                            .catch(() => {});
+                    }
+                    return response;
+                })
+                .catch(() => caches.match(event.request).then(cached => cached || caches.match('/index.html')))
+        );
+        return;
+    }
+
+    // Static assets (images, fonts, etc.) — cache-first is fine here since
+    // they don't carry app logic that needs to update instantly.
     event.respondWith(
         caches.match(event.request)
             .then(cached => {
